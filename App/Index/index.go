@@ -10,9 +10,9 @@ func Index(c *gin.Context) {
 }
 
 func Home1(c *gin.Context) {
-	c.String(http.StatusOK, "home1 page")
+	c.String(http.StatusOK, "Home1 page")
 }
 
 func Home2(c *gin.Context) {
-	c.String(http.StatusOK, "home2 page")
+	c.String(http.StatusOK, "Home2 page")
 }
