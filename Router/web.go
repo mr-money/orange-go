@@ -7,12 +7,12 @@ import (
 )
 
 //
-// Api
-// @Description: api路由
+// Web
+// @Description: 默认路由
 // @param r
 // @return *gin.Engine
 //
-func Api(r *gin.Engine) {
+func Web(r *gin.Engine) {
 	//绑定路由规则，执行的函数
 	r.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "hello World!")
