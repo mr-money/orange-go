@@ -1,9 +1,6 @@
 package main
 
-import (
-	"github.com/gin-gonic/gin"
-	"go-study/Router"
-)
+import "go-study/Routes"
 
 //
 //  main
@@ -11,13 +8,15 @@ import (
 //
 func main() {
 	// 创建路由引擎
-	r := gin.Default()
+	//r := gin.Default()
 
-	//默认web路由
-	Router.Web(r)
+	// 加载路由配置
+	Routes.Include(
+		Routes.Web, //默认web路由
+		Routes.Api) //TODO api路由，需要token中间件验证
 
-	//api路由，需要token中间件验证
-	//Router.Api(r)
+	// 初始化路由
+	r := Routes.Init()
 
 	// 监听端口，默认在8080
 	// Run(":8000")
