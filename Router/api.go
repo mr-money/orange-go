@@ -2,6 +2,7 @@ package Router
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-study/Controller/Index"
 	"net/http"
 )
 
@@ -16,5 +17,15 @@ func Router(r *gin.Engine) {
 	r.GET("/", func(c *gin.Context) {
 		c.String(http.StatusOK, "hello World!")
 	})
+
+	//关联控制器
+	r.GET("/index/index", Index.Index)
+
+	//路由组
+	group := r.Group("/group")
+	{
+		group.GET("/home1", Index.Home1)
+		group.GET("/home2", Index.Home2)
+	}
 
 }
