@@ -3,6 +3,7 @@ package Routes
 import (
 	"github.com/gin-gonic/gin"
 	"go-study/App/Index"
+	"go-study/MiddleWare"
 	"net/http"
 )
 
@@ -28,4 +29,6 @@ func Web(r *gin.Engine) {
 		group.GET("/home2", Index.Home2)
 	}
 
+	//中间件
+	r.Use(MiddleWare.Middle()).GET("/middleware", Index.Middle)
 }
