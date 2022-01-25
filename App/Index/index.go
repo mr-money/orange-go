@@ -2,7 +2,9 @@ package Index
 
 import (
 	"fmt"
+	"github.com/BurntSushi/toml"
 	"github.com/gin-gonic/gin"
+	"go-study/Config"
 	"net/http"
 )
 
@@ -23,4 +25,19 @@ func Middle(c *gin.Context) {
 	fmt.Println("request:", req)
 	// 页面接收
 	c.JSON(200, gin.H{"request": req})
+}
+
+func Conf(c *gin.Context) {
+	var webConfig Config.Web
+
+	_, err := toml.DecodeFile("G:/GoPath/src/go-study/Config/web.toml", &webConfig)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println("config")
+	fmt.Println(webConfig)
+	c.JSON(200, gin.H{"config": webConfig})
+
 }
