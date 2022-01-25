@@ -4,17 +4,19 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-//var configFile = map[string]string{
-//	"Web": "web.toml",
-//}
+var configDir = "./Config/"
 
-var _ConfigDir_ = "./Config/"
+var configs = []interface{}{}
+
+func Include(conf ...interface{}) {
+	configs = append(configs, conf...)
+}
 
 func Init() {
 	var webConfig Web
 
 	//读取配置
-	_, err := toml.DecodeFile(_ConfigDir_+"web.toml", &webConfig)
+	_, err := toml.DecodeFile(configDir+"web.toml", &webConfig)
 	if err != nil {
 		//fmt.Println(err)
 		panic(err)

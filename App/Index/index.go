@@ -30,7 +30,7 @@ func Middle(c *gin.Context) {
 func Conf(c *gin.Context) {
 	var webConfig Config.Web
 
-	_, err := toml.DecodeFile("G:/GoPath/src/go-study/Config/web.toml", &webConfig)
+	_, err := toml.DecodeFile("./Config/web.toml", &webConfig)
 	if err != nil {
 		fmt.Println(err)
 		return
