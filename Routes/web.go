@@ -30,5 +30,8 @@ func Web(r *gin.Engine) {
 	}
 
 	//中间件
-	r.Use(MiddleWare.Middle()).GET("/middleware", Index.Middle)
+	r.GET("/middleware", MiddleWare.Middle(), Index.Middle)
+
+	//配置
+	r.GET("/conf", Index.Conf)
 }

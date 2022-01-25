@@ -1,9 +1,9 @@
 [COMMON]
 
-[[DB]]
+[DB]
     [DB.local]
         host = "127.0.0.1"
-        port = "3306"
+        port = 3306
         db_name = "go_gin"
         user = "root"
         pwd = ""
@@ -11,7 +11,7 @@
         charest = "utf8"
         type = "mysqli"
 
-[[REDIS]]
+[REDIS]
     [REDIS.local]
         host = "127.0.0.1"
         port = "6379"
