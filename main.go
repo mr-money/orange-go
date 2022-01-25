@@ -10,6 +10,9 @@ import (
 //  @Description: 入口
 //
 func main() {
+	//加载配置
+	//Config.Include(Config.Web)
+
 	//初始化配置
 	Config.Init()
 
