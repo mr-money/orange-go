@@ -8,7 +8,7 @@ var configDir = "./Config/"
 
 var configs = []interface{}{}
 
-func Include(conf interface{}) {
+func Include(conf ...interface{}) {
 	configs = append(configs, conf)
 }
 

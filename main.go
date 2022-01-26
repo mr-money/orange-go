@@ -11,7 +11,9 @@ import (
 //
 func main() {
 	//加载配置
-	//Config.Include(Config.Web)
+	var webConfig Config.Web
+
+	Config.Include(webConfig)
 
 	//初始化配置
 	Config.Init()
