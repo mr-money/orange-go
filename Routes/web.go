@@ -34,4 +34,7 @@ func Web(r *gin.Engine) {
 
 	//配置
 	r.GET("/conf", Index.Conf)
+
+	//数据库连接
+	r.POST("/database", Index.Database)
 }

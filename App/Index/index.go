@@ -5,6 +5,8 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/gin-gonic/gin"
 	"go-study/Config"
+	"go-study/Library/Gorm"
+	"go-study/Model"
 	"net/http"
 )
 
@@ -39,5 +41,26 @@ func Conf(c *gin.Context) {
 	fmt.Println("config")
 	fmt.Println(webConfig)
 	c.JSON(200, gin.H{"config": webConfig})
+
+}
+
+func Database(c *gin.Context) {
+	var webConfig Config.Web
+
+	_, err := toml.DecodeFile("./Config/web.toml", &webConfig)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	db := Gorm.Connect()
+
+	var user Model.User
+	db.Raw("select * from user where id = 1").Scan(&user)
+
+	c.JSON(200, gin.H{
+		"config": webConfig,
+		"user":   user,
+	})
 
 }
