@@ -2,8 +2,11 @@ package Model
 
 import (
 	"go-study/Library/Gorm"
+	"gorm.io/gorm"
 	"time"
 )
+
+var tableName = "user"
 
 type User struct {
 	ID        uint64
@@ -13,8 +16,9 @@ type User struct {
 	DeletedAt time.Time
 }
 
-func init() {
+var UserModel *gorm.DB
 
-	var userModel User
-	Gorm.Connect().Model(&userModel)
+func init() {
+	var user User
+	UserModel = Gorm.DBInstance.Table(tableName).Model(&user)
 }
