@@ -1,21 +1,34 @@
 package Config
 
-import "github.com/BurntSushi/toml"
+import (
+	"fmt"
+	"github.com/BurntSushi/toml"
+	"reflect"
+)
 
-var configDir = "./Config/"
+var configDir = "./Config"
 
-var configs = []interface{}{}
+// Configs 全局配置内容
+var Configs = []interface{}{}
 
-func Include(conf ...interface{}) {
-	configs = append(configs, conf)
+//
+// Include
+// @Description: 初始化配置文件
+// @param configs
+//
+func Include(configs ...interface{}) {
+	for _, conf := range configs {
+		//反射获取conf文件名
+		ds := reflect.ValueOf(conf)
+		confFile := fmt.Sprintf("%v/%v.toml", configDir, ds.FieldByName("FileName"))
 
-	var webConfig Web
+		_, confErr := toml.DecodeFile(confFile, &conf)
 
-	//读取配置
-	_, err := toml.DecodeFile(configDir+"web.toml", &webConfig)
-	if err != nil {
-		//fmt.Println(err)
-		panic(err)
-		return
+		if confErr != nil {
+			panic(confErr.Error())
+			return
+		}
+
+		Configs = append(Configs, conf)
 	}
 }

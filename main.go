@@ -12,6 +12,7 @@ import (
 func main() {
 	//加载配置
 	var webConfig Config.Web
+	webConfig.FileName = "web"
 
 	Config.Include(webConfig)
 
