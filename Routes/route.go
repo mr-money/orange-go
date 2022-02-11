@@ -2,10 +2,12 @@ package Routes
 
 import "github.com/gin-gonic/gin"
 
-type Option func(*gin.Engine)
+// Option 路由配置
+type option func(*gin.Engine)
 
-var options = []Option{}
+var options = []option{}
 
+// GinEngine 全局gin.Engine
 var GinEngine *gin.Engine
 
 //
@@ -13,11 +15,16 @@ var GinEngine *gin.Engine
 // @Description: 注册app的路由配置
 // @param opts
 //
-func Include(opts ...Option) {
+func Include(opts ...option) {
 	options = append(options, opts...)
 	GinEngine = newGin()
 }
 
+//
+// newGin
+// @Description: 创建gin Engine
+// @return r
+//
 func newGin() (r *gin.Engine) {
 	r = gin.New()
 	for _, opt := range options {
