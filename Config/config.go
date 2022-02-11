@@ -1,8 +1,6 @@
 package Config
 
-import (
-	"github.com/BurntSushi/toml"
-)
+import "github.com/BurntSushi/toml"
 
 var configDir = "./Config/"
 
@@ -10,9 +8,7 @@ var configs = []interface{}{}
 
 func Include(conf ...interface{}) {
 	configs = append(configs, conf)
-}
 
-func Init() {
 	var webConfig Web
 
 	//读取配置
@@ -22,5 +18,4 @@ func Init() {
 		panic(err)
 		return
 	}
-
 }
