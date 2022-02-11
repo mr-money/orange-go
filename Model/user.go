@@ -6,8 +6,13 @@ import (
 	"time"
 )
 
+//表名
 var tableName = "user"
 
+//
+// User
+// @Description: 表字段结构体
+//
 type User struct {
 	ID        uint64
 	Name      string
