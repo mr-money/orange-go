@@ -6,6 +6,8 @@ type Option func(*gin.Engine)
 
 var options = []Option{}
 
+var GinEngine *gin.Engine
+
 //
 // Include
 // @Description: 注册app的路由配置
@@ -13,17 +15,14 @@ var options = []Option{}
 //
 func Include(opts ...Option) {
 	options = append(options, opts...)
+	GinEngine = newGin()
 }
 
-//
-// Init
-// @Description: 初始化路由
-// @return *gin.Engine
-//
-func Init() *gin.Engine {
-	r := gin.New()
+func newGin() (r *gin.Engine) {
+	r = gin.New()
 	for _, opt := range options {
 		opt(r)
 	}
-	return r
+
+	return
 }
