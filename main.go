@@ -15,7 +15,7 @@ func main() {
 
 	Config.Include(webConfig)
 
-	// 加载路由配置
+	// 加载路由
 	Routes.Include(
 		Routes.Web, //默认web路由
 		Routes.Api) //TODO api路由，需要token中间件验证
@@ -23,9 +23,5 @@ func main() {
 	//
 	//// 监听端口，默认在8080
 	// Run(":8000")
-	err := Routes.GinEngine.Run()
-	if err != nil {
-		panic(err.Error())
-		return
-	}
+	_ = Routes.GinEngine.Run()
 }
