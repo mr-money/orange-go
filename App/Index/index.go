@@ -45,28 +45,18 @@ func Conf(c *gin.Context) {
 }
 
 func Database(c *gin.Context) {
-	//var webConfig Config.Web
-	//
-	//_, err := toml.DecodeFile("./Config/web.toml", &webConfig)
-	//if err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
-	//
-	//db := Gorm.Connect()
-	//
-	//var user Model.User
-	//db.Raw("select * from user where id = 1").Scan(&user)
-	//
-	//c.JSON(200, gin.H{
-	//	"config": webConfig,
-	//	"user":   user,
-	//})
+	/*var webConfig Config.Web
+	_, err := toml.DecodeFile("./Config/web.toml", &webConfig)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}*/
 
 	var userInfo Model.User
 	userInfo = User.FindById(1)
 
 	c.JSON(200, gin.H{
-		"user": userInfo,
+		"config": Config.Configs,
+		"user":   userInfo,
 	})
 }
