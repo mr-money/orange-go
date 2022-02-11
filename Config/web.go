@@ -1,8 +1,9 @@
 package Config
 
 type Web struct {
-	Common interface{} `toml:"COMMON"`
-	DB     map[string]struct {
+	FileName string
+	Common   interface{} `toml:"COMMON"`
+	DB       map[string]struct {
 		Host    string `toml:"host"`
 		Port    uint16 `toml:"port"`
 		DbName  string `toml:"db_name"`
