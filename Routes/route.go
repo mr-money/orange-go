@@ -10,7 +10,6 @@ var options = []option{}
 // GinEngine 全局gin.Engine
 var GinEngine *gin.Engine
 
-//
 // Include
 // @Description: 注册app的路由配置
 // @param opts
@@ -20,8 +19,6 @@ func Include(opts ...option) {
 	GinEngine = newGin()
 }
 
-//
-// newGin
 // @Description: 创建gin Engine
 // @return r
 //
