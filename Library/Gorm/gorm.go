@@ -65,3 +65,5 @@ func connect() *gorm.DB {
 	return db
 
 }
+
+//todo AutoMigrate自动建表 https://blog.csdn.net/qq_39787367/article/details/112567822
