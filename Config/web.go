@@ -10,7 +10,7 @@ type Web struct {
 		User    string `toml:"user"`
 		Pwd     string `toml:"pwd"`
 		Prefix  string `toml:"prefix"`
-		Charest string `toml:"charest"`
+		Charset string `toml:"charset"`
 		Type    string `toml:"type"`
 	} `toml:"DB"`
 	Redis struct {

@@ -56,7 +56,7 @@ func Database(c *gin.Context) {
 	userInfo = User.FindById(1)
 
 	c.JSON(200, gin.H{
-		"config": Config.Configs,
+		"config": Config.Configs.Web,
 		"user":   userInfo,
 	})
 }
