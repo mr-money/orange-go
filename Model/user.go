@@ -25,5 +25,5 @@ var UserModel *gorm.DB
 
 func init() {
 	var user User
-	UserModel = Gorm.DBInstance.Table(tableName).Model(&user)
+	UserModel = Gorm.Mysql.Table(tableName).Model(&user)
 }
