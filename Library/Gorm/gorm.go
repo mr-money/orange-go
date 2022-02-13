@@ -5,19 +5,19 @@ import (
 	"gorm.io/gorm"
 )
 
-// DB database instance
-var DBInstance *gorm.DB
+// Mysql 本地数据库链接
+var Mysql *gorm.DB
 
 func init() {
-	DBInstance = connect()
+	Mysql = connectMysql()
 }
 
 //
-// Connect
-// @Description: 数据库连接
+// connectMysql
+// @Description: 默认mysql数据库连接
 // @return *gorm.DB
 //
-func connect() *gorm.DB {
+func connectMysql() *gorm.DB {
 	dsn := "root:root@(127.0.0.1:3306)/go_gin?charset=utf8mb4&parseTime=True&loc=Local"
 	db, dbErr := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if dbErr != nil {
