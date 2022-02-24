@@ -1,6 +1,8 @@
 package Gorm
 
 import (
+	"fmt"
+	"go-study/Config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -24,7 +26,9 @@ func connectMysql() *gorm.DB {
 		panic(dbErr)
 	}
 
-	//todo Config.Configs[0] 切片config获取值
+	//todo issue init先跑了数据库连接再跑的配置初始化
+
+	fmt.Println("Web---------", Config.Configs.Web)
 
 	/*	var db *gorm.DB
 		dbConf := reflect.ValueOf(Config.Configs[0]).FieldByName("DB")

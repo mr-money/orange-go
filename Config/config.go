@@ -62,7 +62,7 @@ func getConfFileName(confRef reflect.Value) string {
 //  @param conf
 //
 func putConfStruct(confRef reflect.Value, conf interface{}) {
-	fmt.Println("---------", conf)
+	//fmt.Println("---------", conf)
 
 	switch getConfFileName(confRef) {
 	case "Config.Web": //默认web配置
