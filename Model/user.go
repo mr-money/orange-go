@@ -14,11 +14,11 @@ var tableName = "user"
 // @Description: 表字段结构体
 //
 type User struct {
-	ID        uint64
-	Name      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt time.Time
+	ID        uint64     `gorm:"column:id;primaryKey;autoIncrement" json:"id"`
+	Name      string     `gorm:"column:name;" json:"name"`
+	CreatedAt *time.Time `gorm:"column:created_at;" json:"created_at"`
+	UpdatedAt *time.Time `gorm:"column:updated_at;" json:"updated_at"`
+	DeletedAt *time.Time `gorm:"column:deleted_at;" json:"-"`
 }
 
 var UserModel *gorm.DB
