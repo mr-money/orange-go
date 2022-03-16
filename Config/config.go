@@ -14,6 +14,14 @@ var Configs struct {
 	Web Web
 }
 
+func init() {
+	//加载配置
+	var webConfig Web
+	webConfig.FileName = "web"
+
+	Include(webConfig)
+}
+
 //
 // Include
 // @Description: 初始化配置文件
@@ -67,8 +75,6 @@ func putConfStruct(confRef reflect.Value, conf interface{}) {
 	switch getConfFileName(confRef) {
 	case "Config.Web": //默认web配置
 		_ = mapstructure.Decode(conf, &Configs.Web)
-
-		fmt.Println("---------", Configs.Web)
 
 		break
 	}

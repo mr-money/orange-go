@@ -1,19 +1,16 @@
 [COMMON]
 
 [DB]
-    [DB.local]
-        host = "127.0.0.1"
-        port = 3306
-        db_name = "go_gin"
-        user = "root"
-        pwd = ""
-        prefix = ""
-        charest = "utf8"
-        type = "mysqli"
-
+    host = "127.0.0.1"
+    port = "3306"
+    dbName = "go_gin"
+    user = "root"
+    pwd = "root"
+    prefix = ""
+    charset = "utf8"
+    type = "mysqli"
 [REDIS]
-    [REDIS.local]
-        host = "127.0.0.1"
-        port = 6379
-        db = 0
-        prefix = ""
+    host = "127.0.0.1"
+    port = "6379"
+    db = "0"
+    prefix = ""
