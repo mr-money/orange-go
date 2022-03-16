@@ -37,4 +37,12 @@ func Web(r *gin.Engine) {
 
 	//数据库连接
 	r.POST("/database", Index.Database)
+
+	////////////////////////////////
+
+	//根据id获取用户信息
+	user := r.Group("/user")
+	{
+		user.GET("/userInfo", Index.GetUserInfo)
+	}
 }
