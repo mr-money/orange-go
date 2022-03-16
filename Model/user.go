@@ -26,4 +26,5 @@ var UserModel *gorm.DB
 func init() {
 	var user User
 	UserModel = Gorm.Mysql.Table(tableName).Model(&user)
+
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"go-study/Config"
 	"go-study/Routes"
 )
 
@@ -10,12 +9,6 @@ import (
 //  @Description: 入口
 //
 func main() {
-	//加载配置
-	var webConfig Config.Web
-	webConfig.FileName = "web"
-
-	Config.Include(webConfig)
-
 	// 加载路由
 	Routes.Include(
 		Routes.Web, //默认web路由

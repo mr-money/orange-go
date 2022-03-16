@@ -5,8 +5,8 @@ type Web struct {
 	Common   interface{} `toml:"COMMON"`
 	DB       struct {
 		Host    string `toml:"host"`
-		Port    uint16 `toml:"port"`
-		DbName  string `toml:"db_name"`
+		Port    string `toml:"port"`
+		DbName  string `toml:"dbName"`
 		User    string `toml:"user"`
 		Pwd     string `toml:"pwd"`
 		Prefix  string `toml:"prefix"`
@@ -15,8 +15,8 @@ type Web struct {
 	} `toml:"DB"`
 	Redis struct {
 		Host   string `toml:"host"`
-		Port   uint16 `toml:"port"`
-		Db     uint8  `toml:"db"`
+		Port   string `toml:"port"`
+		Db     string `toml:"db"`
 		Pwd    string `toml:"pwd"`
 		Prefix string `toml:"prefix"`
 	} `toml:"REDIS"`
