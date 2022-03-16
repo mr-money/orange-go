@@ -1,7 +1,13 @@
 package main
 
 import (
+	"context"
 	"go-study/Routes"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"time"
 )
 
 //
@@ -17,5 +23,45 @@ func main() {
 	//
 	//// 监听端口，默认在8080
 	// Run(":8000")
-	_ = Routes.GinEngine.Run()
+	//_ = Routes.GinEngine.Run()
+
+	//优雅关闭
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: Routes.GinEngine,
+	}
+
+	shutdown(srv)
+}
+
+//
+// shutdown
+// @Description: 优雅关闭服务
+// @param srv
+//
+func shutdown(srv *http.Server) {
+	go func() {
+		// service connections
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+
+	// Wait for interrupt signal to gracefully shutdown the server with
+	// a timeout of 5 seconds.
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	log.Println("Shutdown Server ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server Shutdown:", err)
+	}
+	select {
+	case <-ctx.Done():
+		log.Println("timeout of 5 seconds.")
+	}
+	log.Println("Server exiting")
 }
