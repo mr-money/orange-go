@@ -6,7 +6,7 @@ import (
 
 func FindById(id uint64) (userInfo Model.User) {
 
-	Model.UserModel.Where("id = ?", id).First(&userInfo)
+	Model.UserModel().Take(&userInfo, id)
 
 	return
 }
