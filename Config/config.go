@@ -7,7 +7,7 @@ import (
 	"reflect"
 )
 
-var configDir = "./Config"
+var tomlDir = "./Config/toml"
 
 // Configs 全局配置内容
 var Configs struct {
@@ -50,7 +50,7 @@ func Include(configs ...interface{}) {
 //  @return string
 //
 func getConfStructName(confRef reflect.Value) string {
-	return fmt.Sprintf("%v/%v.toml", configDir, confRef.FieldByName("FileName"))
+	return fmt.Sprintf("%v/%v.toml", tomlDir, confRef.FieldByName("FileName"))
 }
 
 //
