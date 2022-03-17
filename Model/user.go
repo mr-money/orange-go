@@ -21,10 +21,10 @@ type User struct {
 	DeletedAt *Library.Time `gorm:"column:deleted_at;" json:"-"`
 }
 
-var UserModel *gorm.DB
-
-func init() {
-	var user User
-	UserModel = Gorm.Mysql.Table(tableName).Model(&user)
-
+// UserModel
+// @Description: 初始化model
+// @return *gorm.DB
+//
+func UserModel() *gorm.DB {
+	return Gorm.Mysql.Table(tableName)
 }
