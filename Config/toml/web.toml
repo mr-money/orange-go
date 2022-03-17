@@ -1,0 +1,16 @@
+[COMMON]
+
+[DB]
+    host = "127.0.0.1"
+    port = "3306"
+    dbName = "go_gin"
+    user = "root"
+    pwd = "root"
+    prefix = ""
+    charset = "utf8"
+    type = "mysqli"
+[REDIS]
+    host = "127.0.0.1"
+    port = "6379"
+    db = "0"
+    prefix = ""
