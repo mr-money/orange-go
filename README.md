@@ -1,6 +1,6 @@
 # go-study
 
-##简介
+## 简介
 > 基于gin开发的微服务web框架，使用ddd领域驱动设计思想为基础架构思想  
 > 架构分层为 Model->Repository->Service->App  
 > 数据库连接池基于gorm开发  
