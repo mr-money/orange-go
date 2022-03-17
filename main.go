@@ -61,7 +61,7 @@ func shutdown(srv *http.Server) {
 	}
 	select {
 	case <-ctx.Done():
-		log.Println("timeout of 5 seconds.")
+		log.Println("timeout of 3 seconds.")
 	}
 	log.Println("Server exiting")
 }
