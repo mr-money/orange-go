@@ -17,8 +17,8 @@
 > 支持路由组 中间件 路由规则等方式
 
 ### 配置文件
-> 默认配置文件 /Config/web.toml.default  
->- 同级目录复制 /Config/web.toml.default文件，并修改后缀名为.toml  
+> 默认配置文件 /Config/toml/web.toml.default  
+>- 同级目录复制 /Config/toml/web.toml.default文件，并修改后缀名为.toml  
    同级目录新建web.go 并写入与配置文件结构相同的struct  
    同级目录config.go中init方法内初始化配置的struct
 

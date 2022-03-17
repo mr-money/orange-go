@@ -1,4 +1,4 @@
-package Library
+package MyTime
 
 import (
 	"database/sql/driver"

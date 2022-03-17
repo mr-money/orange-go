@@ -44,5 +44,6 @@ func Web(r *gin.Engine) {
 	user := r.Group("/user")
 	{
 		user.GET("/userInfo", Index.GetUserInfo)
+		user.GET("/add", Index.Add)
 	}
 }
