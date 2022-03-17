@@ -16,10 +16,10 @@ var tableName = "user"
 //
 type User struct {
 	ID        uint64       `gorm:"column:id;primaryKey;autoIncrement" json:"id"`
-	Uuid      uuid.UUID    `gorm:"column:uuid;uniqueIndex:user_uuid_uindex" json:"uuid"`
-	Name      string       `gorm:"column:name;" json:"name"`
-	CreatedAt *MyTime.Time `gorm:"column:created_at;index:user_created_at_index" json:"created_at"`
-	UpdatedAt *MyTime.Time `gorm:"column:updated_at;index:user_updated_at_index" json:"updated_at"`
+	Uuid      uuid.UUID    `gorm:"column:uuid;not null;default:'';uniqueIndex:user_uuid_uindex;comment:'全局唯一标识'" json:"uuid"`
+	Name      string       `gorm:"column:name;;not null;default:'';comment:'用户名'" json:"name"`
+	CreatedAt *MyTime.Time `gorm:"column:created_at;index:user_created_at_index;<-:create" json:"created_at"`
+	UpdatedAt *MyTime.Time `gorm:"column:updated_at;index:user_updated_at_index;<-:update" json:"updated_at"`
 	DeletedAt *MyTime.Time `gorm:"column:deleted_at;" json:"-"`
 }
 
