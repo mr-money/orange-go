@@ -16,10 +16,10 @@ var tableName = "user"
 //
 type User struct {
 	ID        uint64       `gorm:"column:id;primaryKey;autoIncrement" json:"id"`
-	Uuid      uuid.UUID    `gorm:"column:uuid;" json:"uuid"`
+	Uuid      uuid.UUID    `gorm:"column:uuid;uniqueIndex:user_uuid_uindex" json:"uuid"`
 	Name      string       `gorm:"column:name;" json:"name"`
-	CreatedAt *MyTime.Time `gorm:"column:created_at;" json:"created_at"`
-	UpdatedAt *MyTime.Time `gorm:"column:updated_at;" json:"updated_at"`
+	CreatedAt *MyTime.Time `gorm:"column:created_at;index:user_created_at_index" json:"created_at"`
+	UpdatedAt *MyTime.Time `gorm:"column:updated_at;index:user_updated_at_index" json:"updated_at"`
 	DeletedAt *MyTime.Time `gorm:"column:deleted_at;" json:"-"`
 }
 
