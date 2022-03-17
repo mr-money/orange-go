@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"github.com/gin-gonic/gin"
-	"github.com/shockerli/cvt"
 	"go-study/Config"
 	"go-study/Model"
 	"go-study/Repository/User"
@@ -53,20 +52,4 @@ func Database(c *gin.Context) {
 		"config": Config.Configs.Web,
 		"user":   userInfo,
 	})
-}
-
-//
-// GetUserInfo
-// @Description:
-// @param c
-// @param user_id 用户id
-//
-func GetUserInfo(c *gin.Context) {
-	userId := cvt.Uint64(c.Query("user_id"))
-
-	var userInfo Model.User
-	userInfo = User.FindById(userId)
-
-	c.JSON(200, gin.H{"user_info": userInfo})
-
 }
