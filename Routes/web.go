@@ -2,6 +2,7 @@ package Routes
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-study/App/Api/User"
 	"go-study/App/Index"
 	"go-study/MiddleWare"
 	"net/http"
@@ -42,7 +43,7 @@ func Web(r *gin.Engine) {
 	//根据id获取用户信息
 	user := r.Group("/user")
 	{
-		user.GET("/userInfo", Index.GetUserInfo)
-		user.GET("/add", Index.Add)
+		user.GET("/userInfo", User.GetUserInfo)
+		user.GET("/add", User.Add)
 	}
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-study/Config"
 	"go-study/Model"
-	"go-study/Repository/User"
 	"net/http"
 )
 
@@ -58,7 +57,7 @@ func Conf(c *gin.Context) {
 //
 func Database(c *gin.Context) {
 	var userInfo Model.User
-	userInfo = User.FindById(1)
+	//userInfo = User.FindById(1)
 
 	c.JSON(200, gin.H{
 		"config": Config.Configs.Web,
