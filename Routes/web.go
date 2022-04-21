@@ -20,13 +20,12 @@ func Web(r *gin.Engine) {
 	})
 
 	//关联控制器
-	r.GET("/index/index", Index.Index)
+	r.GET("/index/home", Index.Home)
 
 	//路由组
 	group := r.Group("/group")
 	{
-		group.GET("/home1", Index.Home1)
-		group.GET("/home2", Index.Home2)
+		group.GET("/home1", Index.Home)
 	}
 
 	//中间件
