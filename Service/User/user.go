@@ -7,6 +7,12 @@ import (
 	"go-study/Repository/User"
 )
 
+func FindUser(id uint64, userInfo Model.User) Model.User {
+	User.FindById(id, &userInfo)
+
+	return userInfo
+}
+
 //
 // CreateUser
 // @Description: 创建用户业务逻辑层
