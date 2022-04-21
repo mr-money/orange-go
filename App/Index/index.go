@@ -10,18 +10,20 @@ import (
 	"net/http"
 )
 
-func Index(c *gin.Context) {
+//
+// Home
+// @Description: 控制器主页
+// @param c
+//
+func Home(c *gin.Context) {
 	c.String(http.StatusOK, "index page")
 }
 
-func Home1(c *gin.Context) {
-	c.String(http.StatusOK, "Home1 page")
-}
-
-func Home2(c *gin.Context) {
-	c.String(http.StatusOK, "Home2 page")
-}
-
+//
+// Middle
+// @Description: 中间件
+// @param c
+//
 func Middle(c *gin.Context) {
 	req := c.Query("request")
 	fmt.Println("request:", req)
@@ -29,6 +31,11 @@ func Middle(c *gin.Context) {
 	c.JSON(200, gin.H{"request": req})
 }
 
+//
+// Conf
+// @Description: 读取配置
+// @param c
+//
 func Conf(c *gin.Context) {
 	var webConfig Config.Web
 
@@ -44,6 +51,11 @@ func Conf(c *gin.Context) {
 
 }
 
+//
+// Database
+// @Description: 数据库连接池
+// @param c
+//
 func Database(c *gin.Context) {
 	var userInfo Model.User
 	userInfo = User.FindById(1)
