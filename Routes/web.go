@@ -40,7 +40,7 @@ func Web(r *gin.Engine) {
 
 	////////////////////////////////
 
-	//根据id获取用户信息
+	//用户信息
 	user := r.Group("/user")
 	{
 		user.GET("/userInfo", User.GetUserInfo)
