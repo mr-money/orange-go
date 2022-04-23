@@ -1,10 +1,13 @@
 package Index
 
 import (
+	"context"
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"github.com/gin-gonic/gin"
 	"go-study/Config"
+	"go-study/Library/Func"
+	Go_redis "go-study/Library/Go-redis"
 	"go-study/Model"
 	"net/http"
 )
@@ -63,4 +66,43 @@ func Database(c *gin.Context) {
 		"config": Config.Configs.Web,
 		"user":   userInfo,
 	})
+}
+
+//redis连接
+func RedisCon(c *gin.Context) {
+	/*rdb := redis.NewClient(&redis.Options{
+		Addr:     "127.0.0.1:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})*/
+
+	redis := Go_redis.Redis
+
+	ctx := context.Background()
+
+	val, _ := redis.Get(ctx, "go_redis").Result()
+
+	val1, _ := redis.HGet(ctx, "dn:trick:user:11111", "msg_send_flag").Result()
+
+	c.JSON(200, gin.H{
+		"res":  val,
+		"val1": val1,
+	})
+}
+
+func JsonToStruct(c *gin.Context) {
+
+	str := `{"Name": "Ed", "Text": "Knock knock."}`
+
+	var structRes struct {
+		Name string
+		Text string
+	}
+
+	Func.JsonToStruct(str, &structRes)
+
+	fmt.Printf("structRes的类型是%T", structRes)
+	fmt.Println(structRes)
+
+	c.String(http.StatusOK, "JsonToStruct")
 }
