@@ -38,12 +38,17 @@ func Web(r *gin.Engine) {
 	//数据库连接
 	r.POST("/database", Index.Database)
 
-	////////////////////////////////
-
 	//用户信息
 	user := r.Group("/user")
 	{
 		user.GET("/userInfo", User.GetUserInfo)
 		user.GET("/add", User.Add)
 	}
+
+	//redis连接
+	r.GET("/redisCon", Index.RedisCon)
+
+	//json字符串转struct
+	r.GET("/jsonToStruct", Index.JsonToStruct)
+
 }
