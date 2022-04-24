@@ -49,20 +49,23 @@ func shutdown(srv *http.Server) {
 	}()
 
 	// Wait for interrupt signal to gracefully shutdown the server with
-	// a timeout of 5 seconds.
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 	log.Println("Shutdown Server ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+
 	defer cancel()
+
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal("Server Shutdown:", err)
 	}
+
 	select {
 	case <-ctx.Done():
 		log.Println("timeout of 3 seconds.")
 	}
+
 	log.Println("Server exiting")
 }
