@@ -8,7 +8,7 @@ import (
 )
 
 //表名
-var tableName = "user"
+var TableName = "user"
 
 //
 // User
@@ -23,10 +23,20 @@ type User struct {
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at;" json:"-"`
 }
 
+//
+// TableName
+// @Description: 表名 默认单表
+// @receiver User
+// @return string
+//
+func (User) TableName() string {
+	return TableName
+}
+
 // UserModel
-// @Description: 初始化model
+// @Description: 初始化model 方便join查询
 // @return *gorm.DB
 //
 func UserModel() *gorm.DB {
-	return Gorm.Mysql.Table(tableName)
+	return Gorm.Mysql.Table(TableName)
 }
