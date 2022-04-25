@@ -1,4 +1,4 @@
 .idea
 go.mod
 go.sum
-Config/*.toml
+Config/toml/*.toml
