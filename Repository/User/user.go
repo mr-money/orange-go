@@ -3,7 +3,11 @@ package User
 import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/shockerli/cvt"
+	"go-study/Config"
+	"go-study/Library/Cache"
+	"go-study/Library/Func"
 	"go-study/Model"
+	"time"
 )
 
 //
@@ -14,7 +18,31 @@ import (
 //
 func FindById(userInfo *Model.User, id uint64) *Model.User {
 
+	//redis key 数据库名:表名
+	idKey := Cache.SetKey(
+		cvt.String(Config.GetFieldByName(Config.Configs.Web, "DB", "DbName")),
+		Model.TableName,
+		cvt.String(id),
+	)
+
+	userJson, _ := Cache.Redis.Get(Cache.Cxt, idKey).Result()
+	if len(userJson) > 0 {
+		//json转指定struct
+		userInterface := Func.JsonToStruct(userJson, userInfo)
+
+		return userInterface.(*Model.User)
+	}
+
+	//查询数据库
 	Model.UserModel().Take(&userInfo, id)
+	if userInfo.ID > 0 {
+		//插入redis缓存
+		Cache.Redis.Set(
+			Cache.Cxt,
+			idKey, Func.ToJson(userInfo),
+			7*24*60*time.Hour,
+		)
+	}
 
 	return userInfo
 }
