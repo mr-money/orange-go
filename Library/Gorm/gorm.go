@@ -5,7 +5,6 @@ import (
 	"go-study/Config"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"reflect"
 	"time"
 )
 
@@ -28,17 +27,14 @@ func connectMysql() *gorm.DB {
 		panic(dbErr)
 	}*/
 
-	//var db *gorm.DB
-	dbConf := reflect.ValueOf(Config.Configs.Web).FieldByName("DB")
-
 	dsn := fmt.Sprintf("%s:%s@(%s:%s)/%s%s?charset=%s&parseTime=true&loc=Local",
-		dbConf.FieldByName("User"),
-		dbConf.FieldByName("Pwd"),
-		dbConf.FieldByName("Host"),
-		dbConf.FieldByName("Port"),
-		dbConf.FieldByName("Prefix"),
-		dbConf.FieldByName("DbName"),
-		dbConf.FieldByName("Charset"),
+		Config.GetFieldByName(Config.Configs.Web, "DB", "User"),
+		Config.GetFieldByName(Config.Configs.Web, "DB", "Pwd"),
+		Config.GetFieldByName(Config.Configs.Web, "DB", "Host"),
+		Config.GetFieldByName(Config.Configs.Web, "DB", "Port"),
+		Config.GetFieldByName(Config.Configs.Web, "DB", "Prefix"),
+		Config.GetFieldByName(Config.Configs.Web, "DB", "DbName"),
+		Config.GetFieldByName(Config.Configs.Web, "DB", "Charset"),
 	)
 
 	db, dbErr := gorm.Open(mysql.Open(dsn), &gorm.Config{})
