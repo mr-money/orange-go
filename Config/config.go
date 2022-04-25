@@ -79,3 +79,23 @@ func putConfStruct(confRef reflect.Value, conf interface{}) {
 		break
 	}
 }
+
+//// 公共方法 ////
+
+// GetFieldByName
+// @Description: 反射获取配置值
+// @param confStruct 配置结构体
+// @param fieldName 字段名 如 DB,Host
+// @return reflect.Value
+//
+func GetFieldByName(confStruct interface{}, fieldName ...string) reflect.Value {
+	var fieldNames []string
+	fieldNames = append(fieldNames, fieldName...)
+
+	conf := reflect.ValueOf(confStruct)
+	for _, field := range fieldNames {
+		conf = conf.FieldByName(field)
+	}
+
+	return conf
+}

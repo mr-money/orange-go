@@ -18,7 +18,8 @@ func main() {
 	// 加载路由
 	Routes.Include(
 		Routes.Web, //默认web路由
-		Routes.Api) //TODO api路由，需要token中间件验证
+		Routes.Api, //TODO api路由，需要token中间件验证
+	)
 
 	//
 	//// 监听端口，默认在8080
@@ -48,20 +49,23 @@ func shutdown(srv *http.Server) {
 	}()
 
 	// Wait for interrupt signal to gracefully shutdown the server with
-	// a timeout of 5 seconds.
 	quit := make(chan os.Signal)
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 	log.Println("Shutdown Server ...")
 
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+
 	defer cancel()
+
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal("Server Shutdown:", err)
 	}
+
 	select {
 	case <-ctx.Done():
 		log.Println("timeout of 3 seconds.")
 	}
+
 	log.Println("Server exiting")
 }
