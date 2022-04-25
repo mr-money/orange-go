@@ -1,6 +1,10 @@
 package Func
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"github.com/shockerli/cvt"
+	"log"
+)
 
 //
 // JsonToStruct
@@ -9,8 +13,28 @@ import "encoding/json"
 // @param structRes
 // @return *struct{}
 //
-func JsonToStruct(jsonStr string, structRes interface{}) interface{} {
-	_ = json.Unmarshal([]byte(jsonStr), &structRes)
+func JsonToStruct(jsonStr string, structData interface{}) interface{} {
+	err := json.Unmarshal([]byte(jsonStr), &structData)
+	if err != nil {
+		log.Fatal("JsonToStruct:", err)
+		return nil
+	}
 
-	return structRes
+	return structData
+}
+
+//
+// ToJson
+// @Description: 数据格式转json
+// @param data 原始格式数据
+// @return string json字符串
+//
+func ToJson(data interface{}) string {
+	jsonStr, err := json.Marshal(data)
+	if err != nil {
+		log.Fatal("ToJson:", err)
+		return ""
+	}
+
+	return cvt.String(jsonStr)
 }
