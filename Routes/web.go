@@ -32,23 +32,10 @@ func Web(r *gin.Engine) {
 	//中间件
 	r.GET("/middleware", MiddleWare.Middle(), Index.Middle)
 
-	//配置
-	r.GET("/conf", Index.Conf)
-
-	//数据库连接
-	r.POST("/database", Index.Database)
-
 	//用户信息
 	user := r.Group("/user")
 	{
 		user.GET("/userInfo", User.GetUserInfo)
 		user.GET("/add", User.Add)
 	}
-
-	//redis连接
-	r.GET("/redisCon", Index.RedisCon)
-
-	//json字符串转struct
-	r.GET("/jsonToStruct", Index.JsonToStruct)
-
 }
