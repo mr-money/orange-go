@@ -2,6 +2,7 @@ package Routes
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-study/App/Api/User"
 	"go-study/App/Index"
 	"go-study/MiddleWare"
 	"net/http"
@@ -31,18 +32,10 @@ func Web(r *gin.Engine) {
 	//中间件
 	r.GET("/middleware", MiddleWare.Middle(), Index.Middle)
 
-	//配置
-	r.GET("/conf", Index.Conf)
-
-	//数据库连接
-	r.POST("/database", Index.Database)
-
-	////////////////////////////////
-
-	//根据id获取用户信息
+	//用户信息
 	user := r.Group("/user")
 	{
-		user.GET("/userInfo", Index.GetUserInfo)
-		user.GET("/add", Index.Add)
+		user.GET("/userInfo", User.GetUserInfo)
+		user.GET("/add", User.Add)
 	}
 }

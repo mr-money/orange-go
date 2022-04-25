@@ -14,10 +14,9 @@ type Web struct {
 		Type    string `toml:"type"`
 	} `toml:"DB"`
 	Redis struct {
-		Host   string `toml:"host"`
-		Port   string `toml:"port"`
-		Db     string `toml:"db"`
-		Pwd    string `toml:"pwd"`
-		Prefix string `toml:"prefix"`
+		Host string `toml:"host"`
+		Port string `toml:"port"`
+		Db   string `toml:"db"`
+		Pwd  string `toml:"pwd"`
 	} `toml:"REDIS"`
 }
