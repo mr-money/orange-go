@@ -1,16 +1,19 @@
-package Go_redis
+package Cache
 
 import (
+	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"github.com/shockerli/cvt"
 	"go-study/Config"
 	"reflect"
 	"runtime"
+	"strings"
 	"time"
 )
 
 var Redis *redis.Client
+var Cxt = context.Background()
 
 //
 // init
@@ -60,4 +63,17 @@ func connectRedis() *redis.Client {
 	})
 
 	return rdb
+}
+
+//
+// SetKey
+// @Description: 生成缓存key
+// @param key 嵌套key名 如 key1,key2,key3...
+// @return string
+//
+func SetKey(key ...string) string {
+	var keys []string
+	keys = append(keys, key...)
+
+	return strings.Join(keys, ":")
 }
