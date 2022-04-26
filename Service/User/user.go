@@ -2,7 +2,7 @@ package User
 
 import (
 	uuid "github.com/satori/go.uuid"
-	"github.com/shockerli/cvt"
+	"go-study/Library/Handler"
 	"go-study/Model"
 	"go-study/Repository/User"
 )
@@ -40,16 +40,21 @@ func SelectUserListPage(search map[string]interface{}, page uint64, pageSize uin
 }
 
 //
-// CreateUser
-// @Description: 创建用户业务逻辑层
+// Register
+// @Description: 用户注册
 // @param user
 // @return uint64
 //
-func CreateUser(user map[string]interface{}) uint64 {
+func Register(user map[string]string) uint64 {
 	var userInfo Model.User
 
-	userInfo.Name = cvt.String(user["name"])
+	userInfo.Name = user["name"]
 	userInfo.Uuid = uuid.NewV4()
+
+	//密码加密
+	userInfo.Password = Handler.HashAndSalt([]byte(user["password"]))
+
+	//todo 自动登录
 
 	return User.Create(userInfo)
 }

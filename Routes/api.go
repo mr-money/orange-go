@@ -24,5 +24,6 @@ func Api(r *gin.Engine) {
 		user.GET("/userInfo", User.GetUserInfo)
 		user.GET("/userList", User.GetUserListPage)
 		user.GET("/add", User.Add)
+		user.POST("/register", User.Register)
 	}
 }
