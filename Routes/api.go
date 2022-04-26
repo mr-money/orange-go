@@ -12,9 +12,13 @@ import (
 // @return *gin.Engine
 //
 func Api(r *gin.Engine) {
-	//用户信息
-	apiGroup := r.Group("/api")
+	apiGroup := r.Group(
+		"/api", //api组
+		//MiddleWare.CSRF(),      //验证csrf
+		//MiddleWare.CSRFToken(), //生成csrf
+	)
 
+	//用户信息
 	user := apiGroup.Group("/user")
 	{
 		user.GET("/userInfo", User.GetUserInfo)
