@@ -17,7 +17,7 @@ func GetUserInfo(c *gin.Context) {
 	userId := cvt.Uint64(c.Query("user_id"))
 
 	var userInfo Model.User
-	userInfo = User.FindUser(userId)
+	User.FindById(&userInfo, userId)
 
 	c.JSON(200, gin.H{"user_info": userInfo})
 
