@@ -5,7 +5,11 @@ import (
 	"go-study/Service/User"
 )
 
-//登录
+//
+// Login
+// @Description: 普通用户登录
+// @param c
+//
 func Login(c *gin.Context) {
 	userName := c.PostForm("name")
 	password := c.PostForm("password")
@@ -32,7 +36,7 @@ func Login(c *gin.Context) {
 
 //
 // Register
-// @Description: 注册
+// @Description: 普通用户注册
 // @param c
 //
 func Register(c *gin.Context) {
