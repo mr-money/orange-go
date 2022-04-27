@@ -11,8 +11,8 @@ import (
 // @param pwd
 // @return string
 //
-func HashAndSalt(pwd []byte) string {
-	hash, err := bcrypt.GenerateFromPassword(pwd, bcrypt.MinCost)
+func HashAndSalt(pwd string) string {
+	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.MinCost)
 	if err != nil {
 		log.Println(err)
 	}
@@ -26,12 +26,11 @@ func HashAndSalt(pwd []byte) string {
 // @param plainPwd 输入的明文密码
 // @return bool
 //
-func ComparePasswords(hashedPwd string, plainPwd []byte) bool {
-	byteHash := []byte(hashedPwd)
+func ComparePasswords(hashedPwd string, plainPwd string) bool {
 
-	err := bcrypt.CompareHashAndPassword(byteHash, plainPwd)
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPwd), []byte(plainPwd))
 	if err != nil {
-		log.Println(err)
+		log.Println(err, hashedPwd, plainPwd)
 		return false
 	}
 	return true

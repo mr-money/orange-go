@@ -18,12 +18,15 @@ func Api(r *gin.Engine) {
 		//MiddleWare.CSRFToken(), //生成csrf
 	)
 
+	// 注册登录
+	apiGroup.POST("/register", User.Register)
+	apiGroup.POST("/login", User.Login)
+
 	//用户信息
 	user := apiGroup.Group("/user")
 	{
 		user.GET("/userInfo", User.GetUserInfo)
 		user.GET("/userList", User.GetUserListPage)
 		user.GET("/add", User.Add)
-		user.POST("/register", User.Register)
 	}
 }
