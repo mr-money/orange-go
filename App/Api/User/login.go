@@ -19,6 +19,11 @@ func Register(c *gin.Context) {
 	userName := c.PostForm("name")
 	password := c.PostForm("password")
 
+	if len(userName) < 1 || len(password) < 1 {
+		c.JSON(400, gin.H{"msg": "参数错误"})
+		return
+	}
+
 	userInfo := make(map[string]string)
 	userInfo["name"] = userName
 	userInfo["password"] = password

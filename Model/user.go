@@ -7,8 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
-//表名
-var TableName = "user"
+// TableName 表名
+const TableName = "user"
 
 //
 // User
