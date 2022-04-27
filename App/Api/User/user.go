@@ -29,8 +29,8 @@ func GetUserInfo(c *gin.Context) {
 // @param c
 //
 func GetUserListPage(c *gin.Context) {
-	page := cvt.Uint64(c.Query("page"))
-	pageSize := cvt.Uint64(c.Query("page_size"))
+	page := cvt.Uint64(c.DefaultQuery("page", "1"))
+	pageSize := cvt.Uint64(c.DefaultQuery("page_size", "20"))
 	uuid := c.Query("uuid")
 	userName := c.Query("user_name")
 
