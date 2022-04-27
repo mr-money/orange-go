@@ -1,6 +1,7 @@
 package User
 
 import (
+	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 	"go-study/Library/Handler"
 	"go-study/Model"
@@ -52,9 +53,38 @@ func Register(user map[string]string) uint64 {
 	userInfo.Uuid = uuid.NewV4()
 
 	//密码加密
-	userInfo.Password = Handler.HashAndSalt([]byte(user["password"]))
+	userInfo.Password = Handler.HashAndSalt(user["password"])
 
 	//todo 自动登录
 
 	return User.Create(userInfo)
+}
+
+//
+// Login
+// @Description: 登录
+// @param user
+// @return Model.User
+// @return error
+//
+func Login(user map[string]string) (Model.User, error) {
+	var userInfo Model.User
+
+	userInfo.Name = user["name"]
+
+	//查询用户
+	User.FindUserByModel(&userInfo)
+
+	if userInfo.ID == 0 {
+		return userInfo, errors.New("用户名或密码错误")
+	}
+
+	//检查密码
+	if !Handler.ComparePasswords(userInfo.Password, user["password"]) {
+		return userInfo, errors.New("用户名或密码错误")
+	}
+
+	// todo 生成jwt
+
+	return userInfo, nil
 }
