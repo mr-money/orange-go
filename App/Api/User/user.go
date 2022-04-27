@@ -29,8 +29,8 @@ func GetUserInfo(c *gin.Context) {
 // @param c
 //
 func GetUserListPage(c *gin.Context) {
-	page := cvt.Uint64(c.Query("page"))
-	pageSize := cvt.Uint64(c.Query("page_size"))
+	page := cvt.Uint64(c.DefaultQuery("page", "1"))
+	pageSize := cvt.Uint64(c.DefaultQuery("page_size", "20"))
 	uuid := c.Query("uuid")
 	userName := c.Query("user_name")
 
@@ -58,12 +58,12 @@ func GetUserListPage(c *gin.Context) {
 // @return int 插入数据的主键
 //
 func Add(c *gin.Context) {
-	userName := cvt.String(c.Query("name"))
+	userName := c.Query("name")
 
 	userInfo := make(map[string]interface{})
 	userInfo["name"] = userName
-	res := User.CreateUser(userInfo)
+	//res := User.Register(userInfo)
 
-	c.JSON(200, gin.H{"res": res})
+	c.JSON(200, gin.H{"res": userInfo})
 
 }

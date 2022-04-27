@@ -1,4 +1,4 @@
-package Func
+package Handler
 
 import (
 	"encoding/json"

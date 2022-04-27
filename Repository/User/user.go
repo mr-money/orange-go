@@ -5,7 +5,7 @@ import (
 	"github.com/shockerli/cvt"
 	"go-study/Config"
 	"go-study/Library/Cache"
-	"go-study/Library/Func"
+	"go-study/Library/Handler"
 	"go-study/Model"
 	"time"
 )
@@ -28,7 +28,7 @@ func FindById(userInfo *Model.User, id uint64) *Model.User {
 	userJson, _ := Cache.Redis.Get(Cache.Cxt, idKey).Result()
 	if len(userJson) > 0 {
 		//json转指定struct
-		userInterface := Func.JsonToStruct(userJson, userInfo)
+		userInterface := Handler.JsonToStruct(userJson, userInfo)
 
 		return userInterface.(*Model.User)
 	}
@@ -39,7 +39,7 @@ func FindById(userInfo *Model.User, id uint64) *Model.User {
 		//插入redis缓存
 		Cache.Redis.Set(
 			Cache.Cxt,
-			idKey, Func.ToJson(userInfo),
+			idKey, Handler.ToJson(userInfo),
 			7*24*60*time.Hour,
 		)
 	}
@@ -78,4 +78,16 @@ func Create(user Model.User) uint64 {
 	Model.UserModel().Create(&user)
 
 	return user.ID
+}
+
+//
+// FindUserByModel
+// @Description: 根据结构体model查询用户
+// @param user 用户model结构体
+// @return *Model.User
+//
+func FindUserByModel(user *Model.User) *Model.User {
+	Model.UserModel().Where(user).Take(&user)
+
+	return user
 }

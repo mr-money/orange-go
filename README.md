@@ -37,3 +37,11 @@ func UserModel() *gorm.DB {
  Model.UserModel().Take(&userInfo, 1)
 ```
 
+#### Middle中间件 包MiddleWare：
+> CSRF 防跨站请求伪造
+```
+MiddleWare.CSRF() //验证csrf
+MiddleWare.CSRFToken() //生成csrf token
+```
+
+
