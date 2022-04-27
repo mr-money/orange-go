@@ -79,3 +79,15 @@ func Create(user Model.User) uint64 {
 
 	return user.ID
 }
+
+//
+// FindUserByModel
+// @Description: 根据结构体model查询用户
+// @param user 用户model结构体
+// @return *Model.User
+//
+func FindUserByModel(user *Model.User) *Model.User {
+	Model.UserModel().Where(user).Take(&user)
+
+	return user
+}
