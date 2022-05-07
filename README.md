@@ -38,10 +38,14 @@ func UserModel() *gorm.DB {
 ```
 
 #### Middle中间件 包MiddleWare：
-> CSRF 防跨站请求伪造
 ```
+CSRF 防跨站请求伪造
 MiddleWare.CSRF() //验证csrf
 MiddleWare.CSRFToken() //生成csrf token
+
+MiddleWare.Auth() //jwt登录验证
+  auth := context.Request.Header.Get("Authorization")
+
 ```
 
 
