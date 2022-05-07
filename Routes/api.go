@@ -3,6 +3,7 @@ package Routes
 import (
 	"github.com/gin-gonic/gin"
 	"go-study/App/Api/User"
+	"go-study/MiddleWare"
 )
 
 //
@@ -24,6 +25,7 @@ func Api(r *gin.Engine) {
 
 	//用户信息
 	user := apiGroup.Group("/user")
+	user.Use(MiddleWare.Auth())
 	{
 		user.GET("/userInfo", User.GetUserInfo)
 		user.GET("/userList", User.GetUserListPage)

@@ -3,20 +3,48 @@ package User
 import (
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
+	"github.com/shockerli/cvt"
+	"go-study/Config"
+	"go-study/Library/Cache"
 	"go-study/Library/Handler"
 	"go-study/Model"
 	"go-study/Repository/User"
+	"time"
 )
 
 //
-// FindUser
+// FindById
 // @Description: 根据用户id查询用户信息
 // @param uint64 id user_id 用户id
 // @return Model.User
 //
-func FindUser(id uint64) Model.User {
-	userInfo := Model.User{}
-	User.FindById(&userInfo, id)
+func FindById(userInfo *Model.User, id uint64) *Model.User {
+
+	//redis key 数据库名:表名
+	idKey := Cache.SetKey(
+		cvt.String(Config.GetFieldByName(Config.Configs.Web, "DB", "DbName")),
+		Model.TableName,
+		cvt.String(id),
+	)
+
+	userJson, _ := Cache.Redis.Get(Cache.Cxt, idKey).Result()
+	if len(userJson) > 0 {
+		//json转指定struct
+		userInterface := Handler.JsonToStruct(userJson, userInfo)
+
+		return userInterface.(*Model.User)
+	}
+
+	//查询数据库
+	Model.UserModel().Take(&userInfo, id)
+	if userInfo.ID > 0 {
+		//插入redis缓存
+		Cache.Redis.Set(
+			Cache.Cxt,
+			idKey, Handler.ToJson(userInfo),
+			1*time.Hour,
+		)
+	}
 
 	return userInfo
 }
@@ -67,7 +95,7 @@ func Register(user map[string]string) uint64 {
 // @return Model.User
 // @return error
 //
-func Login(user map[string]string) (Model.User, error) {
+func Login(user map[string]string) (Model.User, string, error) {
 	var userInfo Model.User
 
 	userInfo.Name = user["name"]
@@ -76,15 +104,19 @@ func Login(user map[string]string) (Model.User, error) {
 	User.FindUserByModel(&userInfo)
 
 	if userInfo.ID == 0 {
-		return userInfo, errors.New("用户名或密码错误")
+		return userInfo, "", errors.New("用户名或密码错误")
 	}
 
 	//检查密码
 	if !Handler.ComparePasswords(userInfo.Password, user["password"]) {
-		return userInfo, errors.New("用户名或密码错误")
+		return userInfo, "", errors.New("用户名或密码错误")
 	}
 
-	// todo 生成jwt
+	//生成jwt
+	token, err := Handler.ApiLoginToken(userInfo)
+	if err != nil {
+		return Model.User{}, "", err
+	}
 
-	return userInfo, nil
+	return userInfo, token, nil
 }

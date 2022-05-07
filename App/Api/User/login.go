@@ -5,7 +5,11 @@ import (
 	"go-study/Service/User"
 )
 
-//登录
+//
+// Login
+// @Description: 普通用户登录
+// @param c
+//
 func Login(c *gin.Context) {
 	userName := c.PostForm("name")
 	password := c.PostForm("password")
@@ -20,19 +24,22 @@ func Login(c *gin.Context) {
 	userCondition["password"] = password
 
 	//登录
-	res, logErr := User.Login(userCondition)
+	res, token, logErr := User.Login(userCondition)
 	if logErr != nil {
 		c.JSON(400, gin.H{"msg": logErr.Error()})
 		return
 	}
 
-	c.JSON(200, gin.H{"res": res})
+	c.JSON(200, gin.H{
+		"userInfo": res,
+		"token":    token,
+	})
 
 }
 
 //
 // Register
-// @Description: 注册
+// @Description: 普通用户注册
 // @param c
 //
 func Register(c *gin.Context) {
