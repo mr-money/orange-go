@@ -95,7 +95,7 @@ func Register(user map[string]string) uint64 {
 // @return Model.User
 // @return error
 //
-func Login(user map[string]string) (Model.User, error) {
+func Login(user map[string]string) (Model.User, string, error) {
 	var userInfo Model.User
 
 	userInfo.Name = user["name"]
@@ -104,15 +104,19 @@ func Login(user map[string]string) (Model.User, error) {
 	User.FindUserByModel(&userInfo)
 
 	if userInfo.ID == 0 {
-		return userInfo, errors.New("用户名或密码错误")
+		return userInfo, "", errors.New("用户名或密码错误")
 	}
 
 	//检查密码
 	if !Handler.ComparePasswords(userInfo.Password, user["password"]) {
-		return userInfo, errors.New("用户名或密码错误")
+		return userInfo, "", errors.New("用户名或密码错误")
 	}
 
-	// todo 生成jwt
+	//生成jwt
+	token, err := Handler.ApiLoginToken(userInfo)
+	if err != nil {
+		return Model.User{}, "", err
+	}
 
-	return userInfo, nil
+	return userInfo, token, nil
 }
