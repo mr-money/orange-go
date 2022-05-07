@@ -1,9 +1,9 @@
 package MiddleWare
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"go-study/Library/Handler"
+	"log"
 	"net/http"
 )
 
@@ -27,7 +27,7 @@ func Auth() gin.HandlerFunc {
 
 		// 校验token
 		claim, err := Handler.ParseToken(auth)
-		fmt.Println(claim)
+		log.Println(claim)
 
 		if err != nil {
 			context.JSON(http.StatusUnauthorized, gin.H{

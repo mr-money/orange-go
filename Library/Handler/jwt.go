@@ -51,12 +51,12 @@ func ApiLoginToken(user Model.User) (string, error) {
 // @return *jwt.StandardClaims
 // @return error
 //
-func ParseToken(token string) (*jwt.StandardClaims, error) {
-	jwtToken, err := jwt.ParseWithClaims(token, &jwt.StandardClaims{}, func(token *jwt.Token) (i interface{}, e error) {
+func ParseToken(token string) (*ApiLoginClaims, error) {
+	jwtToken, err := jwt.ParseWithClaims(token, &ApiLoginClaims{}, func(token *jwt.Token) (i interface{}, e error) {
 		return keySecret, nil
 	})
 	if err == nil && jwtToken != nil {
-		if claim, ok := jwtToken.Claims.(*jwt.StandardClaims); ok && jwtToken.Valid {
+		if claim, ok := jwtToken.Claims.(*ApiLoginClaims); ok && jwtToken.Valid {
 			return claim, nil
 		}
 	}
