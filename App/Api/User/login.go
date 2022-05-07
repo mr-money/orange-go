@@ -24,13 +24,16 @@ func Login(c *gin.Context) {
 	userCondition["password"] = password
 
 	//登录
-	res, logErr := User.Login(userCondition)
+	res, token, logErr := User.Login(userCondition)
 	if logErr != nil {
 		c.JSON(400, gin.H{"msg": logErr.Error()})
 		return
 	}
 
-	c.JSON(200, gin.H{"res": res})
+	c.JSON(200, gin.H{
+		"userInfo": res,
+		"token":    token,
+	})
 
 }
 
