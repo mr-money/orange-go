@@ -7,6 +7,13 @@ import (
 
 const TimeFormat = "2006-01-02 15:04:05"
 
+const (
+	SecondsPerMinute = 60
+	SecondsPerHour   = 60 * SecondsPerMinute
+	SecondsPerDay    = 24 * SecondsPerHour
+	SecondsPerWeek   = 7 * SecondsPerDay
+)
+
 type Time time.Time
 
 func (t *Time) UnmarshalJSON(data []byte) (err error) {
