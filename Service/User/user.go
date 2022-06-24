@@ -86,7 +86,7 @@ func Register(user map[string]string) (Model.User, string, error) {
 	//创建用户
 	User.Create(userInfo)
 
-	//todo 自动登录
+	//自动登录
 	token, err := Handler.ApiLoginToken(userInfo)
 	if err != nil {
 		return Model.User{}, "", err
