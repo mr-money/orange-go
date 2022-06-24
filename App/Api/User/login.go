@@ -24,9 +24,9 @@ func Login(c *gin.Context) {
 	userCondition["password"] = password
 
 	//登录
-	res, token, logErr := User.Login(userCondition)
-	if logErr != nil {
-		c.JSON(400, gin.H{"msg": logErr.Error()})
+	res, token, loginErr := User.Login(userCondition)
+	if loginErr != nil {
+		c.JSON(500, gin.H{"msg": loginErr.Error()})
 		return
 	}
 
@@ -55,7 +55,15 @@ func Register(c *gin.Context) {
 	userInfo["name"] = userName
 	userInfo["password"] = password
 
-	res := User.Register(userInfo)
+	//注册
+	user, token, loginErr := User.Register(userInfo)
+	if loginErr != nil {
+		c.JSON(500, gin.H{"msg": loginErr.Error()})
+		return
+	}
 
-	c.JSON(200, gin.H{"res": res})
+	c.JSON(200, gin.H{
+		"userInfo": user,
+		"token":    token,
+	})
 }
