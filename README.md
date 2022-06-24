@@ -15,8 +15,8 @@ go modules配置：
 
 
 ### 入口
-> 默认入口文件 /main.go 
->- Routes.Include()方法初始化路由
+> 默认入口文件 /main.go   
+> Routes.Include()方法初始化路由
 
 ### 路由
 > 默认web路由文件 /Routes/web.go  
@@ -54,5 +54,8 @@ MiddleWare.Auth() //jwt登录验证
   auth := context.Request.Header.Get("Authorization")
 
 ```
+
+
+
 
 
