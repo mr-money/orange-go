@@ -3,8 +3,15 @@
 ## 简介
 > 基于gin开发的微服务web框架，使用ddd领域驱动设计思想为基础架构思想  
 > 架构分层为 Model->Repository->Service->App  
+> 值对象（Value Object）→ 实体（Entity）→ 领域服务（Domain Service）  
 > 数据库连接池基于gorm开发  
-> 值对象（Value Object）→ 实体（Entity）→ 领域服务（Domain Service）
+
+### 初始化框架
+go modules配置：  
+> GOPROXY=https://goproxy.cn;GO111MODULE=on  
+
+根目录运行命令：  
+> go mod tidy
 
 
 ### 入口
