@@ -74,7 +74,7 @@ func SelectUserListPage(search map[string]interface{}, page uint64, pageSize uin
 // @param user
 // @return uint64
 //
-func Register(user map[string]string) uint64 {
+func Register(user map[string]string) (Model.User, string, error) {
 	var userInfo Model.User
 
 	userInfo.Name = user["name"]
@@ -83,9 +83,16 @@ func Register(user map[string]string) uint64 {
 	//密码加密
 	userInfo.Password = Handler.HashAndSalt(user["password"])
 
-	//todo 自动登录
+	//创建用户
+	User.Create(userInfo)
 
-	return User.Create(userInfo)
+	//todo 自动登录
+	token, err := Handler.ApiLoginToken(userInfo)
+	if err != nil {
+		return Model.User{}, "", err
+	}
+
+	return userInfo, token, nil
 }
 
 //
