@@ -2,6 +2,7 @@ package User
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/shockerli/cvt"
 	"go-study/Service/User"
 )
 
@@ -65,5 +66,26 @@ func Register(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"userInfo": user,
 		"token":    token,
+	})
+}
+
+func AddUser999(c *gin.Context) {
+	userInfo := make(map[string]string)
+	userInfo["password"] = "123456"
+
+	for i := 11; i <= 10000; i++ {
+		userInfo["name"] = "test-name" + cvt.String(i)
+
+		_, _, loginErr := User.Register(userInfo)
+
+		if loginErr != nil {
+			c.JSON(500, gin.H{"msg": loginErr.Error()})
+			return
+		}
+
+	}
+
+	c.JSON(200, gin.H{
+		"userInfo": userInfo,
 	})
 }
