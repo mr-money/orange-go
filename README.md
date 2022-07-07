@@ -29,7 +29,12 @@ go modules配置：
    同级目录新建web.go 并写入与配置文件结构相同的struct  
    同级目录config.go中init方法内初始化配置的struct
 
-### 连接数据库
+### 数据库
+数据库连接使用连接池 基于gorm连接
+
+> 数据库连接池配置：  
+> Library/Gorm/gorm.go:connectMysql()  
+>
 > 数据库配置按照上文配置文件方法配置后  
 > model层默认demo Model/user.go  
 > 初始化model方法 
@@ -39,6 +44,10 @@ func UserModel() *gorm.DB {
 	return Gorm.Mysql.Table(tableName)
 }
 ```
+#### 数据迁移
+Database/migration.go:migration()
+
+
 #### repo层使用方法示例：
 ```
  Model.UserModel().Take(&userInfo, 1)
