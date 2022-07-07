@@ -18,7 +18,7 @@ func main() {
 	// 加载路由
 	Routes.Include(
 		Routes.Web, //默认web路由
-		Routes.Api, //TODO api路由，需要token中间件验证
+		Routes.Api, //api路由，需要token中间件验证
 	)
 
 	//
