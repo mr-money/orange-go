@@ -69,11 +69,16 @@ func Register(c *gin.Context) {
 	})
 }
 
+//
+// AddUser999
+// @Description:新增5万条测试数据
+// @param c
+//
 func AddUser999(c *gin.Context) {
 	userInfo := make(map[string]string)
 	userInfo["password"] = "123456"
 
-	for i := 11; i <= 10000; i++ {
+	for i := 40001; i <= 50000; i++ {
 		userInfo["name"] = "test-name" + cvt.String(i)
 
 		_, _, loginErr := User.Register(userInfo)
