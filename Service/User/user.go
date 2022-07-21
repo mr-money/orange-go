@@ -3,13 +3,9 @@ package User
 import (
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
-	"github.com/shockerli/cvt"
-	"go-study/Config"
-	"go-study/Library/Cache"
 	"go-study/Library/Handler"
 	"go-study/Model"
 	"go-study/Repository/User"
-	"time"
 )
 
 //
@@ -20,31 +16,7 @@ import (
 //
 func FindById(userInfo *Model.User, id uint64) *Model.User {
 
-	//redis key 数据库名:表名
-	idKey := Cache.SetKey(
-		cvt.String(Config.GetFieldByName(Config.Configs.Web, "DB", "DbName")),
-		Model.TableName,
-		cvt.String(id),
-	)
-
-	userJson, _ := Cache.Redis.Get(Cache.Cxt, idKey).Result()
-	if len(userJson) > 0 {
-		//json转指定struct
-		userInterface := Handler.JsonToStruct(userJson, userInfo)
-
-		return userInterface.(*Model.User)
-	}
-
-	//查询数据库
-	Model.UserModel().Take(&userInfo, id)
-	if userInfo.ID > 0 {
-		//插入redis缓存
-		Cache.Redis.Set(
-			Cache.Cxt,
-			idKey, Handler.ToJson(userInfo),
-			1*time.Hour,
-		)
-	}
+	userInfo = User.FindById(userInfo, id)
 
 	return userInfo
 }
@@ -86,7 +58,7 @@ func Register(user map[string]string) (Model.User, string, error) {
 	//创建用户
 	User.Create(userInfo)
 
-	//todo 自动登录
+	//自动登录
 	token, err := Handler.ApiLoginToken(userInfo)
 	if err != nil {
 		return Model.User{}, "", err
