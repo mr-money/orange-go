@@ -40,7 +40,7 @@ func FindById(userInfo *Model.User, id uint64) *Model.User {
 		Cache.Redis.Set(
 			Cache.Cxt,
 			idKey, Handler.ToJson(userInfo),
-			7*24*60*time.Hour,
+			1*time.Hour,
 		)
 	}
 
