@@ -38,4 +38,8 @@ func Web(r *gin.Engine) {
 		user.GET("/userInfo", User.GetUserInfo)
 		user.GET("/add", User.Add)
 	}
+
+	//性能测试 加入用户数据
+	r.GET("/test/addUser999", User.AddUser999)
+
 }
