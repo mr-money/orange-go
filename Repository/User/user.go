@@ -60,7 +60,7 @@ func SelectPage(userList *[]Model.User, search map[string]interface{}, offset ui
 
 	userModel := Model.UserModel().
 		Where(&Model.User{Uuid: uuid.FromStringOrNil(cvt.String(search["uuid"]))}). //uuid搜索
-		Where("name like ?", "%"+cvt.String(search["user_name"])+"%").              //用户名模糊搜索
+		Where("name like ?", cvt.String(search["user_name"])+"%").                  //用户名模糊搜索
 		Offset(cvt.Int(offset)).Limit(cvt.Int(limit))                               //分页参数
 
 	userModel.Order("id DESC").Find(&userList)
