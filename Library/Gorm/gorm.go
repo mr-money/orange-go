@@ -12,7 +12,11 @@ import (
 var Mysql *gorm.DB
 
 func init() {
+	//默认mysql连接
 	Mysql = connectMysql()
+
+	//AutoMigrate 数据迁移
+	migration()
 }
 
 //
@@ -60,3 +64,24 @@ func connectMysql() *gorm.DB {
 }
 
 //todo AutoMigrate自动建表 https://blog.csdn.net/qq_39787367/article/details/112567822
+func migration() {
+	fmt.Println("Mysql Migration begin!")
+
+	dbSetTableOptions("用户表", "InnoDB")
+}
+
+//
+// dbSetTableOptions
+// @Description: 表默认设置
+// @param comment 表注释
+// @param engine 表引擎
+// @return *gorm.DB
+//
+func dbSetTableOptions(engine string, comment string) *gorm.DB {
+	//设置表引擎和表注释
+	setValue := fmt.Sprintf("ENGINE=%s COMMENT='%s'", engine, comment)
+
+	fmt.Println(setValue)
+
+	return Mysql.Set("gorm:table_options", setValue)
+}
