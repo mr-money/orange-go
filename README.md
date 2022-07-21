@@ -7,10 +7,12 @@
 > 数据库连接池基于gorm开发  
 
 ### 初始化框架
-go modules配置：  
-> GOPROXY=https://goproxy.cn;GO111MODULE=on  
+#### go版本
+> ##### 1.17 https://golang.google.cn/dl/
 
-根目录运行命令：  
+项目根目录运行：
+> go env -w GO111MODULE=on  
+> go env -w GOPROXY=https://goproxy.cn,direct  
 > go mod tidy
 
 
