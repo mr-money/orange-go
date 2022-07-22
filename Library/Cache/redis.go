@@ -6,6 +6,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/shockerli/cvt"
 	"go-study/Config"
+	"log"
 	"reflect"
 	"runtime"
 	"strings"
@@ -76,4 +77,36 @@ func SetKey(key ...string) string {
 	keys = append(keys, key...)
 
 	return strings.Join(keys, ":")
+}
+
+//
+// RememberString
+// @Description:不存在则写入缓存数据后返回
+// @param key 缓存key
+// @param value 缓存数据
+// @param expiration
+// @return string
+//
+func RememberString(key string, value func() string, expiration time.Duration) string {
+	//获取缓存数据
+	data, err := Redis.Get(Cxt, key).Result()
+	if err != nil {
+		//缓存为空 返回传入数据
+		if err.Error() == "redis: nil" || data == "" {
+			//写入缓存
+			Redis.Set(
+				Cxt,
+				key, value(),
+				expiration,
+			)
+
+			return value()
+		}
+
+		log.Println(err)
+
+		return ""
+	}
+
+	return data
 }

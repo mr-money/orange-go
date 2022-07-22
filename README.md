@@ -88,8 +88,10 @@ Cache.SetKey({key1},{key2},{key3},...)
 //获取缓存
 Cache.Redis.Get(Cache.Cxt, {key}).Result()
 
-//设置缓存
-Cache.Redis.Set(
+//设置缓存 Cache.Redis后跟Redis原生方法名就可
+例如：
+  string
+  Cache.Redis.Set(
       Cache.Cxt,
       {key}, {data},
       {expires time},
