@@ -7,6 +7,7 @@ import (
 	"go-study/Library/Cache"
 	"go-study/Library/Handler"
 	"go-study/Model"
+	"reflect"
 	"time"
 )
 
@@ -16,35 +17,37 @@ import (
 // @param id
 // @param userInfo
 //
-func FindById(userInfo *Model.User, id uint64) *Model.User {
+func FindById(UserInfo *Model.User, Id uint64) *Model.User {
 
 	//redis key 数据库名:表名
 	idKey := Cache.SetKey(
 		cvt.String(Config.GetFieldByName(Config.Configs.Web, "DB", "DbName")),
 		Model.TableName,
-		cvt.String(id),
+		cvt.String(Id),
 	)
 
-	userJson, _ := Cache.Redis.Get(Cache.Cxt, idKey).Result()
-	if len(userJson) > 0 {
-		//json转指定struct
-		userInterface := Handler.JsonToStruct(userJson, userInfo)
+	userJson := Cache.RememberString(idKey, func() string {
 
-		return userInterface.(*Model.User)
-	}
+		//避免闭包二次调用查询
+		if UserInfo.ID == 0 {
+			//查询数据库
+			Model.UserModel().Take(&UserInfo, Id)
+		}
 
-	//查询数据库
-	Model.UserModel().Take(&userInfo, id)
-	if userInfo.ID > 0 {
-		//插入redis缓存
-		Cache.Redis.Set(
-			Cache.Cxt,
-			idKey, Handler.ToJson(userInfo),
-			1*time.Hour,
-		)
-	}
+		//默认为空
+		userinfo := ""
+		if !reflect.DeepEqual(UserInfo, Model.User{}) {
+			userinfo = Handler.ToJson(UserInfo)
+		}
 
-	return userInfo
+		return userinfo
+
+	}, 1*time.Hour)
+
+	//json转指定struct
+	userInterface := Handler.JsonToStruct(userJson, UserInfo)
+
+	return userInterface.(*Model.User)
 }
 
 //
