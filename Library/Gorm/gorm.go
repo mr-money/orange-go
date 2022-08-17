@@ -80,7 +80,7 @@ func connectMysql() *gorm.DB {
 
 //todo AutoMigrate自动建表 https://blog.csdn.net/qq_39787367/article/details/112567822
 func migration() {
-	fmt.Println("Mysql Migration begin!")
+	log.Println("Mysql Migration begin!")
 
 	dbSetTableOptions("用户表", "InnoDB")
 }
