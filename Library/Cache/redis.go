@@ -91,12 +91,14 @@ func RememberString(key string, value func() string, expiration time.Duration) s
 	if err != nil {
 		//缓存为空 返回传入数据
 		if err.Error() == "redis: nil" || data == "" {
-			//写入缓存
-			Redis.Set(
-				Cxt,
-				key, value(),
-				expiration,
-			)
+			if len(value()) > 0 {
+				//写入缓存
+				Redis.Set(
+					Cxt,
+					key, value(),
+					expiration,
+				)
+			}
 
 			return value()
 		}
