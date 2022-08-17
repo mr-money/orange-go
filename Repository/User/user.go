@@ -7,6 +7,7 @@ import (
 	"go-study/Library/Cache"
 	"go-study/Library/Handler"
 	"go-study/Model"
+	"reflect"
 	"time"
 )
 
@@ -33,7 +34,13 @@ func FindById(UserInfo *Model.User, Id uint64) *Model.User {
 			Model.UserModel().Take(&UserInfo, Id)
 		}
 
-		return Handler.ToJson(UserInfo)
+		//默认为空
+		userinfo := ""
+		if !reflect.DeepEqual(UserInfo, Model.User{}) {
+			userinfo = Handler.ToJson(UserInfo)
+		}
+
+		return userinfo
 
 	}, 1*time.Hour)
 

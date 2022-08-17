@@ -83,7 +83,7 @@ func putConfStruct(confRef reflect.Value, conf interface{}) {
 //// 公共方法 ////
 
 // GetFieldByName
-// @Description: 反射获取配置值
+// @Description: 反射获取配置值 非字符串值需先转字符串再转其他类型
 // @param confStruct 配置结构体
 // @param fieldName 字段名 如 DB,Host
 // @return reflect.Value

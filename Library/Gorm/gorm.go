@@ -48,7 +48,7 @@ func connectMysql() *gorm.DB {
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer（日志输出的目标，前缀和日志包含的内容——译者注）
 		logger.Config{
 			SlowThreshold:             2 * time.Second, // 慢 SQL 阈值
-			LogLevel:                  logger.Info,     // 日志级别
+			LogLevel:                  logger.Warn,     // 日志级别
 			IgnoreRecordNotFoundError: false,           // 忽略ErrRecordNotFound（记录未找到）错误
 			Colorful:                  true,            // 彩色打印
 		},
@@ -80,7 +80,7 @@ func connectMysql() *gorm.DB {
 
 //todo AutoMigrate自动建表 https://blog.csdn.net/qq_39787367/article/details/112567822
 func migration() {
-	fmt.Println("Mysql Migration begin!")
+	log.Println("Mysql Migration begin!")
 
 	dbSetTableOptions("用户表", "InnoDB")
 }
