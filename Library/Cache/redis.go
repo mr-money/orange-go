@@ -6,7 +6,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/shockerli/cvt"
 	"go-study/Config"
-	"reflect"
+	"log"
 	"runtime"
 	"strings"
 	"time"
@@ -21,6 +21,12 @@ var Cxt = context.Background()
 //
 func init() {
 	Redis = connectRedis()
+
+	if cvt.String(Redis.Ping(Cxt)) != "ping: PONG" {
+		log.Panicln(Redis.Ping(Cxt))
+	} else {
+		log.Println("Redis Connect Success")
+	}
 }
 
 //
@@ -29,17 +35,15 @@ func init() {
 // @return *redis.Client
 //
 func connectRedis() *redis.Client {
-	dbConf := reflect.ValueOf(Config.Configs.Web).FieldByName("Redis")
-
 	rdb := redis.NewClient(&redis.Options{
 		//连接信息
 		Network: "tcp", //网络类型，tcp or unix，默认tcp
 		Addr: fmt.Sprintf("%s:%s", //主机名+冒号+端口，默认localhost:6379
-			dbConf.FieldByName("Host"),
-			dbConf.FieldByName("Port"),
+			Config.GetFieldByName(Config.Configs.Web, "Redis", "Host"),
+			Config.GetFieldByName(Config.Configs.Web, "Redis", "Port"),
 		),
-		Password: cvt.String(dbConf.FieldByName("Pwd")), //密码
-		DB:       cvt.Int(dbConf.FieldByName("Db")),     // redis数据库index
+		Password: cvt.String(Config.GetFieldByName(Config.Configs.Web, "Redis", "Pwd")),         //密码
+		DB:       cvt.Int(cvt.String(Config.GetFieldByName(Config.Configs.Web, "Redis", "Db"))), // redis数据库index
 
 		//连接池容量及闲置连接数量
 		PoolSize:     4 * runtime.GOMAXPROCS(0), // 连接池最大socket连接数，默认为4倍CPU数， 4 * runtime.NumCPU
@@ -76,4 +80,38 @@ func SetKey(key ...string) string {
 	keys = append(keys, key...)
 
 	return strings.Join(keys, ":")
+}
+
+//
+// RememberString
+// @Description:不存在则写入缓存数据后返回
+// @param key 缓存key
+// @param value 缓存数据
+// @param expiration
+// @return string
+//
+func RememberString(key string, value func() string, expiration time.Duration) string {
+	//获取缓存数据
+	data, err := Redis.Get(Cxt, key).Result()
+	if err != nil {
+		//缓存为空 返回传入数据
+		if err.Error() == "redis: nil" || data == "" {
+			if len(value()) > 0 {
+				//写入缓存
+				Redis.Set(
+					Cxt,
+					key, value(),
+					expiration,
+				)
+			}
+
+			return value()
+		}
+
+		log.Println(err)
+
+		return ""
+	}
+
+	return data
 }
