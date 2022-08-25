@@ -44,6 +44,7 @@ func connectMysql() *gorm.DB {
 		Config.GetFieldByName(Config.Configs.Web, "DB", "Charset"),
 	)
 
+	//慢sql和错误
 	loggerConf := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer（日志输出的目标，前缀和日志包含的内容——译者注）
 		logger.Config{
@@ -56,6 +57,8 @@ func connectMysql() *gorm.DB {
 
 	db, dbErr := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: loggerConf,
+		//AutoMigrate 会自动创建数据库外键约束，您可以在初始化时禁用此功能
+		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 	if dbErr != nil {
 		panic(dbErr)
