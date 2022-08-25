@@ -42,8 +42,8 @@ func connectRedis() *redis.Client {
 			Config.GetFieldByName(Config.Configs.Web, "Redis", "Host"),
 			Config.GetFieldByName(Config.Configs.Web, "Redis", "Port"),
 		),
-		Password: cvt.String(Config.GetFieldByName(Config.Configs.Web, "Redis", "Pwd")),         //密码
-		DB:       cvt.Int(cvt.String(Config.GetFieldByName(Config.Configs.Web, "Redis", "Db"))), // redis数据库index
+		Password: Config.GetFieldByName(Config.Configs.Web, "Redis", "Pwd"),         //密码
+		DB:       cvt.Int(Config.GetFieldByName(Config.Configs.Web, "Redis", "Db")), // redis数据库index
 
 		//连接池容量及闲置连接数量
 		PoolSize:     4 * runtime.GOMAXPROCS(0), // 连接池最大socket连接数，默认为4倍CPU数， 4 * runtime.NumCPU
