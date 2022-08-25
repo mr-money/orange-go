@@ -2,13 +2,14 @@ package Model
 
 import (
 	uuid "github.com/satori/go.uuid"
+	"go-study/Config"
 	"go-study/Library/Gorm"
 	"go-study/Library/MyTime"
 	"gorm.io/gorm"
 )
 
-// TableName 表名
-const TableName = "user"
+// 表名（未加表前缀）
+const tableName = "user"
 
 //
 // User
@@ -31,7 +32,9 @@ type User struct {
 // @return string
 //
 func (User) TableName() string {
-	return TableName
+	prefix := Config.GetFieldByName(Config.Configs.Web, "DB", "Prefix")
+
+	return prefix + tableName
 }
 
 // UserModel
@@ -39,5 +42,5 @@ func (User) TableName() string {
 // @return *gorm.DB
 //
 func UserModel() *gorm.DB {
-	return Gorm.Mysql.Table(TableName)
+	return Gorm.Mysql.Table(User{}.TableName())
 }
