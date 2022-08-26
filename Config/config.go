@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/BurntSushi/toml"
 	"github.com/goinggo/mapstructure"
+	"github.com/shockerli/cvt"
 	"reflect"
 )
 
@@ -88,7 +89,7 @@ func putConfStruct(confRef reflect.Value, conf interface{}) {
 // @param fieldName 字段名 如 DB,Host
 // @return reflect.Value
 //
-func GetFieldByName(confStruct interface{}, fieldName ...string) reflect.Value {
+func GetFieldByName(confStruct interface{}, fieldName ...string) string {
 	var fieldNames []string
 	fieldNames = append(fieldNames, fieldName...)
 
@@ -97,5 +98,5 @@ func GetFieldByName(confStruct interface{}, fieldName ...string) reflect.Value {
 		conf = conf.FieldByName(field)
 	}
 
-	return conf
+	return cvt.String(conf)
 }
