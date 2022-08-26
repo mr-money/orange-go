@@ -17,9 +17,6 @@ var Mysql *gorm.DB
 func init() {
 	//默认mysql连接
 	Mysql = connectMysql()
-
-	//AutoMigrate 数据迁移
-	migration()
 }
 
 //
@@ -44,8 +41,9 @@ func connectMysql() *gorm.DB {
 		Config.GetFieldByName(Config.Configs.Web, "DB", "Charset"),
 	)
 
+	//慢sql和错误
 	loggerConf := logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer（日志输出的目标，前缀和日志包含的内容——译者注）
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer（日志输出的目标，前缀和日志包含的内容）
 		logger.Config{
 			SlowThreshold:             2 * time.Second, // 慢 SQL 阈值
 			LogLevel:                  logger.Warn,     // 日志级别
@@ -56,6 +54,8 @@ func connectMysql() *gorm.DB {
 
 	db, dbErr := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: loggerConf,
+		//AutoMigrate 会自动创建数据库外键约束，您可以在初始化时禁用此功能
+		DisableForeignKeyConstraintWhenMigrating: true,
 	})
 	if dbErr != nil {
 		panic(dbErr)
@@ -76,27 +76,4 @@ func connectMysql() *gorm.DB {
 
 	return db
 
-}
-
-//todo AutoMigrate自动建表 https://blog.csdn.net/qq_39787367/article/details/112567822
-func migration() {
-	log.Println("Mysql Migration begin!")
-
-	dbSetTableOptions("用户表", "InnoDB")
-}
-
-//
-// dbSetTableOptions
-// @Description: 表默认设置
-// @param comment 表注释
-// @param engine 表引擎
-// @return *gorm.DB
-//
-func dbSetTableOptions(engine string, comment string) *gorm.DB {
-	//设置表引擎和表注释
-	setValue := fmt.Sprintf("ENGINE=%s COMMENT='%s'", engine, comment)
-
-	fmt.Println(setValue)
-
-	return Mysql.Set("gorm:table_options", setValue)
 }
