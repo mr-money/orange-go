@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/pkg/errors"
 	"go-study/Database"
 	"go-study/Routes"
 	"log"
@@ -50,10 +49,7 @@ func defaultServer() {
 	shutdown(srv)
 
 	//启动自检
-	err := pingServer(port, srv)
-	if err != nil {
-		log.Panicln(err)
-	}
+	pingServer(port, srv)
 }
 
 //
@@ -62,22 +58,24 @@ func defaultServer() {
 // @param port
 // @return error
 //
-func pingServer(port string, srv *http.Server) error {
+func pingServer(port string, srv *http.Server) {
 	if listen := srv.ListenAndServe(); listen == http.ErrServerClosed {
-		return nil
+		return
 	}
 
 	for i := 0; i < 5; i++ {
 		resp, getErr := http.Get(fmt.Sprintf("http://127.0.0.1:%s/", port))
 		if getErr == nil && resp.StatusCode == 200 {
-			return nil
+			return
 		}
 
 		// Sleep for a second to continue the next ping.
 		log.Print("Waiting for the router, retry in 1 second.")
 		time.Sleep(time.Second)
 	}
-	return errors.New("Cannot connect to the router.")
+
+	log.Panicln("Web server in port " + port + ", Cannot connect to this server!")
+
 }
 
 //
