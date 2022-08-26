@@ -2,7 +2,8 @@
 
 ## 简介
 
-> 基于gin开发的微服务web框架，使用ddd领域驱动设计思想为基础架构思想  
+> 基于gin开发的微服务web框架，使用ddd领域驱动设计思想为基础架构思想
+> 入口文件可配置启动多个微服务端口模块 默认启动8080端口
 > 架构分层为 Model->Repository->Service->App  
 > 值对象（Value Object）→ 实体（Entity）→ 领域服务（Domain Service）  
 
@@ -21,7 +22,29 @@
 ### 入口
 
 > 默认入口文件 /main.go   
-> Routes.Include()方法初始化路由
+> Database.InitMigrate() 数据库迁移
+> Routes.Include() 初始化路由
+``` golang
+func defaultServer() {
+	//数据库迁移
+	Database.InitMigrate()
+
+	// 加载路由
+	Routes.Include(
+		Routes.Web, //默认web路由
+		Routes.Api, //api路由，需要token中间件验证
+	)
+
+	//启动服务
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: Routes.GinEngine,
+	}
+
+	//优雅关闭
+	shutdown(srv)
+}
+```
 
 ### 路由
 
@@ -50,7 +73,7 @@ model层默认demo Model/user.go
 
 #### 初始化model方法示例：
 
-```
+``` golang
 func UserModel() *gorm.DB {
 	return Gorm.Mysql.Table(tableName)
 }
@@ -58,7 +81,7 @@ func UserModel() *gorm.DB {
 
 #### repo层使用方法示例：
 
-```
+``` golang
  Model.UserModel().Take(&userInfo, 1)
 ```
 
@@ -67,12 +90,11 @@ func UserModel() *gorm.DB {
 服务启动时运行
 > Database.InitMigrate()
 
-ORM加入数据迁移列表  
+ORM加入数据迁移列表方法
 > Database.getMysqlMigrations()
 
-默认mysql下，也可新建模块append引入
-> Database.init()
-```
+#### ORM加入数据迁移列表 例如
+``` golang
 func getMysqlMigrations() []map[string]interface{} {
 	return append(mysqlMigrations,
 		//mysql下 user 用户表
@@ -94,6 +116,14 @@ func getMysqlMigrations() []map[string]interface{} {
 }
 ```
 
+也可在包Database下新建文件append引入
+``` golang
+func init() {
+	mysqlMigrations := getMysqlMigrations()
+	migrations = append(migrations, mysqlMigrations...)
+}
+```
+
 ### 缓存
 
 > Redis 连接基于go-redis模块
@@ -104,7 +134,7 @@ func getMysqlMigrations() []map[string]interface{} {
 
 #### 生成缓存key
 
-```
+``` golang
 Cache.SetKey({key1},{key2},{key3},...)  
 ```
 
@@ -112,7 +142,7 @@ Cache.SetKey({key1},{key2},{key3},...)
 
 #### 使用Redis
 
-```
+``` golang
 //获取缓存
 Cache.Redis.Get(Cache.Cxt, {key}).Result()
 
@@ -129,7 +159,7 @@ Cache.Redis.Get(Cache.Cxt, {key}).Result()
 
 #### Middle中间件 包MiddleWare：
 
-```
+``` golang
 CSRF 防跨站请求伪造
 MiddleWare.CSRF() //验证csrf
 MiddleWare.CSRFToken() //生成csrf token
