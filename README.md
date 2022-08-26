@@ -35,14 +35,19 @@ func defaultServer() {
 		Routes.Api, //api路由，需要token中间件验证
 	)
 
+	port := "8080"
+
 	//启动服务
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":" + port,
 		Handler: Routes.GinEngine,
 	}
 
 	//优雅关闭
 	shutdown(srv)
+
+	//启动自检
+	pingServer(port, srv)
 }
 ```
 
