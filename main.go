@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"go-study/Database"
 	"go-study/Routes"
 	"log"
 	"net/http"
@@ -15,23 +16,33 @@ import (
 //  @Description: 入口
 //
 func main() {
+
+	//默认服务
+	defaultServer()
+
+}
+
+//
+// defaultServer
+// @Description: 默认服务
+//
+func defaultServer() {
+	//数据库迁移
+	Database.InitMigrate()
+
 	// 加载路由
 	Routes.Include(
 		Routes.Web, //默认web路由
 		Routes.Api, //api路由，需要token中间件验证
 	)
 
-	//
-	//// 监听端口，默认在8080
-	// Run(":8000")
-	//_ = Routes.GinEngine.Run()
-
-	//优雅关闭
+	//启动服务
 	srv := &http.Server{
 		Addr:    ":8080",
 		Handler: Routes.GinEngine,
 	}
 
+	//优雅关闭
 	shutdown(srv)
 }
 

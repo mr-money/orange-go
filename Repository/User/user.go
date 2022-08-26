@@ -21,8 +21,8 @@ func FindById(UserInfo *Model.User, Id uint64) *Model.User {
 
 	//redis key 数据库名:表名
 	idKey := Cache.SetKey(
-		cvt.String(Config.GetFieldByName(Config.Configs.Web, "DB", "DbName")),
-		Model.TableName,
+		Config.GetFieldByName(Config.Configs.Web, "DB", "DbName"),
+		Model.User{}.TableName(),
 		cvt.String(Id),
 	)
 
