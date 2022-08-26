@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"github.com/pkg/errors"
 	"go-study/Database"
 	"go-study/Routes"
 	"log"
@@ -36,14 +38,46 @@ func defaultServer() {
 		Routes.Api, //api路由，需要token中间件验证
 	)
 
+	port := "8080"
+
 	//启动服务
 	srv := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":" + port,
 		Handler: Routes.GinEngine,
 	}
 
 	//优雅关闭
 	shutdown(srv)
+
+	//启动自检
+	err := pingServer(port, srv)
+	if err != nil {
+		log.Panicln(err)
+	}
+}
+
+//
+// pingServer
+// @Description: pings the http server to make sure the router is working.
+// @param port
+// @return error
+//
+func pingServer(port string, srv *http.Server) error {
+	if listen := srv.ListenAndServe(); listen == http.ErrServerClosed {
+		return nil
+	}
+
+	for i := 0; i < 5; i++ {
+		resp, getErr := http.Get(fmt.Sprintf("http://127.0.0.1:%s/", port))
+		if getErr == nil && resp.StatusCode == 200 {
+			return nil
+		}
+
+		// Sleep for a second to continue the next ping.
+		log.Print("Waiting for the router, retry in 1 second.")
+		time.Sleep(time.Second)
+	}
+	return errors.New("Cannot connect to the router.")
 }
 
 //
