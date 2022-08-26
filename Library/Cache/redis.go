@@ -25,7 +25,7 @@ func init() {
 	if cvt.String(Redis.Ping(Cxt)) != "ping: PONG" {
 		log.Panicln(Redis.Ping(Cxt))
 	} else {
-		log.Println("Redis Connect Success")
+		log.Println("Redis [" + Redis.Options().Addr + "]: Connect Success!")
 	}
 }
 
