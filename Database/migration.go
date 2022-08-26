@@ -34,7 +34,7 @@ func InitMigrate() {
 		}
 	}
 
-	log.Println("Database " + Gorm.Mysql.Migrator().CurrentDatabase() + ":----- Migration Success!")
+	log.Println("Database [" + Gorm.Mysql.Migrator().CurrentDatabase() + "]: Migration Success!")
 
 }
 
