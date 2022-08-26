@@ -5,6 +5,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/goinggo/mapstructure"
 	"github.com/shockerli/cvt"
+	"log"
 	"reflect"
 )
 
@@ -20,7 +21,7 @@ func init() {
 	var webConfig Web
 	webConfig.FileName = "web"
 
-	Include(webConfig)
+	include(webConfig)
 }
 
 //
@@ -28,7 +29,7 @@ func init() {
 // @Description: 初始化配置文件
 // @param configs
 //
-func Include(configs ...interface{}) {
+func include(configs ...interface{}) {
 	for _, conf := range configs {
 		//反射获取conf文件名
 		confRef := reflect.ValueOf(conf)
@@ -75,7 +76,14 @@ func putConfStruct(confRef reflect.Value, conf interface{}) {
 
 	switch getConfFileName(confRef) {
 	case "Config.Web": //默认web配置
-		_ = mapstructure.Decode(conf, &Configs.Web)
+		//fmt.Println("---------", conf)
+
+		err := mapstructure.Decode(conf, &Configs.Web)
+		if err != nil {
+			log.Panicln(err)
+		}
+
+		//fmt.Println("---------", Configs.Web)
 
 		break
 	}
@@ -84,10 +92,10 @@ func putConfStruct(confRef reflect.Value, conf interface{}) {
 //// 公共方法 ////
 
 // GetFieldByName
-// @Description: 反射获取配置值 非字符串值需先转字符串再转其他类型
+// @Description: 反射获取配置值
 // @param confStruct 配置结构体
-// @param fieldName 字段名 如 DB,Host
-// @return reflect.Value
+// @param fieldName 结构体内字段名 如 DB,Host
+// @return string
 //
 func GetFieldByName(confStruct interface{}, fieldName ...string) string {
 	var fieldNames []string
