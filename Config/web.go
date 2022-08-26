@@ -2,21 +2,23 @@ package Config
 
 type Web struct {
 	FileName string
-	Common   interface{} `toml:"COMMON"`
-	DB       struct {
-		Host    string `toml:"host"`
-		Port    string `toml:"port"`
-		DbName  string `toml:"dbName"`
-		User    string `toml:"user"`
-		Pwd     string `toml:"pwd"`
-		Prefix  string `toml:"prefix"`
-		Charset string `toml:"charset"`
-		Type    string `toml:"type"`
-	} `toml:"DB"`
+	Common   struct {
+		EnvModel string `mapstructure:"env_mode"`
+	} `mapstructure:"COMMON"`
+	DB struct {
+		Host    string `mapstructure:"host"`
+		Port    string `mapstructure:"port"`
+		DbName  string `mapstructure:"dbName"`
+		User    string `mapstructure:"user"`
+		Pwd     string `mapstructure:"pwd"`
+		Prefix  string `mapstructure:"prefix"`
+		Charset string `mapstructure:"charset"`
+		Type    string `mapstructure:"type"`
+	} `mapstructure:"DB"`
 	Redis struct {
-		Host string `toml:"host"`
-		Port string `toml:"port"`
-		Db   string `toml:"db"`
-		Pwd  string `toml:"pwd"`
-	} `toml:"REDIS"`
+		Host string `mapstructure:"host"`
+		Port string `mapstructure:"port"`
+		Db   string `mapstructure:"db"`
+		Pwd  string `mapstructure:"pwd"`
+	} `mapstructure:"REDIS"`
 }
