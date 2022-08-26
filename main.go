@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/gin-gonic/gin"
+	"go-study/Config"
 	"go-study/Database"
 	"go-study/Routes"
 	"log"
@@ -17,6 +19,8 @@ import (
 //  @Description: 入口
 //
 func main() {
+	//环境模式
+	gin.SetMode(Config.GetFieldByName(Config.Configs.Web, "Common", "EnvModel"))
 
 	//默认服务
 	defaultServer()
