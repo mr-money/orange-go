@@ -12,12 +12,25 @@
 
 #### go版本
 
-> ##### 1.17 https://golang.google.cn/dl/
+> ##### 1.17 
+> 下载地址 https://golang.google.cn/dl/
 
-项目根目录运行：
-> go env -w GO111MODULE=on  
-> go env -w GOPROXY=https://goproxy.cn,direct  
-> go mod tidy
+#### 安装
+```git
+git clone https://github.com/mr-money/go-study.git
+```
+##### 删除目录go-study下 .git文件夹
+> Windows   
+> 显示隐藏文件夹，直接删除即可
+> Linux  
+> ```find . -name ".git" | xargs rm -Rf```
+
+##### 项目根目录运行：
+```shell
+go env -w GO111MODULE=on  
+go env -w GOPROXY=https://goproxy.cn,direct  
+go mod tidy
+```
 
 ### 入口
 
