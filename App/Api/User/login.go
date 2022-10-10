@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/shockerli/cvt"
 	"go-study/Service/User"
+	"time"
 )
 
 //
@@ -78,16 +79,13 @@ func AddUser999(c *gin.Context) {
 	userInfo := make(map[string]string)
 	userInfo["password"] = "123456"
 
-	for i := 40001; i <= 50000; i++ {
-		userInfo["name"] = "test-name" + cvt.String(i)
+	userInfo["name"] = "test-name" + cvt.String(time.Now().Unix())
 
-		_, _, loginErr := User.Register(userInfo)
+	_, _, loginErr := User.Register(userInfo)
 
-		if loginErr != nil {
-			c.JSON(500, gin.H{"msg": loginErr.Error()})
-			return
-		}
-
+	if loginErr != nil {
+		c.JSON(500, gin.H{"msg": loginErr.Error()})
+		return
 	}
 
 	c.JSON(200, gin.H{

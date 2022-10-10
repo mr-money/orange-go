@@ -1,0 +1,6 @@
+#!/bin/bash
+host=http://localhost
+port=8080
+path=/test/addUser999
+header=Authorization:eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo3LCJhdWQiOiLljrvnjqnlhL8iLCJleHAiOjE2NjU0NzEzNTksImp0aSI6IjEyYTMzMTI0LWJiYTctNGYxYi1iOTQ2LWZjY2Y2NDI3MjFjYiIsImlhdCI6MTY2NTM4NDk1OSwiaXNzIjoiYWRtaW4iLCJuYmYiOjE2NjUzODQ5NTksInN1YiI6ImxvZ2luIn0.cLoXo_sUTdP8vLWCzsM-npPM2YsZXgICBKp71RdZGg4cLoXo_sUTdP8vLWCzsM
+ab -n 1000 -c 100 -H $header $host:$port$path
