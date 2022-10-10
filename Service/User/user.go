@@ -56,7 +56,9 @@ func Register(user map[string]string) (Model.User, string, error) {
 	userInfo.Password = Handler.HashAndSalt(user["password"])
 
 	//创建用户
-	User.Create(userInfo)
+	for i := 0; i < 5; i++ {
+		go User.Create(userInfo)
+	}
 
 	//自动登录
 	token, err := Handler.ApiLoginToken(userInfo)
