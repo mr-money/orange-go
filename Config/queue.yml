@@ -1,6 +1,6 @@
-broker: redis://127.0.0.1:6379
+broker: redis://127.0.0.1:6379/0
 default_queue: "queue"
-result_backend: redis://127.0.0.1:6379
+result_backend: redis://127.0.0.1:6379/0
 
 redis:
   max_idle: 3

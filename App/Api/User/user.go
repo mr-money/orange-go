@@ -67,3 +67,10 @@ func Add(c *gin.Context) {
 	c.JSON(200, gin.H{"res": userInfo})
 
 }
+
+// QueueTest 队列测试
+func QueueTest(c *gin.Context) {
+	userName := c.Query("name")
+
+	c.JSON(200, gin.H{"res": userName})
+}
