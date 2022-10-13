@@ -9,7 +9,7 @@ import (
 	"reflect"
 )
 
-var tomlDir = "./Config/toml"
+var tomlDir = "./Config"
 
 // Configs 全局配置内容
 var Configs struct {
