@@ -1,7 +1,6 @@
 package User
 
 import (
-	"fmt"
 	"github.com/RichardKnop/machinery/v1/tasks"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
@@ -108,12 +107,12 @@ func Login(user map[string]string) (Model.User, string, error) {
 }
 
 // QueueTest 队列测试
-func QueueTest(name string) {
+func QueueTest(name string) string {
 	// 注册任务
-	err := Queue.Server.RegisterTask("sum", QueueUser.UserLog)
+	err := Queue.Server.RegisterTask("userLog", QueueUser.UserLog)
 	if err != nil {
 		log.Println("reg task failed", err)
-		return
+		return name
 	}
 
 	//task signature
@@ -121,16 +120,24 @@ func QueueTest(name string) {
 		Name: "userLog",
 		Args: []tasks.Arg{
 			{
+				Name:  "name",
 				Type:  "string",
 				Value: name,
 			},
 		},
 	}
 
+	//发送任务
 	asyncResult, err := Queue.Server.SendTask(signature)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(asyncResult)
+	//获取结果
+	res, err := asyncResult.Get(1)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("queue get res is %v\n", tasks.HumanReadableResults(res))
+	return name
 }
