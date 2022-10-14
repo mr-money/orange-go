@@ -3,10 +3,10 @@ package Cache
 import (
 	"context"
 	"fmt"
+	"github.com/RichardKnop/machinery/v1/log"
 	"github.com/go-redis/redis/v8"
 	"github.com/shockerli/cvt"
 	"go-study/Config"
-	"log"
 	"runtime"
 	"strings"
 	"time"
@@ -23,9 +23,9 @@ func init() {
 	Redis = connectRedis()
 
 	if cvt.String(Redis.Ping(Cxt)) != "ping: PONG" {
-		log.Panicln(Redis.Ping(Cxt))
+		log.FATAL.Panicln(Redis.Ping(Cxt))
 	} else {
-		log.Println("Redis [" + Redis.Options().Addr + "]: Connect Success!")
+		log.INFO.Println("Redis [" + Redis.Options().Addr + "]: Connect Success!")
 	}
 }
 
@@ -108,7 +108,7 @@ func RememberString(key string, value func() string, expiration time.Duration) s
 			return value()
 		}
 
-		log.Println(err)
+		log.ERROR.Println(err)
 
 		return ""
 	}
