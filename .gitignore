@@ -1,2 +1,3 @@
 .idea
-Config/toml/*.toml
+Config/*.toml
+Config/*.yml
