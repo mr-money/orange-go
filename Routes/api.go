@@ -25,10 +25,15 @@ func Api(r *gin.Engine) {
 
 	//用户信息
 	user := apiGroup.Group("/user")
+
+	//队列测试
+	user.GET("/queueTest", User.QueueTest)
+
 	user.Use(MiddleWare.Auth())
 	{
 		user.GET("/userInfo", User.GetUserInfo)
 		user.GET("/userList", User.GetUserListPage)
 		user.GET("/add", User.Add)
 	}
+
 }

@@ -2,10 +2,10 @@ package Database
 
 import (
 	"fmt"
+	"github.com/RichardKnop/machinery/v1/log"
 	"github.com/shockerli/cvt"
 	"go-study/Library/Gorm"
 	"gorm.io/gorm"
-	"log"
 )
 
 var migrations []map[string]interface{}
@@ -29,12 +29,12 @@ func InitMigrate() {
 			cvt.String(migration["charset"]),
 		).AutoMigrate(migration["model"])
 		if migrateErr != nil {
-			log.Println(migrateErr)
+			log.ERROR.Println(migrateErr)
 			return
 		}
 	}
 
-	log.Println("Database [" + Gorm.Mysql.Migrator().CurrentDatabase() + "]: Migration Success!")
+	log.INFO.Println("Database [" + Gorm.Mysql.Migrator().CurrentDatabase() + "]: Migration Success!")
 
 }
 
