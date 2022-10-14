@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-study/Config"
 	"go-study/Database"
+	"go-study/Queue"
 	"go-study/Routes"
 	"log"
 	"net/http"
@@ -22,9 +23,11 @@ func main() {
 	//环境模式
 	gin.SetMode(Config.GetFieldByName(Config.Configs.Web, "Common", "EnvModel"))
 
-	//默认服务
-	defaultServer()
+	//队列服务
+	Queue.InitQueue()
 
+	//默认web服务 web服务需最后启动
+	defaultServer()
 }
 
 //
