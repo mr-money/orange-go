@@ -4,12 +4,14 @@ import (
 	"github.com/RichardKnop/machinery/v1"
 	"github.com/RichardKnop/machinery/v1/config"
 	"log"
+	"os"
 )
 
 var Server *machinery.Server
 
-func init() {
-	cnf, err := config.NewFromYaml("../Config/queue.yml", false)
+func InitQueue() {
+	rootPath, _ := os.Getwd()
+	cnf, err := config.NewFromYaml(rootPath+"/Config/queue.yml", false)
 	if err != nil {
 		log.Println("config failed", err)
 		return
