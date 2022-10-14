@@ -72,5 +72,7 @@ func Add(c *gin.Context) {
 func QueueTest(c *gin.Context) {
 	userName := c.Query("name")
 
-	c.JSON(200, gin.H{"res": userName})
+	res := User.QueueTest(userName)
+
+	c.JSON(200, gin.H{"res": res})
 }
