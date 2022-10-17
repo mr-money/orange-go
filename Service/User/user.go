@@ -1,15 +1,13 @@
 package User
 
 import (
-	"github.com/RichardKnop/machinery/v1/tasks"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 	"go-study/Library/Handler"
 	"go-study/Model"
 	"go-study/Queue"
-	QueueUser "go-study/Queue/Worker/Api/User"
+	"go-study/Queue/Worker/Api/QueueDemo"
 	"go-study/Repository/User"
-	"log"
 )
 
 //
@@ -108,36 +106,42 @@ func Login(user map[string]string) (Model.User, string, error) {
 
 // QueueTest 队列测试
 func QueueTest(name string) string {
-	// 注册任务
-	err := Queue.Server.RegisterTask("userLog", QueueUser.UserLog)
-	if err != nil {
-		log.Println("reg task failed", err)
-		return name
-	}
+	queueParams := make(map[string]interface{})
+	queueParams["name"] = name
 
-	//task signature
-	signature := &tasks.Signature{
-		Name: "userLog",
-		Args: []tasks.Arg{
-			{
-				Name:  "name",
-				Type:  "string",
-				Value: name,
+	res := Queue.AddTask("printName", QueueDemo.PrintName, queueParams)
+
+	return res
+	/*	// 注册任务
+		err := Queue.Server.RegisterTask("userLog", QueueDemo.UserLog)
+		if err != nil {
+			log.Println("reg task failed", err)
+			return name
+		}
+
+		//task signature
+		signature := &tasks.Signature{
+			Name: "userLog",
+			Args: []tasks.Arg{
+				{
+					Name:  "name",
+					Type:  "string",
+					Value: name,
+				},
 			},
-		},
-	}
+		}
 
-	//发送任务
-	asyncResult, err := Queue.Server.SendTask(signature)
-	if err != nil {
-		log.Fatal(err)
-	}
+		//发送任务
+		asyncResult, err := Queue.Server.SendTask(signature)
+		if err != nil {
+			log.Fatal(err)
+		}
 
-	//获取结果
-	res, err := asyncResult.Get(1)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("queue get res is %v\n", tasks.HumanReadableResults(res))
-	return name
+		//获取结果
+		res, err := asyncResult.Get(1)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("queue get res is %v\n", tasks.HumanReadableResults(res))
+		return name*/
 }
