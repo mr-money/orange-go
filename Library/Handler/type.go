@@ -1,17 +1,12 @@
 package Handler
 
-type typeMap struct {
-	index    int
-	typeName string
-}
-
 //
 // JudgeType
 // @Description: 判断基本数据类型
 // @param items
 // @return typeList
 //
-func JudgeType(items ...interface{}) (typeList []typeMap) {
+func JudgeType(items ...interface{}) (typeList map[int]string) {
 
 	for index, value := range items {
 		var typeName string
@@ -47,12 +42,8 @@ func JudgeType(items ...interface{}) (typeList []typeMap) {
 			typeName = "uint64"
 		}
 
-		typeMap := typeMap{
-			index:    index,
-			typeName: typeName,
-		}
-
-		typeList = append(typeList, typeMap)
+		typeMap := make(map[int]string)
+		typeMap[index] = typeName
 	}
 
 	return
