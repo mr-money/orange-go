@@ -1,7 +1,11 @@
-broker: redis://localhost:6379/1 #redis://[password@]host[port][/db_num]
+#redis://[password@]host[port][/db_num]
+#mongodb://[username:password@]host1[:port1][,host2[:port2],...[,hostN[:portN]]][/[database][?options]]
+
+broker: redis://root:@localhost:6379/1
 default_queue: "queue"
-result_backend: redis://localhost:6379/1
-results_expire_in: 604800 #结果过期时间
+#result_backend: redis://localhost:6379/1
+result_backend: mongodb://root:root@localhost:27017/go_study
+results_expire_in: 3600 #结果过期时间
 redis:
   max_idle: 3
   max_active: 3
