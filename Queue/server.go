@@ -50,7 +50,7 @@ func AddTask(taskName string, taskFunc interface{}, params map[string]interface{
 		typeName := Handler.JudgeType(param)
 		arg := tasks.Arg{
 			Name:  key,
-			Type:  typeName[0],
+			Type:  typeName,
 			Value: param,
 		}
 
