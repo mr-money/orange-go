@@ -5,27 +5,30 @@
 > 基于gin开发的微服务web框架，使用ddd领域驱动设计思想为基础架构思想
 > 入口文件可配置启动多个微服务端口模块 默认启动8080端口
 > 架构分层为 Model->Repository->Service->App  
-> 值对象（Value Object）→ 实体（Entity）→ 领域服务（Domain Service）  
-
+> 值对象（Value Object）→ 实体（Entity）→ 领域服务（Domain Service）
 
 ### 初始化框架
 
 #### go版本
 
-> ##### 1.17 
+> ##### 1.17
 > 下载地址 https://golang.google.cn/dl/
 
 #### 安装
+
 ```git
 git clone https://github.com/mr-money/go-study.git
 ```
+
 ##### 删除目录go-study下 .git文件夹
+
 > Windows   
 > 显示隐藏文件夹，直接删除即可
 > Linux  
 > ```find . -name ".git" | xargs rm -Rf```
 
 ##### 项目根目录运行：
+
 ```shell
 go env -w GO111MODULE=on  
 go env -w GOPROXY=https://goproxy.cn,direct  
@@ -37,6 +40,7 @@ go mod tidy
 > 默认入口文件 /main.go   
 > Database.InitMigrate() 数据库迁移
 > Routes.Include() 初始化路由
+
 ``` golang
 func defaultServer() {
 	//数据库迁移
@@ -112,6 +116,7 @@ ORM加入数据迁移列表方法
 > Database.getMysqlMigrations()
 
 #### ORM加入数据迁移列表 例如
+
 ``` golang
 func getMysqlMigrations() []map[string]interface{} {
 	return append(mysqlMigrations,
@@ -135,6 +140,7 @@ func getMysqlMigrations() []map[string]interface{} {
 ```
 
 也可在包Database下新建文件append引入
+
 ``` golang
 func init() {
 	mysqlMigrations := getMysqlMigrations()
@@ -186,6 +192,43 @@ MiddleWare.Auth() //jwt登录验证
   auth := context.Request.Header.Get("Authorization")
 
 ```
+
+### 队列
+
+> 队列 目前基于redis list实现简单队列  
+> TODO 集成RabbitMQ和Kafka
+
+#### 加入队列任务
+
+``` golang
+//任务参数 数据类型 map
+queueParams := make(map[string]interface{})
+queueParams["name"] = name
+
+//加入队列任务
+res := Queue.AddTask(
+  "printName", //任务名称
+  QueueDemo.PrintName, //消费方法
+  queueParams, //任务参数
+)
+```
+
+#### 队列任务消费
+> 队列消费方法目录路径 Queue|Worker|{对应APP下路径} 
+
+```golang
+//name 参数接收 加入任务传入参数
+func PrintName(name string) (string, error) {
+    //TODO 消费逻辑
+	
+	if false { //error 3秒重试
+		return name, tasks.NewErrRetryTaskLater("error:", 3*time.Second)
+	}
+	return name, nil
+}
+
+```
+
 
 
 
