@@ -2,6 +2,7 @@ package Routes
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-study/App/Api/QueueDemo"
 	"go-study/App/Api/User"
 	"go-study/MiddleWare"
 )
@@ -27,7 +28,7 @@ func Api(r *gin.Engine) {
 	user := apiGroup.Group("/user")
 
 	//队列测试
-	user.GET("/queueTest", User.QueueTest)
+	user.GET("/queueTest", QueueDemo.QueueTest)
 
 	user.Use(MiddleWare.Auth())
 	{
