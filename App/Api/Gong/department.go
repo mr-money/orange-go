@@ -8,7 +8,11 @@ import (
 	"strings"
 )
 
-//常高新部门格式化
+//
+// FormatDep
+// @Description: 常高新部门格式化
+// @param c
+//
 func FormatDep(c *gin.Context) {
 	depJson := c.PostForm("data")
 
