@@ -39,7 +39,7 @@ func Api(r *gin.Engine) {
 	}
 
 	//小公
-	gong := apiGroup.Group("/gong")
+	gong := apiGroup.Group("/gong").Use(MiddleWare.Cors())
 
 	//常高新部门格式化
 	gong.POST("/formatDep", Gong.FormatDep)
