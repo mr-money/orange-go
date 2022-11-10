@@ -43,6 +43,9 @@ func FormatDep(c *gin.Context) {
 	//顶级公司关键词定义
 	keywords := []string{
 		"公司",
+		"伙)",
+		"营层",
+		"伙）",
 	}
 
 	//定义返回
