@@ -2,7 +2,6 @@ package Routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"go-study/App/Api/Gong"
 	"go-study/App/Api/QueueDemo"
 	"go-study/App/Api/User"
 	"go-study/MiddleWare"
@@ -37,11 +36,4 @@ func Api(r *gin.Engine) {
 		user.GET("/userList", User.GetUserListPage)
 		user.GET("/add", User.Add)
 	}
-
-	//小公
-	gong := apiGroup.Group("/gong").Use(MiddleWare.Cors())
-
-	//常高新部门格式化
-	gong.POST("/formatDep", Gong.FormatDep)
-
 }
