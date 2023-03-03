@@ -1,12 +1,9 @@
-package main
+package Api
 
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"go-study/Config"
 	"go-study/Database"
-	"go-study/Queue"
 	"go-study/Routes"
 	"log"
 	"net/http"
@@ -16,25 +13,10 @@ import (
 )
 
 //
-//  main
-//  @Description: 入口
-//
-func main() {
-	//环境模式
-	gin.SetMode(Config.GetFieldByName(Config.Configs.Web, "Common", "EnvModel"))
-
-	//队列服务
-	Queue.InitQueue()
-
-	//默认web服务 web服务需最后启动
-	defaultServer()
-}
-
-//
-// defaultServer
+// Run
 // @Description: 默认服务
 //
-func defaultServer() {
+func Run() {
 	//数据库迁移
 	Database.InitMigrate()
 

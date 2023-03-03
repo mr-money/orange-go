@@ -35,37 +35,12 @@ go env -w GOPROXY=https://goproxy.cn,direct
 go mod tidy
 ```
 
-### 入口
+### 微服务入口
 
-> 默认入口文件 /main.go   
-> Database.InitMigrate() 数据库迁移
-> Routes.Include() 初始化路由
-
+> 默认API服务入口文件 /Container/App/main.go   
 ``` golang
-func defaultServer() {
-	//数据库迁移
-	Database.InitMigrate()
-
-	// 加载路由
-	Routes.Include(
-		Routes.Web, //默认web路由
-		Routes.Api, //api路由，需要token中间件验证
-	)
-
-	port := "8080"
-
-	//启动服务
-	srv := &http.Server{
-		Addr:    ":" + port,
-		Handler: Routes.GinEngine,
-	}
-
-	//优雅关闭
-	shutdown(srv)
-
-	//启动自检
-	pingServer(port, srv)
-}
+Database.InitMigrate() //数据库迁移
+Routes.Include() //初始化路由
 ```
 
 ### 路由
