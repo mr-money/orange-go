@@ -11,7 +11,7 @@ import (
 
 var server *machinery.Server
 
-func InitQueue() {
+func Run() {
 	rootPath, _ := os.Getwd()
 	cnf, err := config.NewFromYaml(rootPath+"/Config/queue.yml", false)
 	if err != nil {
