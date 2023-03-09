@@ -2,24 +2,24 @@ package Queue
 
 import (
 	"github.com/RichardKnop/machinery/v1"
-	"github.com/RichardKnop/machinery/v1/config"
 	"github.com/RichardKnop/machinery/v1/tasks"
+	"go-study/Config"
 	"go-study/Library/Handler"
 	"log"
-	"os"
 )
 
 var server *machinery.Server
 
-func Run() {
-	rootPath, _ := os.Getwd()
+// DefaultRun 默认redis队列
+func DefaultRun() {
+	/*rootPath, _ := os.Getwd()
 	cnf, err := config.NewFromYaml(rootPath+"/Config/queue.yml", false)
 	if err != nil {
 		log.Println("config failed", err)
 		return
-	}
+	}*/
 
-	server, err = machinery.NewServer(cnf)
+	server, err := machinery.NewServer(Config.DefaultRedis)
 	if err != nil {
 		log.Println("start server failed", err)
 		return
