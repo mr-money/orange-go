@@ -5,11 +5,8 @@ import (
 	"time"
 )
 
+// PrintName 队列消费 打印名称
 func PrintName(name string) (string, error) {
-	//return name, tasks.NewErrRetryTaskLater("error:", 3*time.Second)
-
-	if false { //error 3秒重试
-		return name, tasks.NewErrRetryTaskLater("error:", 3*time.Second)
-	}
-	return name, nil
+	//error 3秒重试
+	return name, tasks.NewErrRetryTaskLater("error:", 3*time.Second)
 }

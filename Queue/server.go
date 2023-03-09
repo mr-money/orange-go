@@ -19,7 +19,8 @@ func DefaultRun() {
 		return
 	}*/
 
-	server, err := machinery.NewServer(Config.DefaultRedis)
+	var err error
+	server, err = machinery.NewServer(Config.DefaultRedis)
 	if err != nil {
 		log.Println("start server failed", err)
 		return
