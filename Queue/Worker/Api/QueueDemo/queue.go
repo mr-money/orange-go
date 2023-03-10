@@ -1,15 +1,22 @@
 package QueueDemo
 
 import (
-	"github.com/RichardKnop/machinery/v1/tasks"
+	"fmt"
 	"time"
 )
 
-func PrintName(name string) (string, error) {
+// PrintNameDelay 队列消费 打印名称
+func PrintNameDelay(name string) (string, error) {
+	//error 3秒重试
+	time.Sleep(10 * time.Second)
 	//return name, tasks.NewErrRetryTaskLater("error:", 3*time.Second)
+	fmt.Println("delay:" + name)
+	return name, nil
+}
 
-	if false { //error 3秒重试
-		return name, tasks.NewErrRetryTaskLater("error:", 3*time.Second)
-	}
+func PrintName(name string) (string, error) {
+	//error 3秒重试
+	//return name, tasks.NewErrRetryTaskLater("error:", 3*time.Second)
+	fmt.Println("now:" + name)
 	return name, nil
 }
