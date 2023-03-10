@@ -39,11 +39,11 @@ func connectRedis() *redis.Client {
 		//连接信息
 		Network: "tcp", //网络类型，tcp or unix，默认tcp
 		Addr: fmt.Sprintf("%s:%s", //主机名+冒号+端口，默认localhost:6379
-			Config.GetFieldByName(Config.Configs.Web, "Redis", "Host"),
-			Config.GetFieldByName(Config.Configs.Web, "Redis", "Port"),
+			Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
+			Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
 		),
-		Password: Config.GetFieldByName(Config.Configs.Web, "Redis", "Pwd"),         //密码
-		DB:       cvt.Int(Config.GetFieldByName(Config.Configs.Web, "Redis", "Db")), // redis数据库index
+		Password: Config.GetFieldByName(Config.Configs.Web.Redis, "Pwd"),         //密码
+		DB:       cvt.Int(Config.GetFieldByName(Config.Configs.Web.Redis, "Db")), // redis数据库index
 
 		//连接池容量及闲置连接数量
 		PoolSize:     4 * runtime.GOMAXPROCS(0), // 连接池最大socket连接数，默认为4倍CPU数， 4 * runtime.NumCPU
