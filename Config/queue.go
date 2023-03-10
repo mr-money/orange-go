@@ -1,6 +1,9 @@
 package Config
 
-import "github.com/RichardKnop/machinery/v1/config"
+import (
+	"fmt"
+	"github.com/RichardKnop/machinery/v1/config"
+)
 
 /*var cnf = &config.Config{
 	Broker:        "amqp://guest:guest@localhost:5672/",
@@ -13,10 +16,8 @@ import "github.com/RichardKnop/machinery/v1/config"
 	},
 }*/
 
-var DefaultRedis = &config.Config{
-	Broker:          "redis://root:@localhost:6379/1",
+var RedisQueue = &config.Config{
 	DefaultQueue:    "default_queue",
-	ResultBackend:   "mongodb://localhost:27017/go_study",
 	ResultsExpireIn: 259200,
 	Redis: &config.RedisConfig{
 		//MaxIdle:                   3,
@@ -30,4 +31,22 @@ var DefaultRedis = &config.Config{
 		//DelayedTasksPollPeriod: 500,
 		DelayedTasksKey: "default_queue",
 	},
+}
+
+//初始化队列配置
+func init() {
+	RedisQueue.Broker = fmt.Sprintf("redis://%s@%s:%s/%s",
+		GetFieldByName(Configs.Web.Redis, "Pwd"),  //密码
+		GetFieldByName(Configs.Web.Redis, "Host"), //地址
+		GetFieldByName(Configs.Web.Redis, "Port"), //端口
+		"2", //redis db
+	)
+
+	RedisQueue.ResultBackend = fmt.Sprintf("redis://%s@%s:%s/%s",
+		GetFieldByName(Configs.Web.Redis, "Pwd"),  //密码
+		GetFieldByName(Configs.Web.Redis, "Host"), //地址
+		GetFieldByName(Configs.Web.Redis, "Port"), //端口
+		"1", //redis db
+	)
+
 }
