@@ -6,7 +6,6 @@ import (
 	"go-study/Library/Handler"
 	"go-study/Model"
 	"go-study/Queue"
-	"go-study/Queue/Worker/Api/QueueDemo"
 	"go-study/Repository/User"
 )
 
@@ -113,8 +112,12 @@ func QueueTest(name string) string {
 	queueParams["name"] = name
 
 	res := Queue.AddTask(
-		"printName",
-		QueueDemo.PrintName,
+		Queue.PrintName,
+		queueParams,
+	)
+
+	Queue.AddTask(
+		Queue.PrintNameDelay,
 		queueParams,
 	)
 
