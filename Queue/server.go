@@ -10,17 +10,10 @@ import (
 
 var server *machinery.Server
 
-// DefaultRun 默认redis队列
-func DefaultRun() {
-	/*rootPath, _ := os.Getwd()
-	cnf, err := config.NewFromYaml(rootPath+"/Config/queue.yml", false)
-	if err != nil {
-		log.Println("config failed", err)
-		return
-	}*/
-
+// Run 队列服务
+func Run() {
 	var err error
-	server, err = machinery.NewServer(Config.DefaultRedis)
+	server, err = machinery.NewServer(Config.RedisQueue)
 	if err != nil {
 		log.Println("start server failed", err)
 		return
@@ -37,9 +30,9 @@ func DefaultRun() {
 }
 
 // AddTask 加入队列任务
-func AddTask(taskName string, taskFunc interface{}, params map[string]interface{}) string {
+func AddTask(taskName string, params map[string]interface{}) string {
 	// 注册任务
-	err := server.RegisterTask(taskName, taskFunc)
+	err := server.RegisterTasks(taskList)
 	if err != nil {
 		log.Panicln("register task failed", err)
 		return ""
@@ -71,10 +64,12 @@ func AddTask(taskName string, taskFunc interface{}, params map[string]interface{
 	}
 
 	//获取结果
-	res, err := asyncResult.Get(1)
+	/*res, err := asyncResult.Get(1)
+
 	if err != nil {
 		log.Panicln(err)
 	}
-	//log.Printf("queue get res is %v\n", tasks.HumanReadableResults(res))
-	return tasks.HumanReadableResults(res)
+	//log.Printf("queue get res is %v\n", tasks.HumanReadableResults(res))*/
+
+	return asyncResult.GetState().State
 }
