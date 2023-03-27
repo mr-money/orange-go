@@ -13,6 +13,8 @@ var server *machinery.Server
 
 func Run() {
 	rootPath, _ := os.Getwd()
+
+	//todo 配置结构体读取
 	cnf, err := config.NewFromYaml(rootPath+"/Config/queue.yml", false)
 	if err != nil {
 		log.Println("config failed", err)
@@ -37,6 +39,7 @@ func Run() {
 
 // AddTask 加入队列任务
 func AddTask(taskName string, taskFunc interface{}, params map[string]interface{}) string {
+	//todo 注册任务改为列表注册
 	// 注册任务
 	err := server.RegisterTask(taskName, taskFunc)
 	if err != nil {
@@ -59,6 +62,9 @@ func AddTask(taskName string, taskFunc interface{}, params map[string]interface{
 
 	//参数签名
 	signature := &tasks.Signature{
+		//todo 第一个参数传入队列名
+		// RoutingKey: "队列名",
+
 		Name: taskName,
 		Args: args,
 	}
