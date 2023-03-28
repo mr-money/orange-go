@@ -170,25 +170,20 @@ MiddleWare.Auth() //jwt登录验证
 
 ### 队列
 
+> 队列 目前基于redis list实现简单队列  
+> TODO 集成RabbitMQ和Kafka
+
 #### 加入队列任务
 
 ``` golang
-// PrintName 任务名称
-const (
-	PrintName      = "print_name"
-)
-
-// TaskList 对应任务消费方法
-var taskList = map[string]interface{}{
-	PrintName:      QueueDemo.PrintName,
-}
-
 //任务参数 数据类型 map
 queueParams := make(map[string]interface{})
+queueParams["name"] = name
 
 //加入队列任务
 res := Queue.AddTask(
-  Queue.PrintName, //任务名称
+  "printName", //任务名称
+  QueueDemo.PrintName, //消费方法
   queueParams, //任务参数
 )
 ```

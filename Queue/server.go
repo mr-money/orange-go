@@ -2,18 +2,24 @@ package Queue
 
 import (
 	"github.com/RichardKnop/machinery/v1"
+	"github.com/RichardKnop/machinery/v1/config"
 	"github.com/RichardKnop/machinery/v1/tasks"
-	"go-study/Config"
 	"go-study/Library/Handler"
 	"log"
+	"os"
 )
 
 var server *machinery.Server
 
-// Run 队列服务
 func Run() {
-	var err error
-	server, err = machinery.NewServer(Config.RedisQueue)
+	rootPath, _ := os.Getwd()
+	cnf, err := config.NewFromYaml(rootPath+"/Config/queue.yml", false)
+	if err != nil {
+		log.Println("config failed", err)
+		return
+	}
+
+	server, err = machinery.NewServer(cnf)
 	if err != nil {
 		log.Println("start server failed", err)
 		return
@@ -30,9 +36,9 @@ func Run() {
 }
 
 // AddTask 加入队列任务
-func AddTask(taskName string, params map[string]interface{}) string {
+func AddTask(taskName string, taskFunc interface{}, params map[string]interface{}) string {
 	// 注册任务
-	err := server.RegisterTasks(taskList)
+	err := server.RegisterTask(taskName, taskFunc)
 	if err != nil {
 		log.Panicln("register task failed", err)
 		return ""
@@ -64,12 +70,10 @@ func AddTask(taskName string, params map[string]interface{}) string {
 	}
 
 	//获取结果
-	/*res, err := asyncResult.Get(1)
-
+	res, err := asyncResult.Get(1)
 	if err != nil {
 		log.Panicln(err)
 	}
-	//log.Printf("queue get res is %v\n", tasks.HumanReadableResults(res))*/
-
-	return asyncResult.GetState().State
+	//log.Printf("queue get res is %v\n", tasks.HumanReadableResults(res))
+	return tasks.HumanReadableResults(res)
 }
