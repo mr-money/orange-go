@@ -20,6 +20,13 @@
 git clone https://github.com/mr-money/go-study.git
 ```
 
+##### 删除目录go-study下 .git文件夹
+
+> Windows   
+> 显示隐藏文件夹，直接删除即可
+> Linux  
+> ```find . -name ".git" | xargs rm -Rf```
+
 ##### 项目根目录运行：
 
 ```shell
@@ -28,9 +35,9 @@ go env -w GOPROXY=https://goproxy.cn,direct
 go mod tidy
 ```
 
-### 微服务api入口
+### 微服务入口
 
-> 默认API服务入口文件 /Container/Api/main.go   
+> 默认API服务入口文件 /Container/App/main.go   
 ``` golang
 Database.InitMigrate() //数据库迁移
 Routes.Include() //初始化路由
