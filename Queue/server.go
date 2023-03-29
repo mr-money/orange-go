@@ -63,6 +63,7 @@ func AddTask(taskName string, taskFunc interface{}, params map[string]interface{
 	//参数签名
 	signature := &tasks.Signature{
 		//todo 第一个参数传入队列名
+		// 队列名需要去server中配置的defaultQueue相同
 		// RoutingKey: "队列名",
 
 		Name: taskName,
