@@ -29,6 +29,7 @@ func Api(r *gin.Engine) {
 
 	//队列测试
 	user.GET("/queueTest", QueueDemo.QueueTest)
+	user.GET("/queueTest2", QueueDemo.QueueTest2)
 
 	user.Use(MiddleWare.Auth())
 	{
