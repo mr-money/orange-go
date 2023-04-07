@@ -163,8 +163,55 @@ MiddleWare.Auth() //jwt登录验证
 
 ### 队列
 
-> 队列 目前基于redis list实现简单队列  
-> TODO 集成RabbitMQ和Kafka
+> 集成Redis和RabbitMQ  
+> 可配置多条队列server监听
+> 单条队列任务可配置多个worker消费
+ 
+#### 队列配置
+Queue/config.go:confList() 方法 配置队列
+``` golang
+&[]config.Config{
+		{
+			DefaultQueue: "go_study", //队列名
+			Broker: fmt.Sprintf("redis://%s:%s/%s",
+				Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
+				Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
+				"1",
+			),
+			ResultBackend: fmt.Sprintf("redis://%s:%s/%s",
+				Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
+				Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
+				"1",
+			),
+			ResultsExpireIn: 3600, //结果过期时间
+			Redis: &config.RedisConfig{
+				MaxIdle:                3,
+				IdleTimeout:            240,
+				ReadTimeout:            15,
+				WriteTimeout:           15,
+				ConnectTimeout:         15,
+				NormalTasksPollPeriod:  1000,
+				DelayedTasksPollPeriod: 500,
+			},
+		}
+	}
+```
+
+#### 队列配置
+Queue/tasks.go:initTasks() 方法 配置队列及相关消费方法
+``` golang
+for _, conf := range *confList() {
+		tasksList[conf.DefaultQueue] = make(map[string]interface{})
+		switch conf.DefaultQueue {
+		//区分不同队列任务
+		case "go_study":
+			tasksList[conf.DefaultQueue][PrintNameFunc] = QueueDemo.PrintName
+		case "go_study2":
+			tasksList[conf.DefaultQueue][PrintName2Func] = QueueDemo.PrintName
+		}
+	}
+```
+
 
 #### 加入队列任务
 

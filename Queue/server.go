@@ -2,6 +2,7 @@ package Queue
 
 import (
 	"github.com/RichardKnop/machinery/v1"
+	"github.com/RichardKnop/machinery/v1/config"
 	"github.com/RichardKnop/machinery/v1/tasks"
 	"go-study/Library/Handler"
 	"log"
@@ -18,51 +19,46 @@ func Run() {
 		return
 	}*/
 
-	/*server, err = machinery.NewServer(initConf())
+	//初始化队列&消费任务
+	initTasks()
+
+	//循环创建队列server
+	serverMap = make(map[string]*machinery.Server)
+	for _, conf := range *confList() {
+		listen(conf)
+	}
+
+}
+
+//
+// listen
+// @Description: server&worker监听
+// @param conf 队列配置
+//
+func listen(conf config.Config) {
+	server, err := machinery.NewServer(&conf)
 	if err != nil {
 		log.Println("start server failed", err)
 		return
 	}
 
-	worker := server.NewWorker("queue", 1)
-	go func() {
-		err = worker.Launch()
+	worker := server.NewWorker(conf.DefaultQueue, 1)
+	go func(workerIn *machinery.Worker) {
+		err = workerIn.Launch()
 		if err != nil {
-			log.Println("start worker error", err)
-			return
-		}
-	}()*/
-
-	//初始化队列&消费任务
-	initTasks()
-
-	//循环创建队列server
-	var err error
-	serverMap = make(map[string]*machinery.Server)
-	for _, conf := range *confList() {
-		serverMap[conf.DefaultQueue], err = machinery.NewServer(&conf)
-		if err != nil {
-			log.Println("start server: "+conf.DefaultQueue+" failed", err)
+			log.Println("start "+conf.DefaultQueue+": worker error", err)
 			return
 		}
 
-		//todo 协程创建队列配置覆盖重复
-		worker := serverMap[conf.DefaultQueue].NewWorker(conf.DefaultQueue, 1)
-		go func(inWorker *machinery.Worker) {
-			err = inWorker.Launch()
+	}(worker)
 
-			if err != nil {
-				log.Println("start worker error", err)
-				return
-			}
-		}(worker)
-
-		//注册任务
-		err = serverMap[conf.DefaultQueue].RegisterTasks(tasksList[conf.DefaultQueue])
-		if err != nil {
-			log.Panicln("register tasks in queue: "+conf.DefaultQueue+" failed", err)
-		}
+	//注册任务
+	err = server.RegisterTasks(tasksList[conf.DefaultQueue])
+	if err != nil {
+		log.Panicln("register tasks in queue: "+conf.DefaultQueue+" failed", err)
 	}
+
+	serverMap[conf.DefaultQueue] = server
 
 }
 
