@@ -25,7 +25,7 @@ func initTasks() {
 		case "go_study":
 			tasksList[conf.DefaultQueue][PrintNameFunc] = QueueDemo.PrintName
 		case "go_study2":
-			tasksList[conf.DefaultQueue][PrintName2Func] = QueueDemo.PrintName
+			tasksList[conf.DefaultQueue][PrintName2Func] = QueueDemo.PrintName2
 		}
 	}
 }
