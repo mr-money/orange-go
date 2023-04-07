@@ -13,3 +13,11 @@ func QueueTest(c *gin.Context) {
 
 	c.JSON(200, gin.H{"res": res})
 }
+
+func QueueTest2(c *gin.Context) {
+	userName := c.Query("name")
+
+	res := User.QueueTest2(userName)
+
+	c.JSON(200, gin.H{"res": res})
+}

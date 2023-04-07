@@ -116,10 +116,17 @@ func QueueTest(name string) string {
 		queueParams,
 	)
 
-	res2 := Queue.AddTask(
+	return res
+}
+
+func QueueTest2(name string) string {
+	queueParams := make(map[string]interface{})
+	queueParams["name"] = name
+
+	res := Queue.AddTask(
 		Queue.PrintName2Func,
 		queueParams,
 	)
 
-	return res + "---" + res2
+	return res
 }
