@@ -70,12 +70,13 @@ func confList() *[]config.Config {
 		},
 		{
 			DefaultQueue: "go_study2", //队列名
-			/*Broker: fmt.Sprintf("redis://%s:%s/%s",
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
-				"2",
-			),*/
-			Broker: "amqp://guest:guest@localhost:5672",
+			//Broker: "amqp://guest:guest@localhost:5672",
+			Broker: fmt.Sprintf("amqp://%s:%s@%s:%s",
+				Config.GetFieldByName(Config.Configs.Web.RabbitMq, "User"),
+				Config.GetFieldByName(Config.Configs.Web.RabbitMq, "Pwd"),
+				Config.GetFieldByName(Config.Configs.Web.RabbitMq, "Host"),
+				Config.GetFieldByName(Config.Configs.Web.RabbitMq, "Port"),
+			),
 			ResultBackend: fmt.Sprintf("redis://%s:%s/%s",
 				Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
 				Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
