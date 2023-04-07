@@ -197,7 +197,7 @@ Queue/config.go:confList() 方法 配置队列
 	}
 ```
 
-#### 队列配置
+#### 任务消费配置
 Queue/tasks.go:initTasks() 方法 配置队列及相关消费方法
 ``` golang
 for _, conf := range *confList() {
@@ -222,10 +222,9 @@ queueParams["name"] = name
 
 //加入队列任务
 res := Queue.AddTask(
-  "printName", //任务名称
-  QueueDemo.PrintName, //消费方法
-  queueParams, //任务参数
-)
+		Queue.PrintNameFunc, //消费方法
+		queueParams, //任务参数
+	)
 ```
 
 #### 队列任务消费
