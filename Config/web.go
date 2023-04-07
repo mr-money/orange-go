@@ -21,4 +21,10 @@ type Web struct {
 		Db   string `mapstructure:"db"`
 		Pwd  string `mapstructure:"pwd"`
 	} `mapstructure:"REDIS"`
+	RabbitMq struct {
+		Host string `mapstructure:"host"`
+		Port string `mapstructure:"port"`
+		User string `mapstructure:"user"`
+		Pwd  string `mapstructure:"pwd"`
+	} `mapstructure:"RABBITMQ"`
 }
