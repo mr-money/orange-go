@@ -19,9 +19,6 @@ func Run() {
 		return
 	}*/
 
-	//初始化队列&消费任务
-	initTasks()
-
 	//循环创建队列server
 	serverMap = make(map[string]*machinery.Server)
 	for _, conf := range *confList() {

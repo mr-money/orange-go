@@ -17,7 +17,7 @@ var tasksList = map[string]map[string]interface{}{}
 // initTasks
 // @Description: 配置队列及相关消费方法
 //
-func initTasks() {
+func init() {
 	for _, conf := range *confList() {
 		tasksList[conf.DefaultQueue] = make(map[string]interface{})
 		switch conf.DefaultQueue {
