@@ -25,52 +25,37 @@ func Run() {
 	//循环创建队列server
 	serverMap = make(map[string]*machinery.Server)
 	for _, conf := range *confList() {
-		listen(conf)
+		func(confIn config.Config) {
+			server, err := machinery.NewServer(&confIn)
+			if err != nil {
+				log.Println("start server failed", err)
+				return
+			}
+
+			worker := server.NewWorker(confIn.DefaultQueue, 1)
+			go func(workerIn *machinery.Worker) {
+				err = workerIn.Launch()
+				if err != nil {
+					log.Println("start "+confIn.DefaultQueue+": worker error", err)
+					return
+				}
+
+			}(worker)
+
+			//注册任务
+			err = server.RegisterTasks(tasksList[confIn.DefaultQueue])
+			if err != nil {
+				log.Panicln("register tasks in queue: "+confIn.DefaultQueue+" failed", err)
+			}
+
+			serverMap[confIn.DefaultQueue] = server
+		}(conf)
 	}
-
-}
-
-//
-// listen
-// @Description: server&worker监听
-// @param conf 队列配置
-//
-func listen(conf config.Config) {
-	server, err := machinery.NewServer(&conf)
-	if err != nil {
-		log.Println("start server failed", err)
-		return
-	}
-
-	worker := server.NewWorker(conf.DefaultQueue, 1)
-	go func(workerIn *machinery.Worker) {
-		err = workerIn.Launch()
-		if err != nil {
-			log.Println("start "+conf.DefaultQueue+": worker error", err)
-			return
-		}
-
-	}(worker)
-
-	//注册任务
-	err = server.RegisterTasks(tasksList[conf.DefaultQueue])
-	if err != nil {
-		log.Panicln("register tasks in queue: "+conf.DefaultQueue+" failed", err)
-	}
-
-	serverMap[conf.DefaultQueue] = server
 
 }
 
 // AddTask 加入队列任务
 func AddTask(taskName string, params map[string]interface{}) string {
-	// 注册任务
-	/*err := server.RegisterTask(taskName, tasksList[taskName])
-	if err != nil {
-		log.Panicln("register task failed", err)
-		return ""
-	}*/
-
 	//构建参数
 	var args []tasks.Arg
 	for key, param := range params {
