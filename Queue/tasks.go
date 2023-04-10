@@ -13,12 +13,6 @@ const (
 // 任务列表
 var tasksList = map[string]map[string]interface{}{}
 
-//todo 任务列表改为结构体切片
-type task struct {
-	Name string
-	Func interface{}
-}
-
 //
 // initTasks
 // @Description: 配置队列及相关消费方法
