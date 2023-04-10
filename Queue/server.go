@@ -56,13 +56,6 @@ func Run() {
 
 // AddTask 加入队列任务
 func AddTask(taskName string, params map[string]interface{}) string {
-	// 注册任务
-	/*err := server.RegisterTask(taskName, tasksList[taskName])
-	if err != nil {
-		log.Panicln("register task failed", err)
-		return ""
-	}*/
-
 	//构建参数
 	var args []tasks.Arg
 	for key, param := range params {
