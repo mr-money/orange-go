@@ -168,48 +168,80 @@ MiddleWare.Auth() //jwt登录验证
 > 单条队列任务可配置多个worker消费
  
 #### 队列配置
-Queue/config.go:confList() 方法 配置队列
+Queue/config.go:initConf() 方法 初始化队列配置
 ``` golang
-&[]config.Config{
-		{
-			DefaultQueue: "go_study", //队列名
-			Broker: fmt.Sprintf("redis://%s:%s/%s",
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
-				"1",
-			),
-			ResultBackend: fmt.Sprintf("redis://%s:%s/%s",
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
-				"1",
-			),
-			ResultsExpireIn: 3600, //结果过期时间
-			Redis: &config.RedisConfig{
-				MaxIdle:                3,
-				IdleTimeout:            240,
-				ReadTimeout:            15,
-				WriteTimeout:           15,
-				ConnectTimeout:         15,
-				NormalTasksPollPeriod:  1000,
-				DelayedTasksPollPeriod: 500,
-			},
-		}
+return &config.Config{
+		DefaultQueue: "go_study", //默认队列名
+		//redis队列
+		/*Broker: fmt.Sprintf("redis://%s:%s/%s",
+			Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
+			Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
+			"1",
+		),
+		Redis: &config.RedisConfig{
+			MaxIdle:                3,
+			IdleTimeout:            240,
+			ReadTimeout:            15,
+			WriteTimeout:           15,
+			ConnectTimeout:         15,
+			NormalTasksPollPeriod:  1000,
+			DelayedTasksPollPeriod: 500,
+		},*/
+
+		//rabbitMq队列中间件
+		Broker: fmt.Sprintf("amqp://%s:%s@%s:%s",
+			Config.GetFieldByName(Config.Configs.Web.RabbitMq, "User"),
+			Config.GetFieldByName(Config.Configs.Web.RabbitMq, "Pwd"),
+			Config.GetFieldByName(Config.Configs.Web.RabbitMq, "Host"),
+			Config.GetFieldByName(Config.Configs.Web.RabbitMq, "Port"),
+		),
+		AMQP: &config.AMQPConfig{
+			Exchange:      "go_study",
+			ExchangeType:  "direct",
+			BindingKey:    "go_study_task",
+			PrefetchCount: 3,
+		},
+		ResultBackend: fmt.Sprintf("redis://%s:%s/%s",
+			Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
+			Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
+			"1",
+		),
+		ResultsExpireIn: 3600, //结果过期时间
 	}
 ```
 
 #### 任务消费配置
-Queue/tasks.go:initTasks() 方法 配置队列及相关消费方法
+Queue/tasks.go:getQueues() 方法 配置队列及相关消费方法
 ``` golang
-for _, conf := range *confList() {
-		tasksList[conf.DefaultQueue] = make(map[string]interface{})
-		switch conf.DefaultQueue {
-		//区分不同队列任务
-		case "go_study":
-			tasksList[conf.DefaultQueue][PrintNameFunc] = QueueDemo.PrintName
-		case "go_study2":
-			tasksList[conf.DefaultQueue][PrintName2Func] = QueueDemo.PrintName
-		}
+// 定义队列消费方法名称
+const (
+	PrintNameFunc  = "print_name"
+	PrintName2Func = "print_name2"
+)
+type queueGroups struct {
+	queueName string                 //队列名称
+	tasks     map[string]interface{} //队列下任务 任务名称：任务消费方法
+}
+
+//获取队列组配置
+func getQueues() *[]queueGroups {
+
+	return &[]queueGroups{
+		{
+			"queue_test",
+			map[string]interface{}{
+				PrintNameFunc: QueueDemo.PrintName,
+			},
+		},
+		{
+			"queue_test2",
+			map[string]interface{}{
+				PrintName2Func: QueueDemo.PrintName2,
+			},
+		},
 	}
+
+}
 ```
 
 
