@@ -20,12 +20,14 @@
 git clone https://github.com/mr-money/go-study.git
 ```
 
-##### 本地运行：
+##### 本地：
 
 ```shell
 go env -w GO111MODULE=on  
 go env -w GOPROXY=https://goproxy.cn,direct  
 go mod tidy
+cd Container/Api
+go build -o app
 ```
 
 ##### Docker:
