@@ -20,12 +20,19 @@
 git clone https://github.com/mr-money/go-study.git
 ```
 
-##### 项目根目录运行：
+##### 本地运行：
 
 ```shell
 go env -w GO111MODULE=on  
 go env -w GOPROXY=https://goproxy.cn,direct  
 go mod tidy
+```
+
+##### Docker:
+```shell
+#--build-arg image={微服务名称}
+docker build -t go-study/api --build-arg image=Api .
+docker run -d -p 8080:8080 go-study/api
 ```
 
 ### 微服务api入口
