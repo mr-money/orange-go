@@ -1,3 +1,4 @@
+# 多段构建 builder构建二进制文件
 FROM golang:1.17 as builder
 
 # 使用不同的构建参数来选择不同微服务容器
@@ -20,19 +21,16 @@ COPY . .
 
 # 构建应用
 RUN go env -w CGO_ENABLED=0 GOOS=linux GOARCH=amd64 && \
-    go build -o /go/bin/${image} ./Container/${image}/main.go
+    go build -o /go/bin/app ./Container/${image}/main.go
 
-
+# 服务容器运行
 FROM alpine:latest
 
 WORKDIR /app
-COPY --from=builder /go/bin/${image} .
+COPY --from=builder /go/bin/app .
 COPY --from=builder /go/src/go-study/Config ./Config
 
-#todo 提权运行构建文件
-#ENV image=${image}
-#RUN chmod +x ${image}
-#RUN echo "./${image}"
+ENTRYPOINT ["./app"]
 
 # 端口
 EXPOSE 8080
