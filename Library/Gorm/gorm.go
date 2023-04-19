@@ -31,12 +31,11 @@ func connectMysql() *gorm.DB {
 		panic(dbErr)
 	}*/
 
-	dsn := fmt.Sprintf("%s:%s@(%s:%s)/%s%s?charset=%s&parseTime=true&loc=Local",
+	dsn := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=%s&parseTime=true&loc=Local",
 		Config.GetFieldByName(Config.Configs.Web.DB, "User"),
 		Config.GetFieldByName(Config.Configs.Web.DB, "Pwd"),
 		Config.GetFieldByName(Config.Configs.Web.DB, "Host"),
 		Config.GetFieldByName(Config.Configs.Web.DB, "Port"),
-		Config.GetFieldByName(Config.Configs.Web.DB, "Prefix"),
 		Config.GetFieldByName(Config.Configs.Web.DB, "DbName"),
 		Config.GetFieldByName(Config.Configs.Web.DB, "Charset"),
 	)
