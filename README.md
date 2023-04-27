@@ -2,16 +2,17 @@
 
 ## 简介
 
-> 基于gin开发的微服务web框架，使用ddd领域驱动设计思想为基础架构思想
-> 入口文件可配置启动多个微服务端口模块 默认启动8080端口
+> 基于gin开发的微服务web框架，使用ddd领域驱动设计思想为基础架构思想  
+> 入口文件可配置启动多个微服务容器  
+> 支持Mysql，MongoDB，Redis，Rabbitmq  
 > 架构分层为 Model->Repository->Service->App  
-> 值对象（Value Object）→ 实体（Entity）→ 领域服务（Domain Service）
+> 值对象（Value Object）→ 实体（Entity）→ 领域服务（Domain Service） 
 
 ### 初始化框架
 
-#### go版本
+#### Golang
 
-> ##### 1.17
+> ##### ≥1.17
 > 下载地址 https://golang.google.cn/dl/
 
 #### 安装
