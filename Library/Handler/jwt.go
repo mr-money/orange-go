@@ -2,14 +2,12 @@ package Handler
 
 import (
 	"github.com/dgrijalva/jwt-go"
-	"github.com/shockerli/cvt"
 	"go-study/Library/MyTime"
-	"go-study/Model"
 	"time"
 )
 
-type ApiLoginClaims struct {
-	UserId uint64 `json:"user_id"`
+type LoginClaims struct {
+	Guid string `json:"user_id"`
 	jwt.StandardClaims
 }
 
@@ -18,21 +16,21 @@ const tokenExpire = MyTime.SecondsPerDay //设置过期时间 单位s
 var keySecret = []byte("Go-Gin-Study123") //加盐秘钥
 
 //
-// ApiLoginToken
+// LoginToken
 // @Description: 登录生成jwt
 // @param user
 // @return string
 // @return error
 //
-func ApiLoginToken(user Model.User) (string, error) {
+func LoginToken(guid, name string) (string, error) {
 	// 创建api登录声明
-	claims := ApiLoginClaims{
+	claims := LoginClaims{
 		// 自定义字段
-		user.ID, //用户id
+		guid,
 		jwt.StandardClaims{
-			Audience:  user.Name,                       // 受众
+			Audience:  name,                            // 受众
 			ExpiresAt: time.Now().Unix() + tokenExpire, // 失效时间
-			Id:        cvt.String(user.Uuid),           // 编号
+			Id:        guid,                            // 编号
 			IssuedAt:  time.Now().Unix(),               // 签发时间
 			Issuer:    "admin",                         // 签发人
 			NotBefore: time.Now().Unix(),               // 生效时间
@@ -53,12 +51,12 @@ func ApiLoginToken(user Model.User) (string, error) {
 // @return *jwt.StandardClaims
 // @return error
 //
-func ParseToken(token string) (*ApiLoginClaims, error) {
-	jwtToken, err := jwt.ParseWithClaims(token, &ApiLoginClaims{}, func(token *jwt.Token) (i interface{}, e error) {
+func ParseToken(token string) (*LoginClaims, error) {
+	jwtToken, err := jwt.ParseWithClaims(token, &LoginClaims{}, func(token *jwt.Token) (i interface{}, e error) {
 		return keySecret, nil
 	})
 	if err == nil && jwtToken != nil {
-		if claim, ok := jwtToken.Claims.(*ApiLoginClaims); ok && jwtToken.Valid {
+		if claim, ok := jwtToken.Claims.(*LoginClaims); ok && jwtToken.Valid {
 			return claim, nil
 		}
 	}
