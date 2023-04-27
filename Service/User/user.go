@@ -3,6 +3,7 @@ package User
 import (
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
+	"github.com/shockerli/cvt"
 	"go-study/Library/Handler"
 	"go-study/Model"
 	"go-study/Queue"
@@ -65,7 +66,7 @@ func Register(user map[string]string) (Model.User, string, error) {
 	}*/
 
 	//自动登录
-	token, err := Handler.ApiLoginToken(userInfo)
+	token, err := Handler.LoginToken(cvt.String(userInfo.Uuid), userInfo.Name)
 	if err != nil {
 		return Model.User{}, "", err
 	}
@@ -98,7 +99,7 @@ func Login(user map[string]string) (Model.User, string, error) {
 	}
 
 	//生成jwt
-	token, err := Handler.ApiLoginToken(userInfo)
+	token, err := Handler.LoginToken(cvt.String(userInfo.Uuid), userInfo.Name)
 	if err != nil {
 		return Model.User{}, "", err
 	}
