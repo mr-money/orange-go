@@ -45,9 +45,9 @@ func FindById(UserInfo *Model.User, Id uint64) *Model.User {
 	}, 1*time.Hour)
 
 	//json转指定struct
-	userInterface := Handler.JsonToStruct(userJson, UserInfo)
+	Handler.JsonToStruct(userJson, &UserInfo)
 
-	return userInterface.(*Model.User)
+	return UserInfo
 }
 
 //
