@@ -5,6 +5,7 @@ import (
 	"go-study/App/Api/QueueDemo"
 	"go-study/App/Api/User"
 	"go-study/MiddleWare"
+	"net/http"
 )
 
 //
@@ -19,6 +20,11 @@ func Api(r *gin.Engine) {
 		//MiddleWare.CSRF(),      //验证csrf
 		//MiddleWare.CSRFToken(), //生成csrf
 	)
+
+	//api http 测试
+	apiGroup.GET("/ping", func(context *gin.Context) {
+		context.String(http.StatusOK, "pong")
+	})
 
 	// 注册登录
 	apiGroup.POST("/register", User.Register)
