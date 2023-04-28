@@ -1,23 +1,63 @@
 package Test
 
 import (
+	"bytes"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"go-study/Routes"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
-	"strings"
+	"net/url"
 )
 
+var router *gin.Engine
+
+func init() {
+	router = gin.New()
+	//api模块路由
+	Routes.Api(router)
+}
+
 //
-// SetRequest
-// @Description: 测试设置请求
-// @param route 路由
-// @param method 请求方法 GET/POST
+// Get
+// @Description: 测试GET请求
 // @param path 请求地址
 // @return *httptest.ResponseRecorder
 //
-func SetRequest(route http.Handler, method string, path string) *httptest.ResponseRecorder {
-	method = strings.ToUpper(method)
-	request, _ := http.NewRequest(method, path, nil)
+func Get(uri string, params map[string]string) *httptest.ResponseRecorder {
+	data := url.Values{}
+	for key, value := range params {
+		data.Set(key, value)
+	}
+	uri = fmt.Sprintf("%s?%s", uri, data.Encode())
+
+	request, _ := http.NewRequest(http.MethodGet, uri, nil)
+
 	response := httptest.NewRecorder()
-	route.ServeHTTP(response, request)
+	router.ServeHTTP(response, request)
+
+	return response
+}
+
+func Post(uri string, params, headers map[string]string) *httptest.ResponseRecorder {
+	requestBody := &bytes.Buffer{}
+	writer := multipart.NewWriter(requestBody)
+
+	for key, value := range params {
+		_ = writer.WriteField(key, value)
+	}
+	_ = writer.Close()
+
+	request, _ := http.NewRequest(http.MethodPost, uri, requestBody)
+
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+	for key, value := range headers {
+		request.Header.Set(key, value)
+	}
+
+	response := httptest.NewRecorder()
+	router.ServeHTTP(response, request)
+
 	return response
 }
