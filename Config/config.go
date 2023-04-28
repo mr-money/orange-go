@@ -36,7 +36,7 @@ func include(configs ...interface{}) {
 
 		_, confErr := toml.DecodeFile(confFile, &conf)
 		if confErr != nil {
-			panic(confErr)
+			log.Panicln(confErr)
 		}
 
 		putConfStruct(confRef, conf)
