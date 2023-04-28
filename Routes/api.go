@@ -23,7 +23,9 @@ func Api(r *gin.Engine) {
 
 	//api http 测试
 	apiGroup.GET("/ping", func(context *gin.Context) {
-		context.String(http.StatusOK, "pong")
+		ping := context.Query("ping")
+
+		context.String(http.StatusOK, ping)
 	})
 
 	// 注册登录
