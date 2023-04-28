@@ -23,6 +23,11 @@ func TestPing(t *testing.T) {
 	assert.Equal(t, "pong", res.Body.String())
 }
 
+//
+// TestLogin
+// @Description: 登录
+// @param t
+//
 func TestLogin(t *testing.T) {
 	param := map[string]string{
 		"name":     "test-name1",
