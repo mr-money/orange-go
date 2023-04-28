@@ -14,7 +14,7 @@ import (
 // @return *struct{}
 //
 func JsonToStruct(jsonStr string, structData interface{}) interface{} {
-	err := json.Unmarshal([]byte(jsonStr), &structData)
+	err := json.Unmarshal([]byte(jsonStr), structData)
 	if err != nil {
 		log.Fatal("JsonToStruct:", err)
 		return nil
