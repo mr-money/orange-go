@@ -5,11 +5,10 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/goinggo/mapstructure"
 	"github.com/shockerli/cvt"
+	"go-study/Library/Handler"
 	"log"
 	"reflect"
 )
-
-var tomlDir = "./Config"
 
 // Configs 全局配置内容
 var Configs struct {
@@ -37,7 +36,7 @@ func include(configs ...interface{}) {
 
 		_, confErr := toml.DecodeFile(confFile, &conf)
 		if confErr != nil {
-			panic(confErr)
+			log.Panicln(confErr)
 		}
 
 		putConfStruct(confRef, conf)
@@ -52,7 +51,9 @@ func include(configs ...interface{}) {
 //  @return string
 //
 func getConfStructName(confRef reflect.Value) string {
-	return fmt.Sprintf("%v/%v.toml", tomlDir, confRef.FieldByName("FileName"))
+	rootPath, _ := Handler.GetProjectRoot()
+
+	return fmt.Sprintf("%v/Config/%v.toml", rootPath, confRef.FieldByName("FileName"))
 }
 
 //
