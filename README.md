@@ -36,7 +36,7 @@ go build -o app
 # --build-arg image={微服务名称}
 docker build -t go-study/api --build-arg image=Api .
 # windows宿主机地址：host.docker.internal
-docker run -d -p 8080:8080 go-study/api --network host
+docker run -dp 8080:8080 --name go_study  go-study/api
 ```
 
 ### 微服务api入口
