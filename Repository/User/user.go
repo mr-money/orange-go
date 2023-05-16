@@ -31,7 +31,7 @@ func FindById(UserInfo *Model.User, Id uint64) *Model.User {
 		//避免闭包二次调用查询
 		if UserInfo.ID == 0 {
 			//查询数据库
-			Model.UserModel().Take(&UserInfo, Id)
+			Model.User{}.Model().Take(&UserInfo, Id)
 		}
 
 		//默认为空
@@ -61,7 +61,7 @@ func FindById(UserInfo *Model.User, Id uint64) *Model.User {
 //
 func SelectPage(userList *[]Model.User, search map[string]interface{}, offset uint64, limit uint64) *[]Model.User {
 
-	userModel := Model.UserModel().
+	userModel := Model.User{}.Model().
 		Where(&Model.User{Uuid: uuid.FromStringOrNil(cvt.String(search["uuid"]))}). //uuid搜索
 		Where("name like ?", cvt.String(search["user_name"])+"%").                  //用户名模糊搜索
 		Offset(cvt.Int(offset)).Limit(cvt.Int(limit))                               //分页参数
@@ -78,7 +78,7 @@ func SelectPage(userList *[]Model.User, search map[string]interface{}, offset ui
 // @return uint64
 //
 func Create(user Model.User) uint64 {
-	Model.UserModel().Create(&user)
+	Model.User{}.Model().Create(&user)
 
 	return user.ID
 }
@@ -90,7 +90,7 @@ func Create(user Model.User) uint64 {
 // @return *Model.User
 //
 func FindUserByModel(user *Model.User) *Model.User {
-	Model.UserModel().Where(user).Take(&user)
+	Model.User{}.Model().Where(user).Take(&user)
 
 	return user
 }
