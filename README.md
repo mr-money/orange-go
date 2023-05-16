@@ -75,7 +75,7 @@ model层默认demo Model/user.go
 #### 初始化model方法示例：
 
 ``` golang
-func UserModel() *gorm.DB {
+func (tableName)UserModel() *gorm.DB {
 	return Gorm.Mysql.Table(tableName)
 }
 ```

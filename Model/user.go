@@ -35,12 +35,12 @@ func (User) TableName() string {
 	return fmt.Sprintf("%s%s", prefix, "user")
 }
 
-// UserModel
+// Model
 // @Description: 初始化model 方便join查询
 // @return *gorm.DB
 //
-func UserModel() *gorm.DB {
-	return Gorm.Mysql.Table(User{}.TableName())
+func (user User) Model() *gorm.DB {
+	return Gorm.Mysql.Table(user.TableName())
 }
 
 //
