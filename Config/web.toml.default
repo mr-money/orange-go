@@ -1,5 +1,6 @@
 [COMMON]
     env_mode = "debug"
+    host_address = "192.168.1.100" #宿主机地址
 [DB]
     host = "127.0.0.1"
     port = "3306"
