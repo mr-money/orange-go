@@ -4,6 +4,7 @@ type Web struct {
 	FileName string
 	Common   struct {
 		EnvModel string `mapstructure:"env_mode"`
+		HostAddress string `mapstructure:"host_address"`
 	} `mapstructure:"COMMON"`
 	DB struct {
 		Host    string `mapstructure:"host"`
