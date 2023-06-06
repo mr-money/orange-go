@@ -26,6 +26,14 @@ RUN go env -w CGO_ENABLED=0 GOOS=linux GOARCH=amd64 && \
 # 服务容器运行
 FROM alpine:latest
 
+# 时区
+ENV TZ=Asia/Shanghai
+RUN apk update \
+    && apk add tzdata \
+    && echo "${TZ}" > /etc/timezone \
+    && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && rm /var/cache/apk/*
+
 WORKDIR /app
 COPY --from=builder /go/bin/app .
 COPY --from=builder /go/src/go-study/Config ./Config
