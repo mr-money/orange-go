@@ -38,3 +38,19 @@ func ToJson(data interface{}) string {
 
 	return cvt.String(jsonStr)
 }
+
+//
+// JsonToMap
+// @Description: json字符串转map
+// @param jsonStr
+// @return map[string]string
+// @return error
+//
+func JsonToMap(jsonStr string) (map[string]interface{}, error) {
+	var result map[string]interface{}
+	err := json.Unmarshal([]byte(jsonStr), &result)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
