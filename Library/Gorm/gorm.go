@@ -31,6 +31,11 @@ func connectMysql() *gorm.DB {
 		panic(dbErr)
 	}*/
 
+	//未配置mysql
+	if len(Config.GetFieldByName(Config.Configs.Web.DB, "Host")) == 0 {
+		return nil
+	}
+
 	dsn := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=%s&parseTime=true&loc=Local",
 		Config.GetFieldByName(Config.Configs.Web.DB, "User"),
 		Config.GetFieldByName(Config.Configs.Web.DB, "Pwd"),
