@@ -8,19 +8,15 @@ import (
 	"gorm.io/gorm"
 )
 
-var migrations []map[string]interface{}
-
-func init() {
-	mysqlMigrations := getMysqlMigrations()
-	migrations = append(migrations, mysqlMigrations...)
-
-}
-
 //
 // InitMigrate
 // @Description: AutoMigrate数据库自动迁移
 //
 func InitMigrate() {
+	mysqlMigrations := getMysqlMigrations()
+
+	var migrations []map[string]interface{}
+	migrations = append(migrations, mysqlMigrations...)
 
 	for _, migration := range migrations {
 		migrateErr := dbSetTableOptions(
