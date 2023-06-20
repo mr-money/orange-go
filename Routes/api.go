@@ -2,6 +2,7 @@ package Routes
 
 import (
 	"github.com/gin-gonic/gin"
+	"go-study/App/Api/Log"
 	"go-study/App/Api/QueueDemo"
 	"go-study/App/Api/User"
 	"go-study/MiddleWare"
@@ -45,4 +46,7 @@ func Api(r *gin.Engine) {
 		user.GET("/userList", User.GetUserListPage)
 		user.GET("/add", User.Add)
 	}
+
+	//mongoDB查询log
+	apiGroup.GET("/logs", Log.Logs)
 }
