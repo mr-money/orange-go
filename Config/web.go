@@ -3,7 +3,7 @@ package Config
 type Web struct {
 	FileName string
 	Common   struct {
-		EnvModel string `mapstructure:"env_mode"`
+		EnvModel    string `mapstructure:"env_mode"`
 		HostAddress string `mapstructure:"host_address"`
 	} `mapstructure:"COMMON"`
 	DB struct {
@@ -28,4 +28,11 @@ type Web struct {
 		User string `mapstructure:"user"`
 		Pwd  string `mapstructure:"pwd"`
 	} `mapstructure:"RABBITMQ"`
+	MongoDB struct {
+		Host   string `mapstructure:"host"`
+		Port   string `mapstructure:"port"`
+		DbName string `mapstructure:"dbName"`
+		User   string `mapstructure:"user"`
+		Pwd    string `mapstructure:"pwd"`
+	} `mapstructure:"MONGODB"`
 }
