@@ -3,7 +3,6 @@ package Api
 import (
 	"context"
 	"fmt"
-	"go-study/Database"
 	"go-study/Routes"
 	"log"
 	"net/http"
@@ -17,9 +16,6 @@ import (
 // @Description: 默认服务
 //
 func Run() {
-	//数据库迁移
-	Database.InitMigrate()
-
 	// 加载路由
 	Routes.Include(
 		Routes.Web, //默认web路由
