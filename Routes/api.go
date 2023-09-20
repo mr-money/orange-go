@@ -24,7 +24,7 @@ func Api(r *gin.Engine) {
 
 	//api http 测试
 	apiGroup.GET("/ping", func(context *gin.Context) {
-		ping := context.Query("ping")
+		ping := context.DefaultQuery("ping", "pong")
 
 		context.String(http.StatusOK, ping)
 	})
