@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go-study/App/Api"
 	"go-study/Config"
+	"go-study/Database"
 	"go-study/Queue"
 )
 
@@ -14,6 +15,9 @@ import (
 func main() {
 	//环境模式
 	gin.SetMode(Config.GetFieldByName(Config.Configs.Web, "Common", "EnvModel"))
+
+	//数据库迁移
+	Database.InitMigrate()
 
 	//队列服务
 	Queue.Run()
