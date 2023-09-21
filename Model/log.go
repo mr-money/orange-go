@@ -2,6 +2,7 @@ package Model
 
 import (
 	"go-study/Library/MongoDB"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -19,11 +20,11 @@ db.log.insertOne({
 // @Description: 日志表
 //
 type Log struct {
-	ID        string `json:"_id" bson:"_id"`
-	Content   string `json:"content" bson:"content"`
-	Title     string `json:"title" bson:"title"`
-	Type      int    `json:"tpye" bson:"type"`
-	CreatedAt string `json:"created_at" bson:"created_at"`
+	ID        primitive.ObjectID `json:"_id" bson:"_id"`
+	Content   string             `json:"content" bson:"content"`
+	Title     string             `json:"title" bson:"title"`
+	Type      int                `json:"tpye" bson:"type"`
+	CreatedAt string             `json:"created_at" bson:"created_at"`
 }
 
 //
