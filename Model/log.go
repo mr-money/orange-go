@@ -20,7 +20,7 @@ db.log.insertOne({
 // @Description: 日志表
 //
 type Log struct {
-	ID        primitive.ObjectID `json:"_id" bson:"_id"`
+	ID        primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
 	Content   string             `json:"content" bson:"content"`
 	Title     string             `json:"title" bson:"title"`
 	Type      int                `json:"tpye" bson:"type"`
