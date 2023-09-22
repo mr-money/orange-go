@@ -23,7 +23,7 @@ type Log struct {
 	ID        primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
 	Content   string             `json:"content" bson:"content"`
 	Title     string             `json:"title" bson:"title"`
-	Type      int                `json:"tpye" bson:"type"`
+	Type      int                `json:"type" bson:"type"`
 	CreatedAt string             `json:"created_at" bson:"created_at"`
 }
 
