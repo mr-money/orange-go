@@ -16,7 +16,7 @@ import (
 func JsonToStruct(jsonStr string, structData interface{}) interface{} {
 	err := json.Unmarshal([]byte(jsonStr), structData)
 	if err != nil {
-		log.Fatal("JsonToStruct:", err)
+		log.Panicln("JsonToStruct:", err)
 		return nil
 	}
 
@@ -32,7 +32,7 @@ func JsonToStruct(jsonStr string, structData interface{}) interface{} {
 func ToJson(data interface{}) string {
 	jsonStr, err := json.Marshal(data)
 	if err != nil {
-		log.Fatal("ToJson:", err)
+		log.Panicln("ToJson:", err)
 		return ""
 	}
 
