@@ -8,10 +8,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"go.mongodb.org/mongo-driver/mongo/writeconcern"
 	"time"
 )
 
-var MongoDataBase = connect()
+var (
+	MongoDataBase = connect()
+	client        *mongo.Client
+)
 
 //
 // Connect
@@ -58,4 +62,24 @@ func connect() *mongo.Database {
 	log.INFO.Println("MongoDB Database [" + Config.GetFieldByName(Config.Configs.Web.MongoDB, "Port") + "]: Connect Success!")
 
 	return client.Database(Config.GetFieldByName(Config.Configs.Web.MongoDB, "DbName"))
+}
+
+// Transaction
+// @Description: 事务操作
+// @param fun
+// @return interface{}
+// @return error
+func Transaction(fun func()) {
+	//开启事务
+	wc := writeconcern.Majority()
+	txnOptions := options.Transaction().SetWriteConcern(wc)
+	session, _ := client.StartSession()
+	defer session.EndSession(context.TODO())
+
+	_, _ = session.WithTransaction(context.TODO(), func(ctx mongo.SessionContext) (interface{}, error) {
+		fun()
+		return nil, nil
+	}, txnOptions)
+
+	return
 }
