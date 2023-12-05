@@ -8,10 +8,13 @@ import (
 const TimeFormat = "2006-01-02 15:04:05"
 
 const (
-	SecondsPerMinute = 60
-	SecondsPerHour   = 60 * SecondsPerMinute
-	SecondsPerDay    = 24 * SecondsPerHour
-	SecondsPerWeek   = 7 * SecondsPerDay
+	Nanosecond       time.Duration = 1
+	Microsecond                    = 1000 * Nanosecond
+	Millisecond                    = 1000 * Microsecond
+	Second                         = 1000 * Millisecond
+	SecondsPerMinute               = 60 * Second
+	SecondsPerHour                 = 60 * SecondsPerMinute
+	SecondsPerDay                  = 24 * SecondsPerHour
 )
 
 type Time time.Time
@@ -40,7 +43,7 @@ func (t Time) MarshalJSON() ([]byte, error) {
 // Value 写入 mysql 时调用
 func (t Time) Value() (driver.Value, error) {
 	// 0001-01-01 00:00:00 属于空值，遇到空值解析成 null 即可
-	if t.String() == "0001-01-01 00:00:00" {
+	if time.Time(t).IsZero() {
 		return nil, nil
 	}
 	return []byte(time.Time(t).Format(TimeFormat)), nil
