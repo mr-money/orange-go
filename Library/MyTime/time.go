@@ -42,7 +42,6 @@ func (t Time) MarshalJSON() ([]byte, error) {
 
 // Value 写入 mysql 时调用
 func (t Time) Value() (driver.Value, error) {
-	// 0001-01-01 00:00:00 属于空值，遇到空值解析成 null 即可
 	if time.Time(t).IsZero() {
 		return nil, nil
 	}
@@ -51,9 +50,18 @@ func (t Time) Value() (driver.Value, error) {
 
 // Scan 检出 mysql 时调用
 func (t *Time) Scan(v interface{}) error {
-	// mysql 内部日期的格式可能是 2006-01-02 15:04:05 +0800 CST 格式，所以检出的时候还需要进行一次格式化
-	tTime, _ := time.Parse(TimeFormat+" +0800 CST", v.(time.Time).String())
+	tValue, _ := v.(time.Time)
+
+	location, _ := time.LoadLocation("Asia/Shanghai")
+
+	tTime, _ := time.ParseInLocation(
+		TimeFormat,
+		tValue.Format(TimeFormat),
+		location,
+	)
+
 	*t = Time(tTime)
+
 	return nil
 }
 
