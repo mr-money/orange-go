@@ -95,7 +95,7 @@ type PayOrder struct {
 // @Description: 微信服务商支付
 // @return error
 //
-func (conf WxConf) WechatPayService(payOrder PayOrder) (interface{}, error) {
+func (conf WxConf) WechatPayService(payOrder *PayOrder) (interface{}, error) {
 	client, err := clientInit(conf)
 	if err != nil {
 		return nil, err
@@ -176,7 +176,7 @@ func (conf WxConf) WechatPayService(payOrder PayOrder) (interface{}, error) {
 // @Description: 微信商户支付
 // @return error
 //
-func (conf WxConf) WechatPay(payOrder PayOrder) (interface{}, error) {
+func (conf WxConf) WechatPay(payOrder *PayOrder) (interface{}, error) {
 	wechatClient, err := clientInit(conf)
 	if err != nil {
 		return nil, err

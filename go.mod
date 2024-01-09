@@ -14,6 +14,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/shockerli/cvt v0.2.1
+	github.com/wechatpay-apiv3/wechatpay-go v0.2.18
 	golang.org/x/crypto v0.0.0-20221012134737-56aed061732a
 	gorm.io/driver/mysql v1.3.3
 	gorm.io/gorm v1.23.5
