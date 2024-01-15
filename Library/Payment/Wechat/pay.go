@@ -14,10 +14,9 @@ import (
 	"github.com/wechatpay-apiv3/wechatpay-go/core/option"
 	"github.com/wechatpay-apiv3/wechatpay-go/services/payments/jsapi"
 	"github.com/wechatpay-apiv3/wechatpay-go/utils"
+	"go-study/Library/Handler"
 	"io/ioutil"
 	"time"
-	"umay-go/Library/Handler"
-	"umay-go/MiddleWare"
 )
 
 //WxConf 微信支付配置
@@ -197,7 +196,7 @@ func (conf WxConf) WechatPay(payOrder *PayOrder) (interface{}, error) {
 				Total: core.Int64(1),
 			},
 			Payer: &jsapi.Payer{
-				Openid: core.String(MiddleWare.UserInfo.Username),
+				Openid: core.String(payOrder.Openid),
 			},
 		},
 	)
