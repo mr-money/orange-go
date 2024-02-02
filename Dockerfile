@@ -5,7 +5,7 @@ FROM golang:1.17 as builder
 ARG image=Api
 
 # 设置工作目录
-WORKDIR /go/src/go-study
+WORKDIR /go/src/orange-go
 
 # 复制go.mod
 COPY go.mod go.mod
@@ -36,7 +36,7 @@ RUN apk update \
 
 WORKDIR /app
 COPY --from=builder /go/bin/app .
-COPY --from=builder /go/src/go-study/Config ./Config
+COPY --from=builder /go/src/orange-go/Config ./Config
 
 ENTRYPOINT ["./app"]
 

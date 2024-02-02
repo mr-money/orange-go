@@ -1,15 +1,13 @@
 package Api
 
 import (
-	"go-study/App"
-	"go-study/Routes"
 	"net/http"
+	"orange-go/App"
+	"orange-go/Routes"
 )
 
-//
 // Run
 // @Description: 默认服务
-//
 func Run() {
 	// 加载路由
 	Routes.Include(

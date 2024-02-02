@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"github.com/RichardKnop/machinery/v1/log"
-	"go-study/Config"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"go.mongodb.org/mongo-driver/mongo/writeconcern"
+	"orange-go/Config"
 	"time"
 )
 
@@ -17,11 +17,9 @@ var (
 	client        *mongo.Client
 )
 
-//
 // Connect
 // @Description: mongo连接
 // @return *mongo.Database
-//
 func connect() *mongo.Database {
 	var err error
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

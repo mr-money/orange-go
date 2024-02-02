@@ -2,18 +2,16 @@ package Api
 
 import (
 	"github.com/go-playground/assert/v2"
-	"go-study/Library/Handler"
-	"go-study/Model"
-	"go-study/Test"
 	"net/http"
+	"orange-go/Library/Handler"
+	"orange-go/Model"
+	"orange-go/Test"
 	"testing"
 )
 
-//
 // TestPing
 // @Description: http测试链接
 // @param t
-//
 func TestPing(t *testing.T) {
 	res := Test.Get("/api/ping", map[string]string{
 		"ping": "pong",
@@ -23,11 +21,9 @@ func TestPing(t *testing.T) {
 	assert.Equal(t, "pong", res.Body.String())
 }
 
-//
 // TestLogin
 // @Description: 登录
 // @param t
-//
 func TestLogin(t *testing.T) {
 	param := map[string]string{
 		"name":     "test-name1",

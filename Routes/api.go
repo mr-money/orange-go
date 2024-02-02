@@ -2,19 +2,17 @@ package Routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"go-study/App/Api/Log"
-	"go-study/App/Api/QueueDemo"
-	"go-study/App/Api/User"
-	"go-study/MiddleWare"
 	"net/http"
+	"orange-go/App/Api/Log"
+	"orange-go/App/Api/QueueDemo"
+	"orange-go/App/Api/User"
+	"orange-go/MiddleWare"
 )
 
-//
 // Api
 // @Description: api路由
 // @param r
 // @return *gin.Engine
-//
 func Api(r *gin.Engine) {
 	apiGroup := r.Group(
 		"/api", //api组
