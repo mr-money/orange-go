@@ -1,4 +1,4 @@
-# go-study
+# orange-go
 
 ## 简介
 
@@ -18,7 +18,7 @@
 #### 安装
 
 ```git
-git clone https://github.com/mr-money/go-study.git
+git clone https://github.com/mr-money/orange-go.git
 ```
 
 ##### 本地：
@@ -34,9 +34,9 @@ go build -o app
 ##### Docker:
 ```shell
 # --build-arg image={微服务名称}
-docker build -t go-study/api --build-arg image=Api .
+docker build -t orange-go/api --build-arg image=Api .
 # windows宿主机地址：host.docker.internal
-docker run -dp 8080:8080 --name go_study  go-study/api
+docker run -dp 8080:8080 --name orange_go  orange-go/api
 ```
 
 ### 微服务api入口

@@ -14,12 +14,12 @@ import (
 	"github.com/wechatpay-apiv3/wechatpay-go/core/option"
 	"github.com/wechatpay-apiv3/wechatpay-go/services/payments/jsapi"
 	"github.com/wechatpay-apiv3/wechatpay-go/utils"
-	"go-study/Library/Handler"
 	"io/ioutil"
+	"orange-go/Library/Handler"
 	"time"
 )
 
-//WxConf 微信支付配置
+// WxConf 微信支付配置
 type WxConf struct {
 	IsService uint8  //是否为服务商支付  0否 1是
 	SpAppid   string //服务商appid
@@ -31,11 +31,9 @@ type WxConf struct {
 	Key       string //api秘钥
 }
 
-//
 // clientInit
 // @Description: 微信支付创建client
 // @return error
-//
 func clientInit(conf WxConf) (*core.Client, error) {
 	var (
 		mchID       string                // 商户号
@@ -89,11 +87,9 @@ type PayOrder struct {
 	Openid      string //下单人openid
 }
 
-//
 // WechatPayService
 // @Description: 微信服务商支付
 // @return error
-//
 func (conf WxConf) WechatPayService(payOrder *PayOrder) (interface{}, error) {
 	client, err := clientInit(conf)
 	if err != nil {
@@ -170,11 +166,9 @@ func (conf WxConf) WechatPayService(payOrder *PayOrder) (interface{}, error) {
 	return prepay, err
 }
 
-//
 // WechatPay
 // @Description: 微信商户支付
 // @return error
-//
 func (conf WxConf) WechatPay(payOrder *PayOrder) (interface{}, error) {
 	wechatClient, err := clientInit(conf)
 	if err != nil {
@@ -255,7 +249,6 @@ type DecryptedData struct {
 	} `json:"scene_info"`
 }
 
-//
 // DecryptWechatData
 // @Description: 微信支付回调解密
 // @param key
@@ -264,7 +257,6 @@ type DecryptedData struct {
 // @param ciphertext 数据密文
 // @return DecryptedData
 // @return error
-//
 func DecryptWechatData(key, nonce, associatedData, ciphertext string) (DecryptedData, error) {
 	keyBytes := []byte(key)
 	nonceBytes := []byte(nonce)
