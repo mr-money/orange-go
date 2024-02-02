@@ -2,7 +2,7 @@ package Queue
 
 import (
 	"github.com/pkg/errors"
-	"go-study/Queue/Worker/Api/QueueDemo"
+	"orange-go/Queue/Worker/Api/QueueDemo"
 )
 
 // 定义队列消费方法名称
@@ -11,13 +11,11 @@ const (
 	PrintName2Func = "print_name2"
 )
 
-//
 // getQueueByTask
 // @Description: 根据任务消费方法获取队列名称
 // @param taskName 消费方法名
 // @return string 队列名称
 // @return error
-//
 func getQueueByTask(taskName string) (string, error) {
 	for _, queue := range *getQueues() {
 		if _, ok := queue.tasks[taskName]; ok {
@@ -28,13 +26,13 @@ func getQueueByTask(taskName string) (string, error) {
 	return "", errors.New("任务：" + taskName + " 队列不存在")
 }
 
-//队列组
+// 队列组
 type queueGroups struct {
 	queueName string                 //队列名称
 	tasks     map[string]interface{} //队列下任务 任务名称：任务消费方法
 }
 
-//获取队列组配置
+// 获取队列组配置
 func getQueues() *[]queueGroups {
 
 	return &[]queueGroups{

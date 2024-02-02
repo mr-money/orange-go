@@ -3,8 +3,8 @@ package Queue
 import (
 	"github.com/RichardKnop/machinery/v1"
 	"github.com/RichardKnop/machinery/v1/tasks"
-	"go-study/Library/Handler"
 	"log"
+	"orange-go/Library/Handler"
 )
 
 // server对应不同队列queue

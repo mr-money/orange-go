@@ -6,7 +6,7 @@ import (
 	"github.com/RichardKnop/machinery/v1/log"
 	"github.com/go-redis/redis/v8"
 	"github.com/shockerli/cvt"
-	"go-study/Config"
+	"orange-go/Config"
 	"runtime"
 	"strings"
 	"time"
@@ -15,10 +15,8 @@ import (
 var Redis *redis.Client
 var Cxt = context.Background()
 
-//
 // init
 // @Description: 初始化链接
-//
 func init() {
 	Redis = connectRedis()
 
@@ -29,11 +27,9 @@ func init() {
 	}
 }
 
-//
 // connectRedis
 // @Description: 连接redis
 // @return *redis.Client
-//
 func connectRedis() *redis.Client {
 	rdb := redis.NewClient(&redis.Options{
 		//连接信息
@@ -69,12 +65,10 @@ func connectRedis() *redis.Client {
 	return rdb
 }
 
-//
 // SetKey
 // @Description: 生成缓存key
 // @param key 嵌套key名 如 key1,key2,key3...
 // @return string
-//
 func SetKey(key ...string) string {
 	var keys []string
 	keys = append(keys, key...)
@@ -82,14 +76,12 @@ func SetKey(key ...string) string {
 	return strings.Join(keys, ":")
 }
 
-//
 // RememberString
 // @Description:不存在则写入缓存数据后返回
 // @param key 缓存key
 // @param value 缓存数据
 // @param expiration
 // @return string
-//
 func RememberString(key string, value func() string, expiration time.Duration) string {
 	//获取缓存数据
 	data, err := Redis.Get(Cxt, key).Result()

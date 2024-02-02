@@ -3,14 +3,12 @@ package Queue
 import (
 	"fmt"
 	"github.com/RichardKnop/machinery/v1/config"
-	"go-study/Config"
+	"orange-go/Config"
 )
 
-//
 // initConf
 // @Description: 初始化队列配置
 // @return *config.Config
-//
 func initConf() *config.Config {
 	return &config.Config{
 		DefaultQueue: "go_study", //默认队列名
@@ -52,11 +50,9 @@ func initConf() *config.Config {
 	}
 }
 
-//
 // confList
 // @Description: 队列配置list
 // @return *[]config.Config
-//
 func confList() *[]config.Config {
 	return &[]config.Config{
 		{

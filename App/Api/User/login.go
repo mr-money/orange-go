@@ -3,15 +3,13 @@ package User
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/shockerli/cvt"
-	"go-study/Service/User"
+	"orange-go/Service/User"
 	"time"
 )
 
-//
 // Login
 // @Description: 普通用户登录
 // @param c
-//
 func Login(c *gin.Context) {
 	userName := c.PostForm("name")
 	password := c.PostForm("password")
@@ -39,11 +37,9 @@ func Login(c *gin.Context) {
 
 }
 
-//
 // Register
 // @Description: 普通用户注册
 // @param c
-//
 func Register(c *gin.Context) {
 	userName := c.PostForm("name")
 	password := c.PostForm("password")
@@ -70,11 +66,9 @@ func Register(c *gin.Context) {
 	})
 }
 
-//
 // AddUser999
 // @Description:新增5万条测试数据
 // @param c
-//
 func AddUser999(c *gin.Context) {
 	userInfo := make(map[string]string)
 	userInfo["password"] = "123456"

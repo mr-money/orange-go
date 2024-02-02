@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"go-study/Routes"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"orange-go/Routes"
 )
 
 var router *gin.Engine
@@ -19,12 +19,10 @@ func init() {
 	Routes.Api(router)
 }
 
-//
 // Get
 // @Description: 测试GET请求
 // @param path 请求地址
 // @return *httptest.ResponseRecorder
-//
 func Get(uri string, params map[string]string) *httptest.ResponseRecorder {
 	data := url.Values{}
 	for key, value := range params {

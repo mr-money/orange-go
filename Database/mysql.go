@@ -1,14 +1,12 @@
 package Database
 
-import "go-study/Model"
+import "orange-go/Model"
 
 var mysqlMigrations []map[string]interface{}
 
-//
 // getMysqlMigrations
 // @Description: mysql连接 迁移ORM
 // @return []map[string]interface{}
-//
 func getMysqlMigrations() []map[string]interface{} {
 	return append(mysqlMigrations,
 		//mysql下 user 用户表

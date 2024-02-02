@@ -2,15 +2,13 @@ package MiddleWare
 
 import (
 	"github.com/gin-gonic/gin"
-	"go-study/Library/Handler"
 	"net/http"
+	"orange-go/Library/Handler"
 )
 
-//
 // Auth
 // @Description: api接口检查jwt登录
 // @return gin.HandlerFunc
-//
 func Auth() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		auth := context.Request.Header.Get("Authorization")

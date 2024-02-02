@@ -7,8 +7,11 @@ import (
 	"io/ioutil"
 )
 
-//微信退款订单数据
-type WechatRefundOrder struct {
+//
+// RefundOrder
+// @Description: 微信退款订单数据结构
+//
+type RefundOrder struct {
 	OutTradeNo  string //商户订单号
 	OutRefundNo string //退款单号
 	Reason      string //退款原因
@@ -25,7 +28,7 @@ type WechatRefundOrder struct {
 // @return interface{}
 // @return error
 //
-func (conf WxConf) ServiceRefund(refundOrder *WechatRefundOrder) (interface{}, error) {
+func (conf WxConf) ServiceRefund(refundOrder *RefundOrder) (interface{}, error) {
 	client, err := clientInit(conf)
 	if err != nil {
 		return nil, err
