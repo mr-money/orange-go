@@ -4,18 +4,16 @@ import (
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 	"github.com/shockerli/cvt"
-	"go-study/Library/Handler"
-	"go-study/Model"
-	"go-study/Queue"
-	"go-study/Repository/User"
+	"orange-go/Library/Handler"
+	"orange-go/Model"
+	"orange-go/Queue"
+	"orange-go/Repository/User"
 )
 
-//
 // FindById
 // @Description: 根据用户id查询用户信息
 // @param uint64 id user_id 用户id
 // @return Model.User
-//
 func FindById(userInfo *Model.User, id uint64) *Model.User {
 
 	userInfo = User.FindById(userInfo, id)
@@ -23,14 +21,12 @@ func FindById(userInfo *Model.User, id uint64) *Model.User {
 	return userInfo
 }
 
-//
 // SelectUserListPage
 // @Description: 分页获取用户列表
 // @param search 搜索条件
 // @param page 页数
 // @param pageSize 每页条数
 // @return []Model.User
-//
 func SelectUserListPage(search map[string]interface{}, page uint64, pageSize uint64) []Model.User {
 	var userList []Model.User
 
@@ -42,12 +38,10 @@ func SelectUserListPage(search map[string]interface{}, page uint64, pageSize uin
 
 }
 
-//
 // Register
 // @Description: 用户注册
 // @param user
 // @return uint64
-//
 func Register(user map[string]string) (Model.User, string, error) {
 	var userInfo Model.User
 
@@ -74,13 +68,11 @@ func Register(user map[string]string) (Model.User, string, error) {
 	return userInfo, token, nil
 }
 
-//
 // Login
 // @Description: 登录
 // @param user
 // @return Model.User
 // @return error
-//
 func Login(user map[string]string) (Model.User, string, error) {
 	var userInfo Model.User
 

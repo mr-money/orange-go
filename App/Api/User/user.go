@@ -3,16 +3,14 @@ package User
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/shockerli/cvt"
-	"go-study/Model"
-	"go-study/Service/User"
+	"orange-go/Model"
+	"orange-go/Service/User"
 )
 
-//
 // GetUserInfo
 // @Description:根据id获取用户
 // @param c
 // @param user_id 用户id
-//
 func GetUserInfo(c *gin.Context) {
 	userId := cvt.Uint64(c.Query("user_id"))
 
@@ -23,11 +21,9 @@ func GetUserInfo(c *gin.Context) {
 
 }
 
-//
 // GetUserListPage
 // @Description: 分页获取用户列表
 // @param c
-//
 func GetUserListPage(c *gin.Context) {
 	page := cvt.Uint64(c.DefaultQuery("page", "1"))
 	pageSize := cvt.Uint64(c.DefaultQuery("page_size", "20"))
@@ -49,14 +45,11 @@ func GetUserListPage(c *gin.Context) {
 
 }
 
-//
-//
 // Add
 // @Description: 创建用户
 // @param c
 // @param string name 用户名称
 // @return int 插入数据的主键
-//
 func Add(c *gin.Context) {
 	userName := c.Query("name")
 

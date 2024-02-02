@@ -3,8 +3,8 @@ package Log
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/shockerli/cvt"
-	"go-study/Service/Log"
 	"net/http"
+	"orange-go/Service/Log"
 )
 
 func Logs(c *gin.Context) {

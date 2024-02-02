@@ -2,16 +2,14 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"go-study/App/Api"
-	"go-study/Config"
-	"go-study/Database"
-	"go-study/Queue"
+	"orange-go/App/Api"
+	"orange-go/Config"
+	"orange-go/Database"
+	"orange-go/Queue"
 )
 
-//
-//  main
-//  @Description: 入口
-//
+// main
+// @Description: 入口
 func main() {
 	//环境模式
 	gin.SetMode(Config.GetFieldByName(Config.Configs.Web, "Common", "EnvModel"))

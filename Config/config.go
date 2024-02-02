@@ -5,8 +5,8 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/goinggo/mapstructure"
 	"github.com/shockerli/cvt"
-	"go-study/Library/Handler"
 	"log"
+	"orange-go/Library/Handler"
 	"reflect"
 )
 
@@ -23,11 +23,9 @@ func init() {
 	include(webConfig)
 }
 
-//
 // Include
 // @Description: 初始化配置文件
 // @param configs
-//
 func include(configs ...interface{}) {
 	for _, conf := range configs {
 		//反射获取conf文件名
@@ -44,34 +42,28 @@ func include(configs ...interface{}) {
 	}
 }
 
-//
-//  getConfStructName
-//  @Description: 反射获取conf结构体名称
-//  @param confRef
-//  @return string
-//
+// getConfStructName
+// @Description: 反射获取conf结构体名称
+// @param confRef
+// @return string
 func getConfStructName(confRef reflect.Value) string {
 	rootPath, _ := Handler.GetProjectRoot()
 
 	return fmt.Sprintf("%v/Config/%v.toml", rootPath, confRef.FieldByName("FileName"))
 }
 
-//
-//  getConfFileName
-//  @Description: 获取conf文件名
-//  @param confRef
-//  @return string
-//
+// getConfFileName
+// @Description: 获取conf文件名
+// @param confRef
+// @return string
 func getConfFileName(confRef reflect.Value) string {
 	return fmt.Sprintf("%v", confRef.Type())
 }
 
-//
-//  putConfStruct
-//  @Description: 配置map赋值struct
-//  @param confRef
-//  @param conf
-//
+// putConfStruct
+// @Description: 配置map赋值struct
+// @param confRef
+// @param conf
 func putConfStruct(confRef reflect.Value, conf interface{}) {
 	//fmt.Println("---------", conf)
 
@@ -97,7 +89,6 @@ func putConfStruct(confRef reflect.Value, conf interface{}) {
 // @param confStruct 配置结构体
 // @param fieldName 结构体内字段名 如 DB,Host
 // @return string
-//
 func GetFieldByName(confStruct interface{}, fieldName ...string) string {
 	var fieldNames []string
 	fieldNames = append(fieldNames, fieldName...)
