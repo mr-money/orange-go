@@ -180,8 +180,8 @@ func (conf WxConf) WechatPay(payOrder *PayOrder) (interface{}, error) {
 	resp, result, err := svc.PrepayWithRequestPayment(
 		context.Background(),
 		jsapi.PrepayRequest{
-			Appid:       core.String(conf.SpAppid),
-			Mchid:       core.String(conf.SpMchid),
+			Appid:       core.String(conf.SubAppid),
+			Mchid:       core.String(conf.SubMchid),
 			Description: core.String(payOrder.Description),
 			OutTradeNo:  core.String(payOrder.OutTradeNo),
 			Attach:      core.String(""),
