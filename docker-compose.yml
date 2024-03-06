@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  orange-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        image: Api
+    image: orange-api
+    container_name: orange-api
+    ports:
+      - "8001:8080"
