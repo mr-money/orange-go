@@ -10,14 +10,25 @@ import (
 // @Description: 初始化队列配置
 // @return *config.Config
 func initConf() *config.Config {
+	redisBroker := fmt.Sprintf(
+		"redis://%s@%s:%s/%s",
+		Config.Configs.Web.Redis.Pwd,
+		Config.Configs.Web.Redis.Host,
+		Config.Configs.Web.Redis.Port,
+		"2",
+	)
+
+	redisResultBackend := fmt.Sprintf(
+		"redis://%s:%s/%s",
+		Config.Configs.Web.Redis.Host,
+		Config.Configs.Web.Redis.Port,
+		"2",
+	)
+
 	return &config.Config{
 		DefaultQueue: "go_study", //默认队列名
 		//redis队列
-		Broker: fmt.Sprintf("redis://%s:%s/%s",
-			Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
-			Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
-			"1",
-		),
+		Broker: redisBroker,
 		Redis: &config.RedisConfig{
 			MaxIdle:                3,
 			IdleTimeout:            240,
@@ -41,11 +52,7 @@ func initConf() *config.Config {
 			BindingKey:    "go_study_task",
 			PrefetchCount: 3,
 		},*/
-		ResultBackend: fmt.Sprintf("redis://%s:%s/%s",
-			Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
-			Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
-			"1",
-		),
+		ResultBackend:   redisResultBackend,
 		ResultsExpireIn: 3600, //结果过期时间
 	}
 }
@@ -54,19 +61,25 @@ func initConf() *config.Config {
 // @Description: 队列配置list
 // @return *[]config.Config
 func confList() *[]config.Config {
+	redisBroker := fmt.Sprintf(
+		"redis://%s:%s/%s",
+		Config.Configs.Web.Redis.Host,
+		Config.Configs.Web.Redis.Port,
+		"2",
+	)
+
+	redisResultBackend := fmt.Sprintf(
+		"redis://%s:%s/%s",
+		Config.Configs.Web.Redis.Host,
+		Config.Configs.Web.Redis.Port,
+		"2",
+	)
+
 	return &[]config.Config{
 		{
-			DefaultQueue: "go_study", //队列名
-			Broker: fmt.Sprintf("redis://%s:%s/%s",
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
-				"1",
-			),
-			ResultBackend: fmt.Sprintf("redis://%s:%s/%s",
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
-				"1",
-			),
+			DefaultQueue:    "go_study", //队列服务名
+			Broker:          redisBroker,
+			ResultBackend:   redisResultBackend,
 			ResultsExpireIn: 3600, //结果过期时间
 			Redis: &config.RedisConfig{
 				MaxIdle:                3,
@@ -78,7 +91,7 @@ func confList() *[]config.Config {
 				DelayedTasksPollPeriod: 500,
 			},
 		},
-		{
+		/*{
 			DefaultQueue: "go_study2", //队列名
 			//Broker: "amqp://guest:guest@localhost:5672",
 			Broker: fmt.Sprintf("amqp://%s:%s@%s:%s",
@@ -99,6 +112,6 @@ func confList() *[]config.Config {
 				BindingKey:    "go_study_task",
 				PrefetchCount: 3,
 			},
-		},
+		},*/
 	}
 }
