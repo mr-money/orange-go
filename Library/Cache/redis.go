@@ -35,8 +35,8 @@ func connectRedis() *redis.Client {
 		//连接信息
 		Network: "tcp", //网络类型，tcp or unix，默认tcp
 		Addr: fmt.Sprintf("%s:%s", //主机名+冒号+端口，默认localhost:6379
-			Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
-			Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
+			Config.Configs.Web.Redis.Host,
+			Config.Configs.Web.Redis.Port,
 		),
 		Password: Config.GetFieldByName(Config.Configs.Web.Redis, "Pwd"),         //密码
 		DB:       cvt.Int(Config.GetFieldByName(Config.Configs.Web.Redis, "Db")), // redis数据库index
@@ -77,10 +77,10 @@ func SetKey(key ...string) string {
 }
 
 // RememberString
-// @Description:不存在则写入缓存数据后返回
+// @Description:不存在则写入缓存数据后返回 字符串
 // @param key 缓存key
 // @param value 缓存数据
-// @param expiration
+// @param expiration 过期时间 0为不过期
 // @return string
 func RememberString(key string, value func() string, expiration time.Duration) string {
 	//获取缓存数据
@@ -88,13 +88,89 @@ func RememberString(key string, value func() string, expiration time.Duration) s
 	if err != nil {
 		//缓存为空 返回传入数据
 		if err.Error() == "redis: nil" || data == "" {
-			if len(value()) > 0 {
+			if value() != "" {
 				//写入缓存
 				Redis.Set(
 					Cxt,
 					key, value(),
 					expiration,
 				)
+			}
+
+			return value()
+		}
+
+		log.ERROR.Println(err)
+
+		return ""
+	}
+
+	return data
+}
+
+// RememberZScore
+// @Description: 不存在则写入缓存数据后返回 有序集合
+// @param key 缓存key
+// @param member 成员名
+// @param value 缓存数据
+// @param expiration 过期时间 <=0为不过期
+// @return float64
+func RememberZScore(key, member string, value func() float64, expiration time.Duration) float64 {
+	//获取缓存数据
+	data, err := Redis.ZScore(Cxt, key, member).Result()
+	if err != nil {
+		//缓存为空 返回传入数据
+		if err.Error() == "redis: nil" || data == 0 {
+
+			if value() > 0 {
+				//写入缓存
+				zData := redis.Z{
+					Member: member,
+					Score:  value(),
+				}
+
+				Redis.ZAdd(
+					Cxt,
+					key, &zData,
+				)
+				if expiration > 0 {
+					Redis.Expire(Cxt, key, expiration)
+				}
+			}
+
+			return value()
+		}
+
+		log.ERROR.Println(err)
+
+		return 0
+	}
+
+	return data
+}
+
+// RememberHash
+// @Description: 不存在则写入缓存数据后返回 哈希
+// @param key 缓存key
+// @param field 字段名
+// @param value 缓存值
+// @param expiration 过期时间 <=0为不过期
+// @return string
+func RememberHash(key, field string, value func() string, expiration time.Duration) string {
+	//获取缓存数据
+	data, err := Redis.HGet(Cxt, key, field).Result()
+	if err != nil {
+		//缓存为空 返回传入数据
+		if err.Error() == "redis: nil" || data == "" {
+			if value() != "" {
+				//写入缓存
+				Redis.HSet(
+					Cxt,
+					key, field, value(),
+				)
+				if expiration > 0 {
+					Redis.Expire(Cxt, key, expiration)
+				}
 			}
 
 			return value()
