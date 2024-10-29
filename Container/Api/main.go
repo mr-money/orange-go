@@ -12,7 +12,7 @@ import (
 // @Description: 入口
 func main() {
 	//环境模式
-	gin.SetMode(Config.GetFieldByName(Config.Configs.Web, "Common", "EnvModel"))
+	gin.SetMode(Config.Configs.Web.Common.EnvModel)
 
 	//数据库迁移
 	Database.InitMigrate()
