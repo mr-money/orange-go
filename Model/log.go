@@ -6,7 +6,7 @@ import (
 	"orange-go/Library/MongoDB"
 )
 
-/*use go_study
+/*use orange_go
 
 db.log.insertOne({
     "title":"mongo test",

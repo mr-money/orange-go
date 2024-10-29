@@ -14,6 +14,8 @@ func main() {
 	//环境模式
 	gin.SetMode(Config.Configs.Web.Common.EnvModel)
 
+	//todo 初始化日志
+
 	//数据库迁移
 	Database.InitMigrate()
 
