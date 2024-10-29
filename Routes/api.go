@@ -35,16 +35,20 @@ func Api(r *gin.Engine) {
 	user := apiGroup.Group("/user")
 
 	//队列测试
-	user.GET("/queueTest", QueueDemo.QueueTest)
-	user.GET("/queueTest2", QueueDemo.QueueTest2)
+	user.GET("/queue-test", QueueDemo.QueueTest)
+	user.GET("/queue-test2", QueueDemo.QueueTest2)
 
 	user.Use(MiddleWare.Auth())
 	{
-		user.GET("/userInfo", User.GetUserInfo)
-		user.GET("/userList", User.GetUserListPage)
+		user.GET("/userinfo", User.GetUserInfo)
+		user.GET("/user-list", User.GetUserListPage)
 		user.GET("/add", User.Add)
 	}
 
 	//mongoDB查询log
-	apiGroup.GET("/logs", Log.Logs)
+	apiGroup.GET("/mongo-logs", Log.MongoLogs)
+
+	//zap日志
+	apiGroup.GET("/zap-logs", Log.ZapLogs)
+
 }

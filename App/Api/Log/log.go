@@ -7,11 +7,13 @@ import (
 	"orange-go/Service/Log"
 )
 
-func Logs(c *gin.Context) {
+// @Description: 获取mango日志
+// @param c
+func MongoLogs(c *gin.Context) {
 	page := c.DefaultQuery("page", "1")
 	pageSize := c.DefaultQuery("page_size", "20")
 
-	logs := Log.GetLog(cvt.Int64(page),
+	logs := Log.GetMongoLog(cvt.Int64(page),
 		cvt.Int64(pageSize))
 
 	c.JSON(
@@ -22,4 +24,18 @@ func Logs(c *gin.Context) {
 			"msg":  "成功",
 		})
 
+}
+
+// @Description: zap日志
+// @param c
+func ZapLogs(c *gin.Context) {
+	Log.ZapLogs()
+
+	c.JSON(
+		http.StatusOK,
+		gin.H{
+			"code": http.StatusOK,
+			"data": "",
+			"msg":  "成功",
+		})
 }

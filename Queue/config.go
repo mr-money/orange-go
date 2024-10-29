@@ -15,14 +15,14 @@ func initConf() *config.Config {
 		Config.Configs.Web.Redis.Pwd,
 		Config.Configs.Web.Redis.Host,
 		Config.Configs.Web.Redis.Port,
-		"2",
+		"10",
 	)
 
 	redisResultBackend := fmt.Sprintf(
 		"redis://%s:%s/%s",
 		Config.Configs.Web.Redis.Host,
 		Config.Configs.Web.Redis.Port,
-		"2",
+		"10",
 	)
 
 	return &config.Config{
@@ -65,14 +65,14 @@ func confList() *[]config.Config {
 		"redis://%s:%s/%s",
 		Config.Configs.Web.Redis.Host,
 		Config.Configs.Web.Redis.Port,
-		"2",
+		"10",
 	)
 
 	redisResultBackend := fmt.Sprintf(
 		"redis://%s:%s/%s",
 		Config.Configs.Web.Redis.Host,
 		Config.Configs.Web.Redis.Port,
-		"2",
+		"10",
 	)
 
 	return &[]config.Config{
