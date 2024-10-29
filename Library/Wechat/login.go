@@ -2,6 +2,7 @@ package Wechat
 
 import (
 	"crypto/tls"
+	"github.com/go-resty/resty/v2"
 	"github.com/pkg/errors"
 	"net/http"
 	"orange-go/Library/Handler"
