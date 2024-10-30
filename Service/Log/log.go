@@ -1,6 +1,7 @@
 package Log
 
 import (
+	"log/slog"
 	"orange-go/Library/Logger"
 	"orange-go/Model"
 	"orange-go/Repository/Log"
@@ -38,4 +39,6 @@ func ZapLogs() {
 	}
 	Logger.TestLogger.Info(info)
 	Logger.AppLogger.Info(info)
+	go slog.Info("info", info)
+	go slog.Error("error", info)
 }
