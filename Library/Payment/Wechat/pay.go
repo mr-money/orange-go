@@ -10,7 +10,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shockerli/cvt"
 	"github.com/wechatpay-apiv3/wechatpay-go/core"
+	"github.com/wechatpay-apiv3/wechatpay-go/core/cipher/decryptors"
+	"github.com/wechatpay-apiv3/wechatpay-go/core/cipher/encryptors"
 	"github.com/wechatpay-apiv3/wechatpay-go/core/consts"
+	"github.com/wechatpay-apiv3/wechatpay-go/core/downloader"
 	"github.com/wechatpay-apiv3/wechatpay-go/core/option"
 	"github.com/wechatpay-apiv3/wechatpay-go/services/payments/jsapi"
 	"github.com/wechatpay-apiv3/wechatpay-go/utils"
@@ -71,6 +74,10 @@ func clientInit(conf WxConf) (*core.Client, error) {
 			mchCertificateSerialNumber,
 			mchPrivateKey,
 			mchAPIv3Key,
+		),
+		option.WithWechatPayCipher(
+			encryptors.NewWechatPayEncryptor(downloader.MgrInstance().GetCertificateVisitor(mchID)),
+			decryptors.NewWechatPayDecryptor(mchPrivateKey),
 		),
 	}
 
@@ -177,28 +184,24 @@ func (conf WxConf) WechatPay(payOrder *PayOrder) (interface{}, error) {
 
 	svc := jsapi.JsapiApiService{Client: wechatClient}
 	// 得到prepay_id，以及调起支付所需的参数和签名
-	resp, result, err := svc.PrepayWithRequestPayment(
+	resp, _, err := svc.PrepayWithRequestPayment(
 		context.Background(),
 		jsapi.PrepayRequest{
-			Appid:       core.String(conf.SpAppid),
-			Mchid:       core.String(conf.SpMchid),
+			Appid:       core.String(conf.SubAppid),
+			Mchid:       core.String(conf.SubMchid),
 			Description: core.String(payOrder.Description),
 			OutTradeNo:  core.String(payOrder.OutTradeNo),
 			Attach:      core.String(""),
 			NotifyUrl:   core.String(payOrder.NotifyUrl),
 			Amount: &jsapi.Amount{
-				Total: core.Int64(1),
+				Total: core.Int64(payOrder.Amount),
 			},
 			Payer: &jsapi.Payer{
-				Openid: core.String(payOrder.Openid),
+				//支付用户openid
+				Openid: core.String(""),
 			},
 		},
 	)
-
-	fmt.Println("==========resp==========")
-	fmt.Println(resp)
-	fmt.Println("==========result==========")
-	fmt.Println(result)
 
 	return resp, err
 }
@@ -247,6 +250,23 @@ type DecryptedData struct {
 	SceneInfo struct {
 		DeviceID string `json:"device_id"`
 	} `json:"scene_info"`
+}
+
+// NotifyRequest
+// @Description: 支付回调参数
+type NotifyRequest struct {
+	ID           string `json:"id"`
+	CreateTime   string `json:"create_time"`
+	ResourceType string `json:"resource_type"`
+	EventType    string `json:"event_type"`
+	Summary      string `json:"summary"`
+	Resource     struct {
+		OriginalType   string `json:"original_type"`
+		Algorithm      string `json:"algorithm"`
+		Ciphertext     string `json:"ciphertext"`
+		AssociatedData string `json:"associated_data"`
+		Nonce          string `json:"nonce"`
+	} `json:"resource"`
 }
 
 // DecryptWechatData

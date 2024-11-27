@@ -2,6 +2,7 @@ package Gorm
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -15,6 +16,9 @@ import (
 var Mysql *gorm.DB
 
 func init() {
+	//环境模式
+	gin.SetMode(Config.Configs.Web.Common.EnvModel)
+
 	//默认mysql连接
 	Mysql = connectMysql()
 }
@@ -29,11 +33,6 @@ func connectMysql() *gorm.DB {
 		panic(dbErr)
 	}*/
 
-	//未配置mysql
-	if len(Config.GetFieldByName(Config.Configs.Web.DB, "Host")) == 0 {
-		return nil
-	}
-
 	dsn := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=%s&parseTime=true&loc=Local",
 		Config.GetFieldByName(Config.Configs.Web.DB, "User"),
 		Config.GetFieldByName(Config.Configs.Web.DB, "Pwd"),
@@ -43,13 +42,18 @@ func connectMysql() *gorm.DB {
 		Config.GetFieldByName(Config.Configs.Web.DB, "Charset"),
 	)
 
-	//慢sql和错误
+	//日志
+	logLevel := logger.Warn
+	if gin.Mode() == "debug" {
+		logLevel = logger.Info
+	}
+
 	loggerConf := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer（日志输出的目标，前缀和日志包含的内容）
 		logger.Config{
 			SlowThreshold:             2 * time.Second, // 慢 SQL 阈值
-			LogLevel:                  logger.Warn,     // 日志级别
-			IgnoreRecordNotFoundError: false,           // 忽略ErrRecordNotFound（记录未找到）错误
+			LogLevel:                  logLevel,        // 日志级别
+			IgnoreRecordNotFoundError: true,            // 忽略ErrRecordNotFound（记录未找到）错误
 			Colorful:                  true,            // 彩色打印
 		},
 	)
@@ -58,6 +62,8 @@ func connectMysql() *gorm.DB {
 		Logger: loggerConf,
 		//AutoMigrate 会自动创建数据库外键约束，您可以在初始化时禁用此功能
 		DisableForeignKeyConstraintWhenMigrating: true,
+		//全局禁用默认事务
+		SkipDefaultTransaction: true,
 	})
 	if dbErr != nil {
 		panic(dbErr)
