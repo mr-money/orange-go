@@ -2,6 +2,8 @@ package MyTime
 
 import (
 	"database/sql/driver"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -70,17 +72,39 @@ func (t Time) String() string {
 	return time.Time(t).Format(TimeFormat)
 }
 
-//
 // StrToTime
 // @Description: 时间字符串转Time
 // @param value
 // @return Time
-//
 func StrToTime(value string) Time {
-	t, err := time.Parse(TimeFormat, value)
+	t, err := time.ParseInLocation(TimeFormat, value, time.Local)
 	if err != nil {
 		return Time{}
 	}
 
 	return Time(t)
+}
+
+// Format
+// @Description: 格式化时间
+// @receiver t
+// @param layout 时间格式 如 2006-01-02 15:04:05
+// @return string
+func (t Time) Format(layout string) string {
+	return time.Time(t).Format(layout)
+}
+
+// ParseToSecond
+// @Description: 时间字符串转int
+// @param timeStr
+// @return int
+func ParseToSecond(timeStr string) int {
+	if timeStr == "" {
+		return 0
+	}
+	parts := strings.Split(timeStr, ":")
+	hours, _ := strconv.Atoi(parts[0])
+	minutes, _ := strconv.Atoi(parts[1])
+	seconds, _ := strconv.Atoi(parts[2])
+	return hours*3600 + minutes*60 + seconds
 }

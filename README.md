@@ -182,7 +182,7 @@ MiddleWare.Auth() //jwt登录验证
 Queue/config.go:initConf() 方法 初始化队列配置
 ``` golang
 return &config.Config{
-		DefaultQueue: "go_study", //默认队列名
+		DefaultQueue: "orange_go", //默认队列名
 		//redis队列
 		/*Broker: fmt.Sprintf("redis://%s:%s/%s",
 			Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
@@ -207,9 +207,9 @@ return &config.Config{
 			Config.GetFieldByName(Config.Configs.Web.RabbitMq, "Port"),
 		),
 		AMQP: &config.AMQPConfig{
-			Exchange:      "go_study",
+			Exchange:      "orange_go",
 			ExchangeType:  "direct",
-			BindingKey:    "go_study_task",
+			BindingKey:    "orange_go_task",
 			PrefetchCount: 3,
 		},
 		ResultBackend: fmt.Sprintf("redis://%s:%s/%s",

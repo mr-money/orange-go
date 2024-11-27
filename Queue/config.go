@@ -10,14 +10,25 @@ import (
 // @Description: 初始化队列配置
 // @return *config.Config
 func initConf() *config.Config {
+	redisBroker := fmt.Sprintf(
+		"redis://%s@%s:%s/%s",
+		Config.Configs.Web.Redis.Pwd,
+		Config.Configs.Web.Redis.Host,
+		Config.Configs.Web.Redis.Port,
+		"10",
+	)
+
+	redisResultBackend := fmt.Sprintf(
+		"redis://%s:%s/%s",
+		Config.Configs.Web.Redis.Host,
+		Config.Configs.Web.Redis.Port,
+		"10",
+	)
+
 	return &config.Config{
-		DefaultQueue: "go_study", //默认队列名
+		DefaultQueue: "orange_go", //默认队列名
 		//redis队列
-		Broker: fmt.Sprintf("redis://%s:%s/%s",
-			Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
-			Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
-			"1",
-		),
+		Broker: redisBroker,
 		Redis: &config.RedisConfig{
 			MaxIdle:                3,
 			IdleTimeout:            240,
@@ -36,16 +47,12 @@ func initConf() *config.Config {
 			Config.GetFieldByName(Config.Configs.Web.RabbitMq, "Port"),
 		),
 		AMQP: &config.AMQPConfig{
-			Exchange:      "go_study",
+			Exchange:      "orange_go",
 			ExchangeType:  "direct",
-			BindingKey:    "go_study_task",
+			BindingKey:    "orange_go_task",
 			PrefetchCount: 3,
 		},*/
-		ResultBackend: fmt.Sprintf("redis://%s:%s/%s",
-			Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
-			Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
-			"1",
-		),
+		ResultBackend:   redisResultBackend,
 		ResultsExpireIn: 3600, //结果过期时间
 	}
 }
@@ -54,19 +61,25 @@ func initConf() *config.Config {
 // @Description: 队列配置list
 // @return *[]config.Config
 func confList() *[]config.Config {
+	redisBroker := fmt.Sprintf(
+		"redis://%s:%s/%s",
+		Config.Configs.Web.Redis.Host,
+		Config.Configs.Web.Redis.Port,
+		"10",
+	)
+
+	redisResultBackend := fmt.Sprintf(
+		"redis://%s:%s/%s",
+		Config.Configs.Web.Redis.Host,
+		Config.Configs.Web.Redis.Port,
+		"10",
+	)
+
 	return &[]config.Config{
 		{
-			DefaultQueue: "go_study", //队列名
-			Broker: fmt.Sprintf("redis://%s:%s/%s",
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
-				"1",
-			),
-			ResultBackend: fmt.Sprintf("redis://%s:%s/%s",
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
-				Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
-				"1",
-			),
+			DefaultQueue:    "orange_go", //队列服务名
+			Broker:          redisBroker,
+			ResultBackend:   redisResultBackend,
 			ResultsExpireIn: 3600, //结果过期时间
 			Redis: &config.RedisConfig{
 				MaxIdle:                3,
@@ -78,8 +91,8 @@ func confList() *[]config.Config {
 				DelayedTasksPollPeriod: 500,
 			},
 		},
-		{
-			DefaultQueue: "go_study2", //队列名
+		/*{
+			DefaultQueue: "orange_go2", //队列名
 			//Broker: "amqp://guest:guest@localhost:5672",
 			Broker: fmt.Sprintf("amqp://%s:%s@%s:%s",
 				Config.GetFieldByName(Config.Configs.Web.RabbitMq, "User"),
@@ -94,11 +107,11 @@ func confList() *[]config.Config {
 			),
 			ResultsExpireIn: 3600, //结果过期时间
 			AMQP: &config.AMQPConfig{
-				Exchange:      "go_study2",
+				Exchange:      "orange_go2",
 				ExchangeType:  "direct",
-				BindingKey:    "go_study_task",
+				BindingKey:    "orange_go_task",
 				PrefetchCount: 3,
 			},
-		},
+		},*/
 	}
 }
