@@ -103,8 +103,23 @@ func ParseToSecond(timeStr string) int {
 		return 0
 	}
 	parts := strings.Split(timeStr, ":")
-	hours, _ := strconv.Atoi(parts[0])
-	minutes, _ := strconv.Atoi(parts[1])
-	seconds, _ := strconv.Atoi(parts[2])
-	return hours*3600 + minutes*60 + seconds
+	switch len(parts) {
+	case 3: // HH:MM:SS
+		hours, err1 := strconv.Atoi(parts[0])
+		minutes, err2 := strconv.Atoi(parts[1])
+		seconds, err3 := strconv.Atoi(parts[2])
+		if err1 != nil || err2 != nil || err3 != nil {
+			return 0 // 如果转换失败，返回默认值
+		}
+		return hours*3600 + minutes*60 + seconds
+	case 2: // MM:SS
+		minutes, err1 := strconv.Atoi(parts[0])
+		seconds, err2 := strconv.Atoi(parts[1])
+		if err1 != nil || err2 != nil {
+			return 0 // 如果转换失败，返回默认值
+		}
+		return minutes*60 + seconds
+	default:
+		return 0 // 如果格式不正确，返回默认值
+	}
 }
