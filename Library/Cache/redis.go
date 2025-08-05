@@ -5,26 +5,31 @@ import (
 	"fmt"
 	"github.com/RichardKnop/machinery/v1/log"
 	"github.com/go-redis/redis/v8"
+	"github.com/pkg/errors"
 	"github.com/shockerli/cvt"
+	"log/slog"
 	"orange-go/Config"
+	"orange-go/Library/MyTime"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 )
 
-var Redis *redis.Client
-var Cxt = context.Background()
+var (
+	Redis *redis.Client
+	once  sync.Once
+	Cxt   = context.Background()
+)
 
-// init
-// @Description: 初始化链接
-func init() {
-	Redis = connectRedis()
-
-	if cvt.String(Redis.Ping(Cxt)) != "ping: PONG" {
-		log.FATAL.Panicln(Redis.Ping(Cxt))
-	} else {
-		log.INFO.Println("Redis [" + Redis.Options().Addr + "]: Connect Success!")
-	}
+func InitRedis() {
+	once.Do(func() {
+		Redis = connectRedis()
+		if Redis.Ping(Cxt).Val() != "PONG" {
+			log.FATAL.Panicln(Redis.Ping(Cxt))
+		}
+		slog.Info("Redis [" + Redis.Options().Addr + "]: Connect Success!")
+	})
 }
 
 // connectRedis
@@ -35,8 +40,8 @@ func connectRedis() *redis.Client {
 		//连接信息
 		Network: "tcp", //网络类型，tcp or unix，默认tcp
 		Addr: fmt.Sprintf("%s:%s", //主机名+冒号+端口，默认localhost:6379
-			Config.Configs.Web.Redis.Host,
-			Config.Configs.Web.Redis.Port,
+			Config.GetFieldByName(Config.Configs.Web.Redis, "Host"),
+			Config.GetFieldByName(Config.Configs.Web.Redis, "Port"),
 		),
 		Password: Config.GetFieldByName(Config.Configs.Web.Redis, "Pwd"),         //密码
 		DB:       cvt.Int(Config.GetFieldByName(Config.Configs.Web.Redis, "Db")), // redis数据库index
@@ -100,7 +105,7 @@ func RememberString(key string, value func() string, expiration time.Duration) s
 			return value()
 		}
 
-		log.ERROR.Println(err)
+		slog.Error("redis remember string", "err", err)
 
 		return ""
 	}
@@ -141,7 +146,7 @@ func RememberZScore(key, member string, value func() float64, expiration time.Du
 			return value()
 		}
 
-		log.ERROR.Println(err)
+		slog.Error("redis remember zscore", "err", err)
 
 		return 0
 	}
@@ -176,10 +181,74 @@ func RememberHash(key, field string, value func() string, expiration time.Durati
 			return value()
 		}
 
-		log.ERROR.Println(err)
+		slog.Error("redis remember hash", "err", err)
 
 		return ""
 	}
 
 	return data
+}
+
+// @Description: 检查风控时间内次数频率
+// @param key 风控使用键名
+// @param expireAt 到期时间 毫秒 如10秒前 now()-(10*1000)
+// @return error
+func CheckRiskLimit(key string, expireAt, limit int64) error {
+	// 删除到期记录
+	Redis.ZRemRangeByScore(Cxt, key, "0", cvt.String(expireAt))
+
+	// 获取当前数量
+	count, err := Redis.ZCard(Cxt, key).Result()
+	if err != nil && err.Error() != "redis: nil" {
+		return err
+	}
+
+	if count >= limit {
+		return errors.New("操作过于频繁，请稍后再试")
+	}
+
+	return nil
+}
+
+// @Description: 更新风控时间内频率次数
+// @param key 风控使用键名
+// @param member 风控成员
+// @param expire 过期时间 毫秒
+func UpdateRiskLimit(key string, expire int64) {
+	Redis.ZAdd(Cxt, key, &redis.Z{
+		Member: time.Now().UnixMilli(),
+		Score:  float64(time.Now().UnixMilli()),
+	})
+
+	Redis.Expire(Cxt, key, time.Duration(expire)*MyTime.Millisecond)
+
+	return
+}
+
+// @Description:检查风控总次数
+// @param key
+// @param limit
+// @return error
+func CheckRiskTotalLimit(key, member string, limit int64) error {
+	count, err := Redis.ZScore(Cxt, key, member).Result()
+	if err != nil && err.Error() != "redis: nil" {
+		return err
+	}
+
+	if count >= cvt.Float64(limit) {
+		return errors.New("操作过于频繁，请稍后再试")
+	}
+
+	return nil
+}
+
+// @Description:更新风控总次数
+// @param key
+// @param member
+func UpdateRiskTotalLimit(key, member string) {
+	Redis.ZIncrBy(Cxt, key, 1, member)
+
+	Redis.Expire(Cxt, key, 30*MyTime.SecondsPerDay)
+
+	return
 }
