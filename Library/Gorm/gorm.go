@@ -1,7 +1,6 @@
 package Gorm
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -12,35 +11,26 @@ import (
 	"time"
 )
 
-// Mysql 本地数据库链接
-var Mysql *gorm.DB
-
 func init() {
 	//环境模式
 	gin.SetMode(Config.Configs.Web.Common.EnvModel)
 
-	//默认mysql连接
-	Mysql = connectMysql()
+	//初始化连接
+	InitConnect()
 }
 
-// connectMysql
 // @Description: 默认mysql数据库连接
 // @return *gorm.DB
-func connectMysql() *gorm.DB {
+func connectMysql(dsn string) *gorm.DB {
 	/*dsn := "root:root@(127.0.0.1:3306)/go_gin?charset=utf8mb4&parseTime=True&loc=Local"
 	db, dbErr := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if dbErr != nil {
 		panic(dbErr)
 	}*/
 
-	dsn := fmt.Sprintf("%s:%s@(%s:%s)/%s?charset=%s&parseTime=true&loc=Local",
-		Config.GetFieldByName(Config.Configs.Web.DB, "User"),
-		Config.GetFieldByName(Config.Configs.Web.DB, "Pwd"),
-		Config.GetFieldByName(Config.Configs.Web.DB, "Host"),
-		Config.GetFieldByName(Config.Configs.Web.DB, "Port"),
-		Config.GetFieldByName(Config.Configs.Web.DB, "DbName"),
-		Config.GetFieldByName(Config.Configs.Web.DB, "Charset"),
-	)
+	if dsn == "" {
+		panic("Mysql dsn is null")
+	}
 
 	//日志
 	logLevel := logger.Warn
@@ -51,7 +41,7 @@ func connectMysql() *gorm.DB {
 	loggerConf := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer（日志输出的目标，前缀和日志包含的内容）
 		logger.Config{
-			SlowThreshold:             2 * time.Second, // 慢 SQL 阈值
+			SlowThreshold:             5 * time.Second, // 慢 SQL 阈值
 			LogLevel:                  logLevel,        // 日志级别
 			IgnoreRecordNotFoundError: true,            // 忽略ErrRecordNotFound（记录未找到）错误
 			Colorful:                  true,            // 彩色打印
@@ -64,6 +54,8 @@ func connectMysql() *gorm.DB {
 		DisableForeignKeyConstraintWhenMigrating: true,
 		//全局禁用默认事务
 		SkipDefaultTransaction: true,
+		//预编译语句
+		PrepareStmt: true,
 	})
 	if dbErr != nil {
 		panic(dbErr)
@@ -73,14 +65,14 @@ func connectMysql() *gorm.DB {
 	// 获取通用数据库对象 sql.DB ，然后使用其提供的功能
 	sqlDB, _ := db.DB()
 
-	// SetMaxOpenConns 用于设置连接池中空闲连接的最大数量。
-	sqlDB.SetMaxIdleConns(10)
+	// 用于设置连接池中空闲连接的最大数量。
+	sqlDB.SetMaxIdleConns(50)
 
-	// SetMaxOpenConns 设置打开数据库连接的最大数量。
-	sqlDB.SetMaxOpenConns(100)
+	// 设置打开数据库连接的最大数量。
+	sqlDB.SetMaxOpenConns(500)
 
-	// SetConnMaxLifetime 设置了连接可复用的最大时间。
-	sqlDB.SetConnMaxLifetime(30 * time.Minute)
+	// 设置了连接可复用的最大时间。
+	sqlDB.SetConnMaxLifetime(1 * time.Hour)
 
 	return db
 
