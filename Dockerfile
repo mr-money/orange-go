@@ -7,16 +7,13 @@ ARG image=Api
 # 设置工作目录
 WORKDIR /go/src/orange-go
 
-# 复制go.mod
-COPY go.mod go.mod
-COPY go.sum go.sum
-
-#使用cache下载
+# 复制依赖描述文件
+COPY go.mod go.sum ./
 RUN go env -w GO111MODULE=on && \
-    go env -w GOPROXY=https://goproxy.cn,direct  && \
+    go env -w GOPROXY=https://goproxy.cn,direct && \
     go mod download
 
-# 复制项目
+# 复制源码
 COPY . .
 
 # 构建应用
@@ -28,11 +25,12 @@ FROM alpine:latest
 
 # 时区
 ENV TZ=Asia/Shanghai
-RUN apk update \
-    && apk add tzdata \
-    && echo "${TZ}" > /etc/timezone \
-    && ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime \
-    && rm /var/cache/apk/*
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories && \
+    apk update && \
+    apk add --no-cache tzdata && \
+    ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime && \
+    apk del tzdata && \
+    rm -rf /var/cache/apk/*
 
 WORKDIR /app
 COPY --from=builder /go/bin/app .
