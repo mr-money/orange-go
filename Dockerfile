@@ -1,5 +1,5 @@
 # 多段构建 builder构建二进制文件
-FROM golang:1.17 as builder
+FROM golang:1.23 as builder
 
 # 使用不同的构建参数来选择不同微服务容器
 ARG image=Api
@@ -8,7 +8,9 @@ ARG image=Api
 WORKDIR /go/src/orange-go
 
 # 复制依赖描述文件
-COPY go.mod go.sum ./
+COPY go.mod go.mod
+COPY go.sum go.sum
+
 RUN go env -w GO111MODULE=on && \
     go env -w GOPROXY=https://goproxy.cn,direct && \
     go mod download
