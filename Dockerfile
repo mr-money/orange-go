@@ -1,5 +1,5 @@
 # 多段构建 builder构建二进制文件
-FROM golang:1.23 as builder
+FROM golang:1.21 as builder
 
 # 使用不同的构建参数来选择不同微服务容器
 ARG image=Api

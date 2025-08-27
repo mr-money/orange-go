@@ -12,7 +12,7 @@
 
 #### Golang
 
-> ##### ≥1.17
+> ##### ≥1.21
 > 下载地址 https://golang.google.cn/dl/
 
 #### 安装
