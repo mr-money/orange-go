@@ -4,7 +4,6 @@ import (
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"log/slog"
 )
 
 type logConfig struct {
@@ -16,34 +15,6 @@ type logConfig struct {
 }
 
 var logger *zap.Logger
-
-var AppLogger *zap.SugaredLogger
-
-func init() {
-	defaultConfig := logConfig{
-		//Level:      "info",
-		FileName:   "Logs/app.log",
-		MaxSize:    10,
-		MaxAge:     60,
-		MaxBackups: 1000,
-	}
-	err := initLogger(defaultConfig)
-	if err != nil {
-		slog.Error(err.Error())
-		return
-	}
-
-	// 单例日志
-	logger := zap.L()
-	zap.NewAtomicLevel().SetLevel(zap.InfoLevel)
-
-	// 调用内核的Sync方法，刷新所有缓冲的日志条目。
-	// 应用程序应该注意在退出之前调用Sync。
-	defer logger.Sync()
-
-	// 应用日志
-	AppLogger = logger.Sugar()
-}
 
 // @Description: 负责设置 encoding 的日志格式
 // @return zapcore.Encoder
