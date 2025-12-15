@@ -32,7 +32,6 @@ func InitRedis() {
 	})
 }
 
-// connectRedis
 // @Description: 连接redis
 // @return *redis.Client
 func connectRedis() *redis.Client {
@@ -70,7 +69,6 @@ func connectRedis() *redis.Client {
 	return rdb
 }
 
-// SetKey
 // @Description: 生成缓存key
 // @param key 嵌套key名 如 key1,key2,key3...
 // @return string
@@ -81,7 +79,6 @@ func SetKey(key ...string) string {
 	return strings.Join(keys, ":")
 }
 
-// RememberString
 // @Description:不存在则写入缓存数据后返回 字符串
 // @param key 缓存key
 // @param value 缓存数据
@@ -93,16 +90,18 @@ func RememberString(key string, value func() string, expiration time.Duration) s
 	if err != nil {
 		//缓存为空 返回传入数据
 		if err.Error() == "redis: nil" || data == "" {
-			if value() != "" {
+			value := value()
+
+			if value != "" {
 				//写入缓存
 				Redis.Set(
 					Cxt,
-					key, value(),
+					key, value,
 					expiration,
 				)
 			}
 
-			return value()
+			return value
 		}
 
 		slog.Error("redis remember string", "err", err)
@@ -113,7 +112,6 @@ func RememberString(key string, value func() string, expiration time.Duration) s
 	return data
 }
 
-// RememberZScore
 // @Description: 不存在则写入缓存数据后返回 有序集合
 // @param key 缓存key
 // @param member 成员名
@@ -126,12 +124,13 @@ func RememberZScore(key, member string, value func() float64, expiration time.Du
 	if err != nil {
 		//缓存为空 返回传入数据
 		if err.Error() == "redis: nil" || data == 0 {
+			value := value()
 
-			if value() > 0 {
+			if value > 0 {
 				//写入缓存
 				zData := redis.Z{
 					Member: member,
-					Score:  value(),
+					Score:  value,
 				}
 
 				Redis.ZAdd(
@@ -143,7 +142,7 @@ func RememberZScore(key, member string, value func() float64, expiration time.Du
 				}
 			}
 
-			return value()
+			return value
 		}
 
 		slog.Error("redis remember zscore", "err", err)
@@ -154,7 +153,6 @@ func RememberZScore(key, member string, value func() float64, expiration time.Du
 	return data
 }
 
-// RememberHash
 // @Description: 不存在则写入缓存数据后返回 哈希
 // @param key 缓存key
 // @param field 字段名
@@ -167,18 +165,20 @@ func RememberHash(key, field string, value func() string, expiration time.Durati
 	if err != nil {
 		//缓存为空 返回传入数据
 		if err.Error() == "redis: nil" || data == "" {
-			if value() != "" {
+			value := value()
+
+			if value != "" {
 				//写入缓存
 				Redis.HSet(
 					Cxt,
-					key, field, value(),
+					key, field, value,
 				)
 				if expiration > 0 {
 					Redis.Expire(Cxt, key, expiration)
 				}
 			}
 
-			return value()
+			return value
 		}
 
 		slog.Error("redis remember hash", "err", err)
