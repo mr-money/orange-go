@@ -9,8 +9,7 @@ import (
 var loggerCache sync.Map
 
 var (
-	AppLogger  = MustModuleLogger("app")
-	UserLogger = MustModuleLogger("user")
+	AppLogger = MustModuleLogger("app")
 )
 
 // @Description: 根据模块创建日志
