@@ -5,7 +5,7 @@ import (
 	"log/slog"
 )
 
-var TestLogger *zap.SugaredLogger
+var AppLogger *zap.SugaredLogger
 
 func init() {
 	lc := logConfig{
@@ -21,5 +21,5 @@ func init() {
 	}
 
 	//全局日志结构
-	TestLogger = logger.Sugar()
+	AppLogger = logger.Sugar()
 }
