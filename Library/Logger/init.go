@@ -4,6 +4,7 @@ import (
 	"go.uber.org/zap"
 	"log/slog"
 	"sync"
+	"time"
 )
 
 var loggerCache sync.Map
@@ -21,10 +22,10 @@ func MustModuleLogger(name string) *zap.SugaredLogger {
 		return v.(*zap.SugaredLogger)
 	}
 
-	// 默认规则：logs/{name}.log
+	// 默认规则：logs/日期/{name}.log
 	lc := logConfig{
 		Level:      "info", // 默认级别，想区分就外面传进来
-		FileName:   "logs/" + name + ".log",
+		FileName:   "Logs/" + time.Now().Format("20060102") + "/" + name + ".log",
 		MaxSize:    10,
 		MaxBackups: 5,
 		MaxAge:     30,
