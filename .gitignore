@@ -2,3 +2,6 @@
 Config/*.toml
 Config/*.yml
 Logs
+CLAUDE.md
+ARCHITECTURE_OPTIMIZATION.md
+.claude/
