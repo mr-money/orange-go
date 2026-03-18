@@ -1,5 +1,6 @@
 # 多段构建 builder构建二进制文件
-FROM golang:1.21 as builder
+FROM golang:1.23-alpine as builder
+#FROM golang:1.23-alpine
 
 # 使用不同的构建参数来选择不同微服务容器
 ARG image=Api
@@ -19,11 +20,10 @@ RUN go env -w GO111MODULE=on && \
 COPY . .
 
 # 构建应用
-RUN go env -w CGO_ENABLED=0 GOOS=linux GOARCH=amd64 && \
-    go build -o /go/bin/app ./Container/${image}/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -installsuffix cgo -o /go/bin/app ./Container/${image}/main.go
 
 # 服务容器运行
-FROM alpine:latest
+FROM golang:1.23-alpine
 
 # 时区
 ENV TZ=Asia/Shanghai
@@ -36,7 +36,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositorie
 
 WORKDIR /app
 COPY --from=builder /go/bin/app .
-COPY --from=builder /go/src/orange-go/Config ./Config
+COPY --from=builder /go/src/orange-go/Config/web.toml ./Config/web.toml
 
 ENTRYPOINT ["./app"]
 
