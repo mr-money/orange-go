@@ -8,15 +8,15 @@ import (
 )
 
 // TestPing
-// @Description: http测试链接
+// @Description: 测试自定义ping参数响应
 // @param t
 func TestPing(t *testing.T) {
 	res := Test.Get("/api/ping", map[string]string{
-		"ping": "pong",
+		"ping": "hello",
 	})
 
 	assert.Equal(t, http.StatusOK, res.Code)
-	assert.Equal(t, "pong", res.Body.String())
+	assert.Equal(t, "hello", res.Body.String())
 }
 
 // TestPingDefault
