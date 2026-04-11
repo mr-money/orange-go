@@ -1,10 +1,11 @@
 package Logger
 
 import (
-	"go.uber.org/zap"
 	"log/slog"
 	"sync"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 var loggerCache sync.Map
@@ -14,29 +15,32 @@ var (
 	TestLogger = MustModuleLogger("test")
 )
 
-// @Description: 根据模块创建日志
-// @param name
+// MustModuleLogger 根据模块创建日志（线程安全，每个模块独立logger）
+// @param name 模块名称
 // @return *zap.SugaredLogger
 func MustModuleLogger(name string) *zap.SugaredLogger {
-	// 用 sync.Map 做简单缓存，线程安全
+	// 用 sync.Map 做缓存，线程安全
 	if v, ok := loggerCache.Load(name); ok {
 		return v.(*zap.SugaredLogger)
 	}
 
-	// 默认规则：logs/日期/{name}.log
+	// 默认规则：Logs/日期/{name}.log
 	lc := logConfig{
-		Level:      "info", // 默认级别，想区分就外面传进来
+		Level:      "info",
 		FileName:   "Logs/" + time.Now().Format("20060102") + "/" + name + ".log",
 		MaxSize:    10,
 		MaxBackups: 5,
 		MaxAge:     30,
 	}
-	if err := initLogger(lc); err != nil {
+
+	// 创建独立的 logger 实例（不修改全局变量）
+	localLogger, err := createLogger(lc)
+	if err != nil {
 		slog.Error("init logger", "module", name, "err", err)
 		panic(err)
 	}
 
-	sugar := logger.Sugar()
+	sugar := localLogger.Sugar()
 	loggerCache.Store(name, sugar)
 
 	return sugar
