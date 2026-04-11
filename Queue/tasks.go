@@ -2,13 +2,6 @@ package Queue
 
 import (
 	"github.com/pkg/errors"
-	"orange-go/Queue/Worker/Api/QueueDemo"
-)
-
-// 定义队列消费方法名称
-const (
-	PrintNameFunc  = "print_name"
-	PrintName2Func = "print_name2"
 )
 
 // getQueueByTask
@@ -34,20 +27,5 @@ type queueGroups struct {
 
 // 获取队列组配置
 func getQueues() *[]queueGroups {
-
-	return &[]queueGroups{
-		{
-			"queue_test",
-			map[string]interface{}{
-				PrintNameFunc: QueueDemo.PrintName,
-			},
-		},
-		{
-			"queue_test2",
-			map[string]interface{}{
-				PrintName2Func: QueueDemo.PrintName2,
-			},
-		},
-	}
-
+	return &[]queueGroups{}
 }
