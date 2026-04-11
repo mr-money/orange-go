@@ -1,8 +1,6 @@
 package Log
 
 import (
-	"log/slog"
-	"orange-go/Library/Logger"
 	"orange-go/Model"
 	"orange-go/Repository/Log"
 )
@@ -22,23 +20,4 @@ func GetMongoLog(page int64, pageSize int64) map[string]interface{} {
 		"total": total,
 		"list":  logList,
 	}
-}
-
-func ZapLogs() {
-	info := struct {
-		Name    string
-		Age     int
-		MapName map[string]string
-	}{
-		Name: "Zap",
-		Age:  80,
-		MapName: map[string]string{
-			"abc": "aaaa",
-			"ccc": "wwww",
-		},
-	}
-	Logger.TestLogger.Info(info)
-	Logger.AppLogger.Info(info)
-	go slog.Info("info", info)
-	go slog.Error("error", info)
 }

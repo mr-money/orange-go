@@ -6,7 +6,6 @@ import (
 	"github.com/shockerli/cvt"
 	"orange-go/Library/Handler"
 	"orange-go/Model"
-	"orange-go/Queue"
 	"orange-go/Repository/User"
 )
 
@@ -54,11 +53,6 @@ func Register(user map[string]string) (Model.User, string, error) {
 	//创建用户
 	User.Create(userInfo)
 
-	//test 多线程
-	/*for i := 0; i < 5; i++ {
-		go User.Create(userInfo)
-	}*/
-
 	//自动登录
 	token, err := Handler.LoginToken(cvt.String(userInfo.Uuid), userInfo.Name)
 	if err != nil {
@@ -97,29 +91,4 @@ func Login(user map[string]string) (Model.User, string, error) {
 	}
 
 	return userInfo, token, nil
-}
-
-// QueueTest 队列测试
-func QueueTest(name string) string {
-	queueParams := make(map[string]interface{})
-	queueParams["name"] = name
-
-	res := Queue.AddTask(
-		Queue.PrintNameFunc,
-		queueParams,
-	)
-
-	return res
-}
-
-func QueueTest2(name string) string {
-	queueParams := make(map[string]interface{})
-	queueParams["name"] = name
-
-	res := Queue.AddTask(
-		Queue.PrintName2Func,
-		queueParams,
-	)
-
-	return res
 }
