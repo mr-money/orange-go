@@ -44,19 +44,3 @@ func GetUserListPage(c *gin.Context) {
 	c.JSON(200, gin.H{"userList": userList})
 
 }
-
-// Add
-// @Description: 创建用户
-// @param c
-// @param string name 用户名称
-// @return int 插入数据的主键
-func Add(c *gin.Context) {
-	userName := c.Query("name")
-
-	userInfo := make(map[string]interface{})
-	userInfo["name"] = userName
-	//res := User.Register(userInfo)
-
-	c.JSON(200, gin.H{"res": userInfo})
-
-}

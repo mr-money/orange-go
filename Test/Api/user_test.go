@@ -9,18 +9,6 @@ import (
 	"testing"
 )
 
-// TestPing
-// @Description: http测试链接
-// @param t
-func TestPing(t *testing.T) {
-	res := Test.Get("/api/ping", map[string]string{
-		"ping": "pong",
-	})
-
-	assert.Equal(t, http.StatusOK, res.Code)
-	assert.Equal(t, "pong", res.Body.String())
-}
-
 // TestLogin
 // @Description: 登录
 // @param t

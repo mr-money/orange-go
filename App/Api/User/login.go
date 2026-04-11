@@ -2,9 +2,7 @@ package User
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/shockerli/cvt"
 	"orange-go/Service/User"
-	"time"
 )
 
 // Login
@@ -63,26 +61,5 @@ func Register(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"userInfo": user,
 		"token":    token,
-	})
-}
-
-// AddUser999
-// @Description:新增5万条测试数据
-// @param c
-func AddUser999(c *gin.Context) {
-	userInfo := make(map[string]string)
-	userInfo["password"] = "123456"
-
-	userInfo["name"] = "test-name" + cvt.String(time.Now().Unix())
-
-	_, _, loginErr := User.Register(userInfo)
-
-	if loginErr != nil {
-		c.JSON(500, gin.H{"msg": loginErr.Error()})
-		return
-	}
-
-	c.JSON(200, gin.H{
-		"userInfo": userInfo,
 	})
 }
