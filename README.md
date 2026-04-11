@@ -226,9 +226,9 @@ Queue/tasks.go:getQueues() 方法 配置队列及相关消费方法
 ``` golang
 // 定义队列消费方法名称
 const (
-	PrintNameFunc  = "print_name"
-	PrintName2Func = "print_name2"
+	ExampleTaskFunc = "example_task"
 )
+
 type queueGroups struct {
 	queueName string                 //队列名称
 	tasks     map[string]interface{} //队列下任务 任务名称：任务消费方法
@@ -236,22 +236,15 @@ type queueGroups struct {
 
 //获取队列组配置
 func getQueues() *[]queueGroups {
-
 	return &[]queueGroups{
-		{
-			"queue_test",
-			map[string]interface{}{
-				PrintNameFunc: QueueDemo.PrintName,
-			},
-		},
-		{
-			"queue_test2",
-			map[string]interface{}{
-				PrintName2Func: QueueDemo.PrintName2,
-			},
-		},
+		// 示例队列配置
+		// {
+		//     "example_queue",
+		//     map[string]interface{}{
+		//         ExampleTaskFunc: Worker.ExampleTask,
+		//     },
+		// },
 	}
-
 }
 ```
 
@@ -261,29 +254,28 @@ func getQueues() *[]queueGroups {
 ``` golang
 //任务参数 数据类型 map
 queueParams := make(map[string]interface{})
-queueParams["name"] = name
+queueParams["param"] = value
 
 //加入队列任务
 res := Queue.AddTask(
-		Queue.PrintNameFunc, //消费方法
+		Queue.ExampleTaskFunc, //消费方法
 		queueParams, //任务参数
 	)
 ```
 
 #### 队列任务消费
-> 队列消费方法目录路径 Queue|Worker|{对应APP下路径} 
+> 队列消费方法目录路径 Queue|Worker|{对应APP下路径}
 
 ```golang
-//name 参数接收 加入任务传入参数
-func PrintName(name string) (string, error) {
+//参数接收 加入任务传入参数
+func ExampleTask(param string) (string, error) {
     //TODO 消费逻辑
-	
-	if false { //error 3秒重试
-		return name, tasks.NewErrRetryTaskLater("error:", 3*time.Second)
-	}
-	return name, nil
-}
 
+	// 如果需要重试，返回重试错误
+	// return "", tasks.NewErrRetryTaskLater("error message", 3*time.Second)
+
+	return "result", nil
+}
 ```
 
 
