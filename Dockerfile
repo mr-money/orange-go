@@ -36,7 +36,12 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositorie
 
 WORKDIR /app
 COPY --from=builder /go/bin/app .
+COPY --from=builder /go/src/orange-go/go.mod .
 COPY --from=builder /go/src/orange-go/Config/web.toml ./Config/web.toml
+COPY --from=builder /go/src/orange-go/App/LogViewer/*.html ./App/LogViewer/
+
+# 创建Logs目录作为挂载点
+RUN mkdir -p /app/Logs
 
 ENTRYPOINT ["./app"]
 
