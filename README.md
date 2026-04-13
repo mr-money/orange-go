@@ -278,4 +278,46 @@ func ExampleTask(param string) (string, error) {
 }
 ```
 
+### 日志查看器
 
+LogViewer 是 orange-go 项目中用于实时查看和分析应用日志的可视化模块，提供 Web 界面支持日志浏览、实时流式传输、级别过滤和搜索功能。
+
+#### 构建与运行
+
+##### 本地运行
+
+```bash
+# 方法1：使用 go run 直接运行
+cd orange-go
+go run ./Container/LogViewer
+
+# 方法2：构建后运行
+cd orange-go
+go build -o logviewer.exe ./Container/LogViewer
+./logviewer.exe
+```
+
+服务将在 `http://localhost:8081` 启动。
+
+##### Docker 运行
+
+```bash
+# 构建
+docker build --build-arg image=LogViewer -t orange-go/logviewer .
+
+# 运行
+docker run -d --name orange_logviewer -p 8081:8081 -v $(pwd)/Config/web.toml:/app/Config/web.toml -v $(pwd)/Logs:/app/Logs orange-go/logviewer
+```
+
+#### 使用说明
+
+1. 访问 `http://localhost:8081` 打开日志查看器
+2. 从左侧文件列表中选择日志文件
+3. 使用顶部控制栏：
+   - 日期和文件名下拉框切换日志文件
+   - 级别过滤按钮（All/Debug/Info/Warn/Error/Panic/Fatal）
+   - 搜索框进行关键词搜索
+4. 点击"实时刷新"按钮启用实时监听
+5. 点击"暂停"按钮停止实时刷新
+
+**注意**：LogViewer 只在 debug 模式下（web.toml 中 `EnvModel = debug`）启用，非 debug 模式返回 403 Forbidden。
