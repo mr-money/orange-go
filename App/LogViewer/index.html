@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+            background: #1a1a2e;
+            color: #eee;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #16213e;
+            padding: 15px 20px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .header h1 {
+            color: #4ade80;
+            font-size: 20px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        select, input, button {
+            background: #0f3460;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #4ade80;
+        }
+
+        button {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #238636;
+            border-color: #238636;
+        }
+
+        button.active {
+            background: #238636;
+            border-color: #238636;
+        }
+
+        .level-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .level-buttons button {
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #16213e;
+            border-right: 1px solid #30363d;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .sidebar h3 {
+            color: #8b949e;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+
+        .date-group {
+            margin-bottom: 15px;
+        }
+
+        .date-header {
+            color: #4ade80;
+            font-size: 13px;
+            padding: 8px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .date-header:hover {
+            background: #0f3460;
+            border-radius: 4px;
+        }
+
+        .date-files {
+            display: none;
+        }
+
+        .date-files.open {
+            display: block;
+        }
+
+        .file-item {
+            padding: 8px 8px 8px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #c9d1d9;
+        }
+
+        .file-item:hover {
+            background: #0f3460;
+        }
+
+        .file-item.active {
+            background: #238636;
+        }
+
+        .file-size {
+            color: #8b949e;
+            font-size: 11px;
+        }
+
+        .log-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .log-header {
+            background: #16213e;
+            padding: 10px 15px;
+            border-bottom: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-header .file-name {
+            color: #58a6ff;
+        }
+
+        .log-header .stats {
+            color: #8b949e;
+            font-size: 13px;
+        }
+
+        .log-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background: #0d1117;
+        }
+
+        .log-line {
+            padding: 8px 12px;
+            border-bottom: 1px solid #161b22;
+            font-size: 15px;
+            line-height: 1.6;
+            word-break: break-all;
+        }
+
+        .log-line-main {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .log-time {
+            color: #8b949e;
+            flex-shrink: 0;
+        }
+
+        .log-level {
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .level-INFO {
+            background: rgba(88, 166, 255, 0.25);
+            color: #58a6ff;
+        }
+
+        .level-WARN {
+            background: rgba(210, 153, 34, 0.25);
+            color: #d29922;
+        }
+
+        .level-ERROR {
+            background: rgba(248, 81, 73, 0.25);
+            color: #f85149;
+        }
+
+        .level-FATAL {
+            background: rgba(248, 81, 73, 0.45);
+            color: #f85149;
+        }
+
+        .level-DEBUG {
+            background: rgba(158, 106, 3, 0.25);
+            color: #d4a72c;
+        }
+
+        .log-message {
+            color: #c9d1d9;
+            flex: 1;
+        }
+
+        .log-caller {
+            color: #6e7681;
+            font-size: 12px;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        .log-extra {
+            margin-top: 5px;
+            margin-left: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .log-extra-item {
+            background: rgba(88, 166, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .log-extra-key {
+            color: #8b949e;
+        }
+
+        .log-extra-value {
+            color: #58a6ff;
+            margin-left: 4px;
+        }
+
+        .load-more {
+            text-align: center;
+            padding: 15px;
+        }
+
+        .load-more button {
+            width: 200px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: #8b949e;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .live-dot.paused {
+            background: #8b949e;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #8b949e;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🪵 Log Viewer</h1>
+        <div class="controls">
+            <div class="level-buttons">
+                <button class="level-btn active" data-level="all">All</button>
+                <button class="level-btn" data-level="error">ERROR</button>
+                <button class="level-btn" data-level="warn">WARN</button>
+                <button class="level-btn" data-level="info">INFO</button>
+                <button class="level-btn" data-level="debug">DEBUG</button>
+            </div>
+            <input type="text" class="search-input" id="searchInput" placeholder="搜索日志...">
+            <button id="liveToggle" class="active">
+                <span class="live-indicator">
+                    <span class="live-dot" id="liveDot"></span>
+                    Live
+                </span>
+            </button>
+            <button id="clearBtn">清空</button>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="sidebar">
+            <h3>📁 日志文件</h3>
+            <div id="fileTree" class="loading">加载中...</div>
+        </div>
+
+        <div class="log-container">
+            <div class="log-header">
+                <span class="file-name" id="currentFile">请选择日志文件</span>
+                <span class="stats" id="logStats"></span>
+            </div>
+            <div class="log-content" id="logContent">
+                <div class="empty-state">从左侧选择日志文件开始查看</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            currentDate: null,
+            currentFile: null,
+            currentLevel: 'all',
+            searchTerm: '',
+            isLive: true,
+            offset: 0,
+            limit: 100,
+            total: 0,
+            eventSource: null,
+            logs: []
+        };
+
+        const fileTreeEl = document.getElementById('fileTree');
+        const logContentEl = document.getElementById('logContent');
+        const currentFileEl = document.getElementById('currentFile');
+        const logStatsEl = document.getElementById('logStats');
+        const searchInput = document.getElementById('searchInput');
+        const liveToggle = document.getElementById('liveToggle');
+        const liveDot = document.getElementById('liveDot');
+        const clearBtn = document.getElementById('clearBtn');
+        const levelButtons = document.querySelectorAll('.level-btn');
+
+        async function loadFiles() {
+            try {
+                const response = await fetch('/logviewer/files');
+                const data = await response.json();
+                renderFileTree(data);
+            } catch (err) {
+                fileTreeEl.innerHTML = '<div class="empty-state">加载失败: ' + err.message + '</div>';
+            }
+        }
+
+        function renderFileTree(data) {
+            if (!data.files || data.files.length === 0) {
+                fileTreeEl.innerHTML = '<div class="empty-state">暂无日志文件</div>';
+                return;
+            }
+
+            const dates = data.dates || [];
+            const filesByDate = {};
+
+            data.files.forEach(file => {
+                if (!filesByDate[file.date]) {
+                    filesByDate[file.date] = [];
+                }
+                filesByDate[file.date].push(file);
+            });
+
+            let html = '';
+            dates.forEach((date, index) => {
+                const files = filesByDate[date] || [];
+                html += `
+                    <div class="date-group">
+                        <div class="date-header" data-date="${date}">
+                            <span>📅 ${date}</span>
+                            <span>(${files.length})</span>
+                        </div>
+                        <div class="date-files ${index === 0 ? 'open' : ''}" id="date-${date}">
+                            ${files.map(file => `
+                                <div class="file-item" data-date="${date}" data-name="${file.name}">
+                                    <div>${file.name}</div>
+                                    <div class="file-size">${formatSize(file.size)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            fileTreeEl.innerHTML = html;
+
+            document.querySelectorAll('.date-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const date = header.dataset.date;
+                    const filesEl = document.getElementById(`date-${date}`);
+                    filesEl.classList.toggle('open');
+                });
+            });
+
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    document.querySelectorAll('.file-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    loadLogFile(item.dataset.date, item.dataset.name);
+                });
+            });
+        }
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        async function loadLogFile(date, name, append = false) {
+            state.currentDate = date;
+            state.currentFile = name;
+
+            if (!append) {
+                state.offset = 0;
+                state.logs = [];
+            }
+
+            try {
+                const params = new URLSearchParams({
+                    level: state.currentLevel,
+                    search: state.searchTerm,
+                    offset: state.offset,
+                    limit: state.limit
+                });
+
+                const response = await fetch(`/logviewer/files/${date}/${name}?${params}`);
+                const data = await response.json();
+
+                // 安全处理数据
+                state.total = data.total || 0;
+                const entries = data.entries || [];
+
+                if (append) {
+                    state.logs = [...state.logs, ...entries];
+                } else {
+                    state.logs = entries;
+                }
+
+                state.offset = state.logs.length;
+
+                renderLogs(!append);
+                updateStats();
+
+                if (state.isLive) {
+                    startLiveStream();
+                }
+            } catch (err) {
+                logContentEl.innerHTML = '<div class="empty-state">加载失败: ' + err.message + '</div>';
+            }
+        }
+
+        function renderLogs(scrollToBottom = true) {
+            currentFileEl.textContent = `${state.currentDate}/${state.currentFile}`;
+
+            if (state.logs.length === 0) {
+                logContentEl.innerHTML = '<div class="empty-state">暂无日志</div>';
+                return;
+            }
+
+            let html = '';
+
+            if (state.offset < state.total) {
+                html += `
+                    <div class="load-more">
+                        <button id="loadMoreBtn">加载更多 (${state.total - state.offset} 条)</button>
+                    </div>
+                `;
+            }
+
+            state.logs.forEach(entry => {
+                const message = entry.message || entry.msg || '';
+                let extraHtml = '';
+
+                if (entry.extra && Object.keys(entry.extra).length > 0) {
+                    extraHtml = '<div class="log-extra">';
+                    for (const [key, value] of Object.entries(entry.extra)) {
+                        let displayValue;
+                        if (typeof value === 'object') {
+                            displayValue = JSON.stringify(value);
+                        } else {
+                            displayValue = String(value);
+                        }
+                        extraHtml += `<span class="log-extra-item"><span class="log-extra-key">${escapeHtml(key)}=</span><span class="log-extra-value">${escapeHtml(displayValue)}</span></span>`;
+                    }
+                    extraHtml += '</div>';
+                }
+
+                html += `
+                    <div class="log-line">
+                        <div class="log-line-main">
+                            <span class="log-time">${formatTime(entry.time)}</span>
+                            <span class="log-level level-${entry.level}">${entry.level}</span>
+                            <span class="log-message">${escapeHtml(message)}</span>
+                            ${entry.caller ? `<span class="log-caller">${entry.caller}</span>` : ''}
+                        </div>
+                        ${extraHtml}
+                    </div>
+                `;
+            });
+
+            logContentEl.innerHTML = html;
+
+            const loadMoreBtn = document.getElementById('loadMoreBtn');
+            if (loadMoreBtn) {
+                loadMoreBtn.addEventListener('click', () => {
+                    loadLogFile(state.currentDate, state.currentFile, true);
+                });
+            }
+
+            if (scrollToBottom) {
+                logContentEl.scrollTop = logContentEl.scrollHeight;
+            }
+        }
+
+        function formatTime(timeStr) {
+            if (!timeStr) return '';
+            try {
+                const date = new Date(timeStr);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                const seconds = String(date.getSeconds()).padStart(2, '0');
+                const ms = String(date.getMilliseconds()).padStart(3, '0');
+                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${ms}`;
+            } catch (e) {
+                return timeStr;
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function updateStats() {
+            logStatsEl.textContent = `显示 ${state.logs.length} / ${state.total} 条`;
+        }
+
+        function startLiveStream() {
+            if (state.eventSource) {
+                state.eventSource.close();
+            }
+
+            if (!state.currentDate || !state.currentFile) {
+                return;
+            }
+
+            const params = new URLSearchParams({
+                date: state.currentDate,
+                name: state.currentFile
+            });
+
+            state.eventSource = new EventSource(`/logviewer/stream?${params}`);
+
+            state.eventSource.addEventListener('log', (event) => {
+                if (!state.isLive) return;
+
+                const entry = JSON.parse(event.data);
+
+                // 兼容 msg 和 message 字段
+                if (entry.msg && !entry.message) {
+                    entry.message = entry.msg;
+                }
+
+                if (state.currentLevel !== 'all' && entry.level.toLowerCase() !== state.currentLevel) {
+                    return;
+                }
+
+                if (state.searchTerm) {
+                    const message = entry.message || entry.msg || '';
+                    let match = message.toLowerCase().includes(state.searchTerm.toLowerCase());
+
+                    // 同时搜索额外字段
+                    if (!match && entry.extra) {
+                        for (const value of Object.values(entry.extra)) {
+                            const valueStr = typeof value === 'object' ? JSON.stringify(value) : String(value);
+                            if (valueStr.toLowerCase().includes(state.searchTerm.toLowerCase())) {
+                                match = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!match) {
+                        return;
+                    }
+                }
+
+                state.logs.push(entry);
+                state.total++;
+                renderLogs(true);
+                updateStats();
+            });
+
+            state.eventSource.onerror = () => {
+                setTimeout(() => {
+                    if (state.isLive) {
+                        startLiveStream();
+                    }
+                }, 3000);
+            };
+        }
+
+        function stopLiveStream() {
+            if (state.eventSource) {
+                state.eventSource.close();
+                state.eventSource = null;
+            }
+        }
+
+        levelButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                levelButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.currentLevel = btn.dataset.level;
+                if (state.currentFile) {
+                    loadLogFile(state.currentDate, state.currentFile);
+                }
+            });
+        });
+
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                state.searchTerm = searchInput.value;
+                if (state.currentFile) {
+                    loadLogFile(state.currentDate, state.currentFile);
+                }
+            }, 300);
+        });
+
+        liveToggle.addEventListener('click', () => {
+            state.isLive = !state.isLive;
+            liveToggle.classList.toggle('active', state.isLive);
+            liveDot.classList.toggle('paused', !state.isLive);
+
+            if (state.isLive) {
+                startLiveStream();
+            } else {
+                stopLiveStream();
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            state.logs = [];
+            renderLogs();
+            updateStats();
+        });
+
+        loadFiles();
+    </script>
+</body>
+</html>
