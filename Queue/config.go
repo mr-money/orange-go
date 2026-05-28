@@ -10,13 +10,23 @@ import (
 // @Description: 初始化队列配置
 // @return *config.Config
 func initConf() *config.Config {
-	redisBroker := fmt.Sprintf(
-		"redis://%s@%s:%s/%s",
-		Config.Configs.Web.Redis.Pwd,
-		Config.Configs.Web.Redis.Host,
-		Config.Configs.Web.Redis.Port,
-		"10",
-	)
+	var redisBroker string
+	if Config.Configs.Web.Redis.Pwd != "" {
+		redisBroker = fmt.Sprintf(
+			"redis://%s@%s:%s/%s",
+			Config.Configs.Web.Redis.Pwd,
+			Config.Configs.Web.Redis.Host,
+			Config.Configs.Web.Redis.Port,
+			"10",
+		)
+	} else {
+		redisBroker = fmt.Sprintf(
+			"redis://%s:%s/%s",
+			Config.Configs.Web.Redis.Host,
+			Config.Configs.Web.Redis.Port,
+			"10",
+		)
+	}
 
 	redisResultBackend := fmt.Sprintf(
 		"redis://%s:%s/%s",
@@ -61,12 +71,23 @@ func initConf() *config.Config {
 // @Description: 队列配置list
 // @return *[]config.Config
 func confList() *[]config.Config {
-	redisBroker := fmt.Sprintf(
-		"redis://%s:%s/%s",
-		Config.Configs.Web.Redis.Host,
-		Config.Configs.Web.Redis.Port,
-		"10",
-	)
+	var redisBroker string
+	if Config.Configs.Web.Redis.Pwd != "" {
+		redisBroker = fmt.Sprintf(
+			"redis://%s@%s:%s/%s",
+			Config.Configs.Web.Redis.Pwd,
+			Config.Configs.Web.Redis.Host,
+			Config.Configs.Web.Redis.Port,
+			"10",
+		)
+	} else {
+		redisBroker = fmt.Sprintf(
+			"redis://%s:%s/%s",
+			Config.Configs.Web.Redis.Host,
+			Config.Configs.Web.Redis.Port,
+			"10",
+		)
+	}
 
 	redisResultBackend := fmt.Sprintf(
 		"redis://%s:%s/%s",
