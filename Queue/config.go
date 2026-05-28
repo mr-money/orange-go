@@ -2,8 +2,9 @@ package Queue
 
 import (
 	"fmt"
-	"github.com/RichardKnop/machinery/v1/config"
 	"orange-go/Config"
+
+	"github.com/RichardKnop/machinery/v1/config"
 )
 
 // initConf
@@ -17,14 +18,14 @@ func initConf() *config.Config {
 			Config.Configs.Web.Redis.Pwd,
 			Config.Configs.Web.Redis.Host,
 			Config.Configs.Web.Redis.Port,
-			"10",
+			Config.Configs.Web.Redis.Db,
 		)
 	} else {
 		redisBroker = fmt.Sprintf(
 			"redis://%s:%s/%s",
 			Config.Configs.Web.Redis.Host,
 			Config.Configs.Web.Redis.Port,
-			"10",
+			Config.Configs.Web.Redis.Db,
 		)
 	}
 
@@ -32,7 +33,7 @@ func initConf() *config.Config {
 		"redis://%s:%s/%s",
 		Config.Configs.Web.Redis.Host,
 		Config.Configs.Web.Redis.Port,
-		"10",
+		Config.Configs.Web.Redis.Db,
 	)
 
 	return &config.Config{
@@ -78,14 +79,14 @@ func confList() *[]config.Config {
 			Config.Configs.Web.Redis.Pwd,
 			Config.Configs.Web.Redis.Host,
 			Config.Configs.Web.Redis.Port,
-			"10",
+			Config.Configs.Web.Redis.Db,
 		)
 	} else {
 		redisBroker = fmt.Sprintf(
 			"redis://%s:%s/%s",
 			Config.Configs.Web.Redis.Host,
 			Config.Configs.Web.Redis.Port,
-			"10",
+			Config.Configs.Web.Redis.Db,
 		)
 	}
 
@@ -93,7 +94,7 @@ func confList() *[]config.Config {
 		"redis://%s:%s/%s",
 		Config.Configs.Web.Redis.Host,
 		Config.Configs.Web.Redis.Port,
-		"10",
+		Config.Configs.Web.Redis.Db,
 	)
 
 	return &[]config.Config{
