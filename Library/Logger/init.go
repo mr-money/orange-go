@@ -5,6 +5,8 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 	"sync"
 	"time"
 
@@ -15,6 +17,40 @@ import (
 var loggerCache sync.Map
 
 const logsBaseDir = "Logs"
+
+// getLogLevel 直接读取 Config/web.toml 的 env_mode，避免循环依赖
+func getLogLevel() string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "info"
+	}
+	root := cwd
+	for {
+		if _, err := os.Stat(filepath.Join(root, "go.mod")); err == nil {
+			break
+		}
+		parent := filepath.Dir(root)
+		if parent == root {
+			return "info"
+		}
+		root = parent
+	}
+	tomlPath := filepath.Join(root, "Config", "web.toml")
+	data, err := os.ReadFile(tomlPath)
+	if err != nil {
+		return "info"
+	}
+	re := regexp.MustCompile(`(?m)^\s*env_mode\s*=\s*"([^"]*)"`)
+	matches := re.FindSubmatch(data)
+	if len(matches) < 2 {
+		return "info"
+	}
+	mode := strings.ToLower(strings.TrimSpace(string(matches[1])))
+	if mode == "debug" {
+		return "debug"
+	}
+	return "info"
+}
 
 var nowFunc = func() time.Time {
 	return time.Now().In(time.Local)
@@ -122,7 +158,7 @@ func MustModuleLogger(name string) *zap.SugaredLogger {
 	}
 
 	lc := logConfig{
-		Level:      "info",
+		Level:      getLogLevel(),
 		MaxSize:    10,
 		MaxBackups: 5,
 		MaxAge:     30,
