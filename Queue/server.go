@@ -34,6 +34,9 @@ func Run() {
 			return
 		}
 
+		// 包装 backend，将 CreatedAt 从 UTC 改为本地时区
+		serverMap[queue.queueName].SetBackend(NewLocalTimeBackend(serverMap[queue.queueName].GetBackend()))
+
 		//匿名闭包使用队列组
 		func(queueIn queueGroups) {
 			//worker := server.NewWorker(queueIn.queueName, 1)
