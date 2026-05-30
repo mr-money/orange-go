@@ -491,7 +491,7 @@
                 }
 
                 if (append) {
-                    state.logs = [...state.logs, ...entries];
+                    state.logs = [...entries, ...state.logs];
                 } else {
                     state.logs = entries;
                 }
@@ -511,7 +511,7 @@
             }
         }
 
-        function renderLogs(isInitialLoad = true) {
+        function renderLogs(isInitialLoad = true, isLiveAppend = false) {
             currentFileEl.textContent = `${state.currentDate}/${state.currentFile}`;
 
             if (state.logs.length === 0) {
@@ -519,13 +519,21 @@
                 return;
             }
 
-            // "加载更多"时保留滚动位置
-            const savedScrollTop = isInitialLoad ? null : logContentEl.scrollTop;
-            const wasAtTop = isInitialLoad ? true : logContentEl.scrollTop <= 5;
+            // 加载更多时：记录旧 scrollHeight 用于保持视觉位置
+            const savedScrollHeight = isInitialLoad ? null : logContentEl.scrollHeight;
 
             let html = '';
 
-            // 后端已倒序返回，直接渲染（最新在上）
+            // "加载更多"按钮在顶部（加载更旧的数据）
+            if (state.hasMore) {
+                html += `
+                    <div class="load-more">
+                        <button id="loadMoreBtn">加载更多</button>
+                    </div>
+                `;
+            }
+
+            // 正序渲染：旧→新
             state.logs.forEach(entry => {
                 const message = entry.message || entry.msg || '';
                 let extraHtml = '';
@@ -557,15 +565,6 @@
                 `;
             });
 
-            // "加载更多"按钮在底部
-            if (state.hasMore) {
-                html += `
-                    <div class="load-more">
-                        <button id="loadMoreBtn">加载更多</button>
-                    </div>
-                `;
-            }
-
             logContentEl.innerHTML = html;
 
             const loadMoreBtn = document.getElementById('loadMoreBtn');
@@ -576,9 +575,18 @@
             }
 
             if (isInitialLoad) {
-                logContentEl.scrollTop = 0;
-            } else if (savedScrollTop !== null) {
-                logContentEl.scrollTop = savedScrollTop;
+                // 首次加载：滚动到底部（最新日志在下面）
+                logContentEl.scrollTop = logContentEl.scrollHeight;
+            } else if (isLiveAppend) {
+                // live 追加：仅在已在底部附近时自动滚到底部
+                const isNearBottom = logContentEl.scrollHeight - logContentEl.scrollTop - logContentEl.clientHeight < 80;
+                if (isNearBottom) {
+                    logContentEl.scrollTop = logContentEl.scrollHeight;
+                }
+            } else if (savedScrollHeight !== null) {
+                // 加载更多：新内容插入顶部，保持原有内容的视觉位置不变
+                const heightDiff = logContentEl.scrollHeight - savedScrollHeight;
+                logContentEl.scrollTop = heightDiff;
             }
         }
 
@@ -659,8 +667,8 @@
                     }
                 }
 
-                state.logs.unshift(entry);
-                renderLogs(false);
+                state.logs.push(entry);
+                renderLogs(false, true);
                 updateStats();
             });
 

@@ -123,7 +123,7 @@ func ListAllLogFiles() (*LogFilesResponse, error) {
 	}, nil
 }
 
-// ReadLogFile 读取日志文件内容（倒序分页，基于 initialFileSize 避免文件增长导致重复）
+// ReadLogFile 读取日志文件内容（正序分页，基于 initialFileSize 避免文件增长导致重复）
 func ReadLogFile(date, name string, level, search string, offset, limit int, initialFileSize int64) (*ReadLogResponse, error) {
 	filePath := filepath.Join(logsBaseDir, date, name)
 	file, err := os.Open(filePath)
@@ -162,9 +162,9 @@ func ReadLogFile(date, name string, level, search string, offset, limit int, ini
 		allLines = allLines[:len(allLines)-1]
 	}
 
-	// 倒序遍历：从最新行到最旧行
+	// 正序遍历：从最旧行到最新行
 	entries := make([]LogEntry, 0, limit)
-	for i := len(allLines) - 1; i >= 0; i-- {
+	for i := 0; i < len(allLines); i++ {
 		line := allLines[i]
 		if strings.TrimSpace(line) == "" {
 			continue
