@@ -368,8 +368,11 @@
             currentLevel: 'all',
             searchTerm: '',
             isLive: true,
-            cursor: 0,
+            offset: 0,
             limit: 100,
+            initialFileSize: 0,
+            totalLines: 0,
+            hasMore: false,
             eventSource: null,
             logs: []
         };
@@ -461,7 +464,10 @@
             state.currentFile = name;
 
             if (!append) {
-                state.cursor = 0;
+                state.offset = 0;
+                state.initialFileSize = 0;
+                state.totalLines = 0;
+                state.hasMore = false;
                 state.logs = [];
             }
 
@@ -469,8 +475,9 @@
                 const params = new URLSearchParams({
                     level: state.currentLevel,
                     search: state.searchTerm,
-                    cursor: state.cursor,
-                    limit: state.limit
+                    offset: state.offset,
+                    limit: state.limit,
+                    initialFileSize: state.initialFileSize
                 });
 
                 const response = await fetch(`/logviewer/files/${date}/${name}?${params}`);
@@ -478,13 +485,20 @@
 
                 const entries = data.entries || [];
 
+                // 首次加载时记录文件大小，后续分页使用同一快照
+                if (!append && data.initialFileSize) {
+                    state.initialFileSize = data.initialFileSize;
+                }
+
                 if (append) {
                     state.logs = [...state.logs, ...entries];
                 } else {
                     state.logs = entries;
                 }
 
-                state.cursor = data.nextCursor ?? -1;
+                state.offset = state.offset + entries.length;
+                state.totalLines = data.totalLines || state.totalLines;
+                state.hasMore = data.nextOffset >= 0;
 
                 renderLogs(!append);
                 updateStats();
@@ -497,7 +511,7 @@
             }
         }
 
-        function renderLogs(scrollToBottom = true) {
+        function renderLogs(isInitialLoad = true) {
             currentFileEl.textContent = `${state.currentDate}/${state.currentFile}`;
 
             if (state.logs.length === 0) {
@@ -505,16 +519,13 @@
                 return;
             }
 
+            // "加载更多"时保留滚动位置
+            const savedScrollTop = isInitialLoad ? null : logContentEl.scrollTop;
+            const wasAtTop = isInitialLoad ? true : logContentEl.scrollTop <= 5;
+
             let html = '';
 
-            if (state.cursor >= 0) {
-                html += `
-                    <div class="load-more">
-                        <button id="loadMoreBtn">加载更多</button>
-                    </div>
-                `;
-            }
-
+            // 后端已倒序返回，直接渲染（最新在上）
             state.logs.forEach(entry => {
                 const message = entry.message || entry.msg || '';
                 let extraHtml = '';
@@ -546,6 +557,15 @@
                 `;
             });
 
+            // "加载更多"按钮在底部
+            if (state.hasMore) {
+                html += `
+                    <div class="load-more">
+                        <button id="loadMoreBtn">加载更多</button>
+                    </div>
+                `;
+            }
+
             logContentEl.innerHTML = html;
 
             const loadMoreBtn = document.getElementById('loadMoreBtn');
@@ -555,8 +575,10 @@
                 });
             }
 
-            if (scrollToBottom) {
-                logContentEl.scrollTop = logContentEl.scrollHeight;
+            if (isInitialLoad) {
+                logContentEl.scrollTop = 0;
+            } else if (savedScrollTop !== null) {
+                logContentEl.scrollTop = savedScrollTop;
             }
         }
 
@@ -584,7 +606,7 @@
         }
 
         function updateStats() {
-            logStatsEl.textContent = `已加载 ${state.logs.length} 条`;
+            logStatsEl.textContent = `显示 ${state.logs.length} / ${state.totalLines} 条`;
         }
 
         function startLiveStream() {
@@ -637,8 +659,8 @@
                     }
                 }
 
-                state.logs.push(entry);
-                renderLogs(true);
+                state.logs.unshift(entry);
+                renderLogs(false);
                 updateStats();
             });
 
@@ -694,7 +716,11 @@
 
         clearBtn.addEventListener('click', () => {
             state.logs = [];
-            renderLogs();
+            state.offset = 0;
+            state.initialFileSize = 0;
+            state.totalLines = 0;
+            state.hasMore = false;
+            renderLogs(true);
             updateStats();
         });
 

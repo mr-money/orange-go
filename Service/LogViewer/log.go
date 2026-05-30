@@ -38,8 +38,10 @@ type LogFilesResponse struct {
 
 // ReadLogResponse 读取日志响应
 type ReadLogResponse struct {
-	Entries    []LogEntry `json:"entries"`
-	NextCursor int64      `json:"nextCursor"`
+	Entries         []LogEntry `json:"entries"`
+	NextOffset      int        `json:"nextOffset"`
+	InitialFileSize int64      `json:"initialFileSize"`
+	TotalLines      int        `json:"totalLines"`
 }
 
 const logsBaseDir = "Logs"
@@ -121,8 +123,8 @@ func ListAllLogFiles() (*LogFilesResponse, error) {
 	}, nil
 }
 
-// ReadLogFile 读取日志文件内容（基于文件游标分页，避免文件增长导致重复数据）
-func ReadLogFile(date, name string, level, search string, cursor int64, limit int) (*ReadLogResponse, error) {
+// ReadLogFile 读取日志文件内容（倒序分页，基于 initialFileSize 避免文件增长导致重复）
+func ReadLogFile(date, name string, level, search string, offset, limit int, initialFileSize int64) (*ReadLogResponse, error) {
 	filePath := filepath.Join(logsBaseDir, date, name)
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -134,32 +136,36 @@ func ReadLogFile(date, name string, level, search string, cursor int64, limit in
 	if err != nil {
 		return nil, err
 	}
-	fileSize := stat.Size()
 
-	// 游标超出文件大小时重置（文件被截断/轮转的情况）
-	if cursor > fileSize {
-		cursor = 0
+	// 首次加载时使用当前文件大小作为快照
+	if initialFileSize <= 0 {
+		initialFileSize = stat.Size()
 	}
 
-	if cursor > 0 {
-		if _, err := file.Seek(cursor, io.SeekStart); err != nil {
+	// 文件被截断/轮转时重置
+	if stat.Size() < initialFileSize {
+		initialFileSize = stat.Size()
+	}
+
+	// 只读取 initialFileSize 范围内的内容，忽略后续追加的新数据
+	content := make([]byte, initialFileSize)
+	if initialFileSize > 0 {
+		if _, err := io.ReadFull(file, content); err != nil {
 			return nil, err
 		}
 	}
 
-	content, err := io.ReadAll(file)
-	if err != nil {
-		return nil, err
+	allLines := strings.Split(string(content), "\n")
+
+	// 去掉末尾空行（文件末尾换行符产生）
+	if len(allLines) > 0 && allLines[len(allLines)-1] == "" {
+		allLines = allLines[:len(allLines)-1]
 	}
 
-	lines := strings.Split(string(content), "\n")
+	// 倒序遍历：从最新行到最旧行
 	entries := make([]LogEntry, 0, limit)
-	pos := cursor
-
-	for _, line := range lines {
-		lineLen := int64(len(line)) + 1 // +1 for the newline delimiter
-		pos += lineLen
-
+	for i := len(allLines) - 1; i >= 0; i-- {
+		line := allLines[i]
 		if strings.TrimSpace(line) == "" {
 			continue
 		}
@@ -206,20 +212,29 @@ func ReadLogFile(date, name string, level, search string, cursor int64, limit in
 		}
 	}
 
-	// 确保返回空数组而不是 nil
 	if entries == nil {
 		entries = make([]LogEntry, 0)
 	}
 
-	// 计算下次请求的游标：读满 limit 条说明可能还有更多
-	nextCursor := int64(-1)
+	// nextOffset: -1 表示没有更多数据
+	nextOffset := -1
 	if limit > 0 && len(entries) >= limit {
-		nextCursor = pos
+		nextOffset = offset + limit
+	}
+
+	// 统计 initialFileSize 范围内的总行数（非空行）
+	totalLines := 0
+	for _, line := range allLines {
+		if strings.TrimSpace(line) != "" {
+			totalLines++
+		}
 	}
 
 	return &ReadLogResponse{
-		Entries:    entries,
-		NextCursor: nextCursor,
+		Entries:         entries,
+		NextOffset:      nextOffset,
+		InitialFileSize: initialFileSize,
+		TotalLines:      totalLines,
 	}, nil
 }
 
