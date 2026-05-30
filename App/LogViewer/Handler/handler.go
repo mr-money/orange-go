@@ -45,13 +45,13 @@ func GetLogFile(c *gin.Context) {
 
 	level := c.DefaultQuery("level", "all")
 	search := c.DefaultQuery("search", "")
-	offsetStr := c.DefaultQuery("offset", "0")
+	cursorStr := c.DefaultQuery("cursor", "0")
 	limitStr := c.DefaultQuery("limit", "100")
 
-	offset, _ := strconv.Atoi(offsetStr)
+	cursor, _ := strconv.ParseInt(cursorStr, 10, 64)
 	limit, _ := strconv.Atoi(limitStr)
 
-	logs, err := LogViewerService.ReadLogFile(date, name, level, search, offset, limit)
+	logs, err := LogViewerService.ReadLogFile(date, name, level, search, cursor, limit)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),

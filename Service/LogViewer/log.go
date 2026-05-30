@@ -38,8 +38,8 @@ type LogFilesResponse struct {
 
 // ReadLogResponse 读取日志响应
 type ReadLogResponse struct {
-	Entries []LogEntry `json:"entries"`
-	Total   int        `json:"total"`
+	Entries    []LogEntry `json:"entries"`
+	NextCursor int64      `json:"nextCursor"`
 }
 
 const logsBaseDir = "Logs"
@@ -121,8 +121,8 @@ func ListAllLogFiles() (*LogFilesResponse, error) {
 	}, nil
 }
 
-// ReadLogFile 读取日志文件内容
-func ReadLogFile(date, name string, level, search string, offset, limit int) (*ReadLogResponse, error) {
+// ReadLogFile 读取日志文件内容（基于文件游标分页，避免文件增长导致重复数据）
+func ReadLogFile(date, name string, level, search string, cursor int64, limit int) (*ReadLogResponse, error) {
 	filePath := filepath.Join(logsBaseDir, date, name)
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -130,14 +130,36 @@ func ReadLogFile(date, name string, level, search string, offset, limit int) (*R
 	}
 	defer file.Close()
 
-	entries := make([]LogEntry, 0)
-	scanner := bufio.NewScanner(file)
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	fileSize := stat.Size()
 
-	buf := make([]byte, 1024*1024)
-	scanner.Buffer(buf, 10*1024*1024)
+	// 游标超出文件大小时重置（文件被截断/轮转的情况）
+	if cursor > fileSize {
+		cursor = 0
+	}
 
-	for scanner.Scan() {
-		line := scanner.Text()
+	if cursor > 0 {
+		if _, err := file.Seek(cursor, io.SeekStart); err != nil {
+			return nil, err
+		}
+	}
+
+	content, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	lines := strings.Split(string(content), "\n")
+	entries := make([]LogEntry, 0, limit)
+	pos := cursor
+
+	for _, line := range lines {
+		lineLen := int64(len(line)) + 1 // +1 for the newline delimiter
+		pos += lineLen
+
 		if strings.TrimSpace(line) == "" {
 			continue
 		}
@@ -155,7 +177,6 @@ func ReadLogFile(date, name string, level, search string, offset, limit int) (*R
 			searchLower := strings.ToLower(search)
 			found := strings.Contains(strings.ToLower(entry.Message), searchLower)
 
-			// 同时搜索额外字段
 			if !found {
 				for _, v := range entry.ExtraFields {
 					var valueStr string
@@ -179,31 +200,26 @@ func ReadLogFile(date, name string, level, search string, offset, limit int) (*R
 		}
 
 		entries = append(entries, entry)
-	}
 
-	if err := scanner.Err(); err != nil {
-		return nil, err
-	}
-
-	total := len(entries)
-	resultEntries := entries
-
-	if offset > 0 && offset < total {
-		resultEntries = resultEntries[offset:]
-	}
-
-	if limit > 0 && limit < len(resultEntries) {
-		resultEntries = resultEntries[:limit]
+		if limit > 0 && len(entries) >= limit {
+			break
+		}
 	}
 
 	// 确保返回空数组而不是 nil
-	if resultEntries == nil {
-		resultEntries = make([]LogEntry, 0)
+	if entries == nil {
+		entries = make([]LogEntry, 0)
+	}
+
+	// 计算下次请求的游标：读满 limit 条说明可能还有更多
+	nextCursor := int64(-1)
+	if limit > 0 && len(entries) >= limit {
+		nextCursor = pos
 	}
 
 	return &ReadLogResponse{
-		Entries: resultEntries,
-		Total:   total,
+		Entries:    entries,
+		NextCursor: nextCursor,
 	}, nil
 }
 

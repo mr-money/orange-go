@@ -368,9 +368,8 @@
             currentLevel: 'all',
             searchTerm: '',
             isLive: true,
-            offset: 0,
+            cursor: 0,
             limit: 100,
-            total: 0,
             eventSource: null,
             logs: []
         };
@@ -462,7 +461,7 @@
             state.currentFile = name;
 
             if (!append) {
-                state.offset = 0;
+                state.cursor = 0;
                 state.logs = [];
             }
 
@@ -470,15 +469,13 @@
                 const params = new URLSearchParams({
                     level: state.currentLevel,
                     search: state.searchTerm,
-                    offset: state.offset,
+                    cursor: state.cursor,
                     limit: state.limit
                 });
 
                 const response = await fetch(`/logviewer/files/${date}/${name}?${params}`);
                 const data = await response.json();
 
-                // 安全处理数据
-                state.total = data.total || 0;
                 const entries = data.entries || [];
 
                 if (append) {
@@ -487,7 +484,7 @@
                     state.logs = entries;
                 }
 
-                state.offset = state.logs.length;
+                state.cursor = data.nextCursor ?? -1;
 
                 renderLogs(!append);
                 updateStats();
@@ -510,10 +507,10 @@
 
             let html = '';
 
-            if (state.offset < state.total) {
+            if (state.cursor >= 0) {
                 html += `
                     <div class="load-more">
-                        <button id="loadMoreBtn">加载更多 (${state.total - state.offset} 条)</button>
+                        <button id="loadMoreBtn">加载更多</button>
                     </div>
                 `;
             }
@@ -587,7 +584,7 @@
         }
 
         function updateStats() {
-            logStatsEl.textContent = `显示 ${state.logs.length} / ${state.total} 条`;
+            logStatsEl.textContent = `已加载 ${state.logs.length} 条`;
         }
 
         function startLiveStream() {
@@ -641,7 +638,6 @@
                 }
 
                 state.logs.push(entry);
-                state.total++;
                 renderLogs(true);
                 updateStats();
             });
