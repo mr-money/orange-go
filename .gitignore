@@ -2,5 +2,5 @@
 Config/*.toml
 Config/*.yml
 Logs
-ARCHITECTURE_OPTIMIZATION.md
 .claude/
+AGENTS.md

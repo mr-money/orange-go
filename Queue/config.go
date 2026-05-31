@@ -2,27 +2,38 @@ package Queue
 
 import (
 	"fmt"
-	"github.com/RichardKnop/machinery/v1/config"
 	"orange-go/Config"
+
+	"github.com/RichardKnop/machinery/v1/config"
 )
 
 // initConf
 // @Description: 初始化队列配置
 // @return *config.Config
 func initConf() *config.Config {
-	redisBroker := fmt.Sprintf(
-		"redis://%s@%s:%s/%s",
-		Config.Configs.Web.Redis.Pwd,
-		Config.Configs.Web.Redis.Host,
-		Config.Configs.Web.Redis.Port,
-		"10",
-	)
+	var redisBroker string
+	if Config.Configs.Web.Redis.Pwd != "" {
+		redisBroker = fmt.Sprintf(
+			"redis://%s@%s:%s/%s",
+			Config.Configs.Web.Redis.Pwd,
+			Config.Configs.Web.Redis.Host,
+			Config.Configs.Web.Redis.Port,
+			Config.Configs.Web.Redis.Db,
+		)
+	} else {
+		redisBroker = fmt.Sprintf(
+			"redis://%s:%s/%s",
+			Config.Configs.Web.Redis.Host,
+			Config.Configs.Web.Redis.Port,
+			Config.Configs.Web.Redis.Db,
+		)
+	}
 
 	redisResultBackend := fmt.Sprintf(
 		"redis://%s:%s/%s",
 		Config.Configs.Web.Redis.Host,
 		Config.Configs.Web.Redis.Port,
-		"10",
+		Config.Configs.Web.Redis.Db,
 	)
 
 	return &config.Config{
@@ -61,18 +72,29 @@ func initConf() *config.Config {
 // @Description: 队列配置list
 // @return *[]config.Config
 func confList() *[]config.Config {
-	redisBroker := fmt.Sprintf(
-		"redis://%s:%s/%s",
-		Config.Configs.Web.Redis.Host,
-		Config.Configs.Web.Redis.Port,
-		"10",
-	)
+	var redisBroker string
+	if Config.Configs.Web.Redis.Pwd != "" {
+		redisBroker = fmt.Sprintf(
+			"redis://%s@%s:%s/%s",
+			Config.Configs.Web.Redis.Pwd,
+			Config.Configs.Web.Redis.Host,
+			Config.Configs.Web.Redis.Port,
+			Config.Configs.Web.Redis.Db,
+		)
+	} else {
+		redisBroker = fmt.Sprintf(
+			"redis://%s:%s/%s",
+			Config.Configs.Web.Redis.Host,
+			Config.Configs.Web.Redis.Port,
+			Config.Configs.Web.Redis.Db,
+		)
+	}
 
 	redisResultBackend := fmt.Sprintf(
 		"redis://%s:%s/%s",
 		Config.Configs.Web.Redis.Host,
 		Config.Configs.Web.Redis.Port,
-		"10",
+		Config.Configs.Web.Redis.Db,
 	)
 
 	return &[]config.Config{

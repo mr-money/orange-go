@@ -369,8 +369,10 @@
             searchTerm: '',
             isLive: true,
             offset: 0,
-            limit: 100,
-            total: 0,
+            limit: 50,
+            initialFileSize: 0,
+            totalLines: 0,
+            hasMore: false,
             eventSource: null,
             logs: []
         };
@@ -463,6 +465,9 @@
 
             if (!append) {
                 state.offset = 0;
+                state.initialFileSize = 0;
+                state.totalLines = 0;
+                state.hasMore = false;
                 state.logs = [];
             }
 
@@ -471,23 +476,32 @@
                     level: state.currentLevel,
                     search: state.searchTerm,
                     offset: state.offset,
-                    limit: state.limit
+                    limit: state.limit,
+                    initialFileSize: state.initialFileSize
                 });
 
                 const response = await fetch(`/logviewer/files/${date}/${name}?${params}`);
                 const data = await response.json();
 
-                // 安全处理数据
-                state.total = data.total || 0;
                 const entries = data.entries || [];
 
+                // 首次加载时记录文件大小，后续分页使用同一快照
+                if (!append && data.initialFileSize) {
+                    state.initialFileSize = data.initialFileSize;
+                }
+
                 if (append) {
-                    state.logs = [...state.logs, ...entries];
+                    // 加载更多（更旧的日志），prepend 到前面
+                    state.logs = [...entries, ...state.logs];
                 } else {
                     state.logs = entries;
                 }
 
-                state.offset = state.logs.length;
+                if (data.nextOffset >= 0) {
+                    state.offset = data.nextOffset;
+                }
+                state.totalLines = data.totalLines || state.totalLines;
+                state.hasMore = data.nextOffset >= 0;
 
                 renderLogs(!append);
                 updateStats();
@@ -500,7 +514,7 @@
             }
         }
 
-        function renderLogs(scrollToBottom = true) {
+        function renderLogs(isInitialLoad = true, isLiveAppend = false) {
             currentFileEl.textContent = `${state.currentDate}/${state.currentFile}`;
 
             if (state.logs.length === 0) {
@@ -508,16 +522,23 @@
                 return;
             }
 
+            // 加载更多时：记录旧 scrollHeight 和 scrollTop 用于保持视觉位置
+            const savedScrollTop = isInitialLoad ? null : logContentEl.scrollTop;
+            const savedScrollHeight = isInitialLoad ? null : logContentEl.scrollHeight;
+            const savedClientHeight = isInitialLoad ? null : logContentEl.clientHeight;
+
             let html = '';
 
-            if (state.offset < state.total) {
+            // "加载更多"按钮在顶部（加载更旧的数据）
+            if (state.hasMore) {
                 html += `
                     <div class="load-more">
-                        <button id="loadMoreBtn">加载更多 (${state.total - state.offset} 条)</button>
+                        <button id="loadMoreBtn">加载更多</button>
                     </div>
                 `;
             }
 
+            // 渲染日志：logs 数组是最旧→最新，渲染时保持这个顺序
             state.logs.forEach(entry => {
                 const message = entry.message || entry.msg || '';
                 let extraHtml = '';
@@ -558,8 +579,18 @@
                 });
             }
 
-            if (scrollToBottom) {
+            if (isInitialLoad) {
+                // 首次加载：滚动到底部（最新日志在最下面）
                 logContentEl.scrollTop = logContentEl.scrollHeight;
+            } else if (isLiveAppend) {
+                // live 追加：仅在已在底部附近时自动滚到底部
+                const isNearBottom = logContentEl.scrollHeight - logContentEl.scrollTop - logContentEl.clientHeight < 80;
+                if (isNearBottom) {
+                    logContentEl.scrollTop = logContentEl.scrollHeight;
+                }
+            } else if (savedScrollHeight !== null && savedScrollTop !== null && savedClientHeight !== null) {
+                // 加载更多：保持原有的滚动位置 - 新内容在顶部，直接保持 savedScrollTop + 新增高度
+                logContentEl.scrollTop = savedScrollTop + (logContentEl.scrollHeight - savedScrollHeight);
             }
         }
 
@@ -587,7 +618,7 @@
         }
 
         function updateStats() {
-            logStatsEl.textContent = `显示 ${state.logs.length} / ${state.total} 条`;
+            logStatsEl.textContent = `显示 ${state.logs.length} / ${state.totalLines} 条`;
         }
 
         function startLiveStream() {
@@ -641,8 +672,7 @@
                 }
 
                 state.logs.push(entry);
-                state.total++;
-                renderLogs(true);
+                renderLogs(false, true);
                 updateStats();
             });
 
@@ -698,7 +728,11 @@
 
         clearBtn.addEventListener('click', () => {
             state.logs = [];
-            renderLogs();
+            state.offset = 0;
+            state.initialFileSize = 0;
+            state.totalLines = 0;
+            state.hasMore = false;
+            renderLogs(true);
             updateStats();
         });
 

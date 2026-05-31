@@ -38,8 +38,10 @@ type LogFilesResponse struct {
 
 // ReadLogResponse 读取日志响应
 type ReadLogResponse struct {
-	Entries []LogEntry `json:"entries"`
-	Total   int        `json:"total"`
+	Entries         []LogEntry `json:"entries"`
+	NextOffset      int        `json:"nextOffset"`
+	InitialFileSize int64      `json:"initialFileSize"`
+	TotalLines      int        `json:"totalLines"`
 }
 
 const logsBaseDir = "Logs"
@@ -121,8 +123,8 @@ func ListAllLogFiles() (*LogFilesResponse, error) {
 	}, nil
 }
 
-// ReadLogFile 读取日志文件内容
-func ReadLogFile(date, name string, level, search string, offset, limit int) (*ReadLogResponse, error) {
+// ReadLogFile 读取日志文件内容（倒序分页，最新日志优先）
+func ReadLogFile(date, name string, level, search string, offset, limit int, initialFileSize int64) (*ReadLogResponse, error) {
 	filePath := filepath.Join(logsBaseDir, date, name)
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -130,14 +132,40 @@ func ReadLogFile(date, name string, level, search string, offset, limit int) (*R
 	}
 	defer file.Close()
 
-	entries := make([]LogEntry, 0)
-	scanner := bufio.NewScanner(file)
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
 
-	buf := make([]byte, 1024*1024)
-	scanner.Buffer(buf, 10*1024*1024)
+	// 首次加载时使用当前文件大小作为快照
+	if initialFileSize <= 0 {
+		initialFileSize = stat.Size()
+	}
 
-	for scanner.Scan() {
-		line := scanner.Text()
+	// 文件被截断/轮转时重置
+	if stat.Size() < initialFileSize {
+		initialFileSize = stat.Size()
+	}
+
+	// 只读取 initialFileSize 范围内的内容，忽略后续追加的新数据
+	content := make([]byte, initialFileSize)
+	if initialFileSize > 0 {
+		if _, err := io.ReadFull(file, content); err != nil {
+			return nil, err
+		}
+	}
+
+	allLines := strings.Split(string(content), "\n")
+
+	// 去掉末尾空行（文件末尾换行符产生）
+	if len(allLines) > 0 && allLines[len(allLines)-1] == "" {
+		allLines = allLines[:len(allLines)-1]
+	}
+
+	// 先收集所有符合条件的条目（正序：最旧→最新）
+	allEntries := make([]LogEntry, 0)
+	for i := 0; i < len(allLines); i++ {
+		line := allLines[i]
 		if strings.TrimSpace(line) == "" {
 			continue
 		}
@@ -155,7 +183,6 @@ func ReadLogFile(date, name string, level, search string, offset, limit int) (*R
 			searchLower := strings.ToLower(search)
 			found := strings.Contains(strings.ToLower(entry.Message), searchLower)
 
-			// 同时搜索额外字段
 			if !found {
 				for _, v := range entry.ExtraFields {
 					var valueStr string
@@ -178,32 +205,44 @@ func ReadLogFile(date, name string, level, search string, offset, limit int) (*R
 			}
 		}
 
-		entries = append(entries, entry)
+		allEntries = append(allEntries, entry)
 	}
 
-	if err := scanner.Err(); err != nil {
-		return nil, err
+	// 倒序：最新→最旧
+	// allEntries[0] = 最旧, allEntries[len(allEntries)-1] = 最新
+	// 我们需要取从末尾往前的 offset 开始的 limit 条
+	startIdx := len(allEntries) - offset - limit
+	if startIdx < 0 {
+		startIdx = 0
+	}
+	endIdx := len(allEntries) - offset
+	if endIdx < 0 {
+		endIdx = 0
 	}
 
-	total := len(entries)
-	resultEntries := entries
-
-	if offset > 0 && offset < total {
-		resultEntries = resultEntries[offset:]
+	var entries []LogEntry
+	if startIdx < endIdx {
+		entries = allEntries[startIdx:endIdx]
+	} else {
+		entries = make([]LogEntry, 0)
 	}
 
-	if limit > 0 && limit < len(resultEntries) {
-		resultEntries = resultEntries[:limit]
+	// 不反转：entries 现在是正序（最旧→最新），前端需要这个顺序
+
+	// nextOffset: -1 表示没有更多数据
+	nextOffset := -1
+	if startIdx > 0 {
+		nextOffset = offset + limit
 	}
 
-	// 确保返回空数组而不是 nil
-	if resultEntries == nil {
-		resultEntries = make([]LogEntry, 0)
-	}
+	// 统计符合条件的总行数
+	totalLines := len(allEntries)
 
 	return &ReadLogResponse{
-		Entries: resultEntries,
-		Total:   total,
+		Entries:         entries,
+		NextOffset:      nextOffset,
+		InitialFileSize: initialFileSize,
+		TotalLines:      totalLines,
 	}, nil
 }
 
