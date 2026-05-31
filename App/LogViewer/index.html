@@ -369,7 +369,7 @@
             searchTerm: '',
             isLive: true,
             offset: 0,
-            limit: 100,
+            limit: 50,
             initialFileSize: 0,
             totalLines: 0,
             hasMore: false,
@@ -491,12 +491,15 @@
                 }
 
                 if (append) {
+                    // 加载更多（更旧的日志），prepend 到前面
                     state.logs = [...entries, ...state.logs];
                 } else {
                     state.logs = entries;
                 }
 
-                state.offset = state.offset + entries.length;
+                if (data.nextOffset >= 0) {
+                    state.offset = data.nextOffset;
+                }
                 state.totalLines = data.totalLines || state.totalLines;
                 state.hasMore = data.nextOffset >= 0;
 
@@ -519,8 +522,10 @@
                 return;
             }
 
-            // 加载更多时：记录旧 scrollHeight 用于保持视觉位置
+            // 加载更多时：记录旧 scrollHeight 和 scrollTop 用于保持视觉位置
+            const savedScrollTop = isInitialLoad ? null : logContentEl.scrollTop;
             const savedScrollHeight = isInitialLoad ? null : logContentEl.scrollHeight;
+            const savedClientHeight = isInitialLoad ? null : logContentEl.clientHeight;
 
             let html = '';
 
@@ -533,7 +538,7 @@
                 `;
             }
 
-            // 正序渲染：旧→新
+            // 渲染日志：logs 数组是最旧→最新，渲染时保持这个顺序
             state.logs.forEach(entry => {
                 const message = entry.message || entry.msg || '';
                 let extraHtml = '';
@@ -575,7 +580,7 @@
             }
 
             if (isInitialLoad) {
-                // 首次加载：滚动到底部（最新日志在下面）
+                // 首次加载：滚动到底部（最新日志在最下面）
                 logContentEl.scrollTop = logContentEl.scrollHeight;
             } else if (isLiveAppend) {
                 // live 追加：仅在已在底部附近时自动滚到底部
@@ -583,10 +588,9 @@
                 if (isNearBottom) {
                     logContentEl.scrollTop = logContentEl.scrollHeight;
                 }
-            } else if (savedScrollHeight !== null) {
-                // 加载更多：新内容插入顶部，保持原有内容的视觉位置不变
-                const heightDiff = logContentEl.scrollHeight - savedScrollHeight;
-                logContentEl.scrollTop = heightDiff;
+            } else if (savedScrollHeight !== null && savedScrollTop !== null && savedClientHeight !== null) {
+                // 加载更多：保持原有的滚动位置 - 新内容在顶部，直接保持 savedScrollTop + 新增高度
+                logContentEl.scrollTop = savedScrollTop + (logContentEl.scrollHeight - savedScrollHeight);
             }
         }
 

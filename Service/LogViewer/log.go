@@ -123,7 +123,7 @@ func ListAllLogFiles() (*LogFilesResponse, error) {
 	}, nil
 }
 
-// ReadLogFile 读取日志文件内容（正序分页，基于 initialFileSize 避免文件增长导致重复）
+// ReadLogFile 读取日志文件内容（倒序分页，最新日志优先）
 func ReadLogFile(date, name string, level, search string, offset, limit int, initialFileSize int64) (*ReadLogResponse, error) {
 	filePath := filepath.Join(logsBaseDir, date, name)
 	file, err := os.Open(filePath)
@@ -162,8 +162,8 @@ func ReadLogFile(date, name string, level, search string, offset, limit int, ini
 		allLines = allLines[:len(allLines)-1]
 	}
 
-	// 正序遍历：从最旧行到最新行
-	entries := make([]LogEntry, 0, limit)
+	// 先收集所有符合条件的条目（正序：最旧→最新）
+	allEntries := make([]LogEntry, 0)
 	for i := 0; i < len(allLines); i++ {
 		line := allLines[i]
 		if strings.TrimSpace(line) == "" {
@@ -205,30 +205,38 @@ func ReadLogFile(date, name string, level, search string, offset, limit int, ini
 			}
 		}
 
-		entries = append(entries, entry)
-
-		if limit > 0 && len(entries) >= limit {
-			break
-		}
+		allEntries = append(allEntries, entry)
 	}
 
-	if entries == nil {
+	// 倒序：最新→最旧
+	// allEntries[0] = 最旧, allEntries[len(allEntries)-1] = 最新
+	// 我们需要取从末尾往前的 offset 开始的 limit 条
+	startIdx := len(allEntries) - offset - limit
+	if startIdx < 0 {
+		startIdx = 0
+	}
+	endIdx := len(allEntries) - offset
+	if endIdx < 0 {
+		endIdx = 0
+	}
+
+	var entries []LogEntry
+	if startIdx < endIdx {
+		entries = allEntries[startIdx:endIdx]
+	} else {
 		entries = make([]LogEntry, 0)
 	}
 
+	// 不反转：entries 现在是正序（最旧→最新），前端需要这个顺序
+
 	// nextOffset: -1 表示没有更多数据
 	nextOffset := -1
-	if limit > 0 && len(entries) >= limit {
+	if startIdx > 0 {
 		nextOffset = offset + limit
 	}
 
-	// 统计 initialFileSize 范围内的总行数（非空行）
-	totalLines := 0
-	for _, line := range allLines {
-		if strings.TrimSpace(line) != "" {
-			totalLines++
-		}
-	}
+	// 统计符合条件的总行数
+	totalLines := len(allEntries)
 
 	return &ReadLogResponse{
 		Entries:         entries,
