@@ -3,10 +3,12 @@ package Gorm
 import (
 	"fmt"
 	"gorm.io/gorm"
-	"log/slog"
 	"orange-go/Config"
+	"orange-go/Library/Logger"
 	"sync"
 )
+
+var dbLogger = Logger.MustModuleLogger("database")
 
 var (
 	Mysql *gorm.DB //默认本地数据库链接
@@ -33,7 +35,7 @@ func localMysql() {
 
 	Mysql = connectMysql(dsn)
 
-	slog.Info(fmt.Sprintf("Mysql [%s.%s]: Connect Success!",
+	dbLogger.Info(fmt.Sprintf("Mysql [%s.%s]: Connect Success!",
 		Config.Configs.Web.DB.Host,
 		Config.Configs.Web.DB.DbName,
 	))

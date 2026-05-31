@@ -5,10 +5,12 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/goinggo/mapstructure"
 	"github.com/shockerli/cvt"
-	"log"
 	"orange-go/Library/Handler"
+	"orange-go/Library/Logger"
 	"reflect"
 )
+
+var configLogger = Logger.MustModuleLogger("config")
 
 // Configs 全局配置内容
 var Configs struct {
@@ -34,7 +36,7 @@ func include(configs ...interface{}) {
 
 		_, confErr := toml.DecodeFile(confFile, &conf)
 		if confErr != nil {
-			log.Panicln(confErr)
+			configLogger.Panic("config decode error", "error", confErr)
 		}
 
 		putConfStruct(confRef, conf)
@@ -73,7 +75,7 @@ func putConfStruct(confRef reflect.Value, conf interface{}) {
 
 		err := mapstructure.Decode(conf, &Configs.Web)
 		if err != nil {
-			log.Panicln(err)
+			configLogger.Panic("config decode error", "error", err)
 		}
 
 		//fmt.Println("---------", Configs.Web)

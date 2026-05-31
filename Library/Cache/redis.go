@@ -3,18 +3,19 @@ package Cache
 import (
 	"context"
 	"fmt"
-	"github.com/RichardKnop/machinery/v1/log"
 	"github.com/go-redis/redis/v8"
 	"github.com/pkg/errors"
 	"github.com/shockerli/cvt"
-	"log/slog"
 	"orange-go/Config"
+	"orange-go/Library/Logger"
 	"orange-go/Library/MyTime"
 	"runtime"
 	"strings"
 	"sync"
 	"time"
 )
+
+var cacheLogger = Logger.MustModuleLogger("cache")
 
 var (
 	Redis *redis.Client
@@ -26,9 +27,9 @@ func InitRedis() {
 	once.Do(func() {
 		Redis = connectRedis()
 		if Redis.Ping(Cxt).Val() != "PONG" {
-			log.FATAL.Panicln(Redis.Ping(Cxt))
+			cacheLogger.Panic("redis ping failed", "result", Redis.Ping(Cxt))
 		}
-		slog.Info("Redis [" + Redis.Options().Addr + "]: Connect Success!")
+		cacheLogger.Info("Redis [" + Redis.Options().Addr + "]: Connect Success!")
 	})
 }
 
@@ -104,7 +105,7 @@ func RememberString(key string, value func() string, expiration time.Duration) s
 			return value
 		}
 
-		slog.Error("redis remember string", "err", err)
+		cacheLogger.Error("redis remember string", "err", err)
 
 		return ""
 	}
@@ -145,7 +146,7 @@ func RememberZScore(key, member string, value func() float64, expiration time.Du
 			return value
 		}
 
-		slog.Error("redis remember zscore", "err", err)
+		cacheLogger.Error("redis remember zscore", "err", err)
 
 		return 0
 	}
@@ -181,7 +182,7 @@ func RememberHash(key, field string, value func() string, expiration time.Durati
 			return value
 		}
 
-		slog.Error("redis remember hash", "err", err)
+		cacheLogger.Error("redis remember hash", "err", err)
 
 		return ""
 	}

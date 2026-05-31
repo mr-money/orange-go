@@ -3,9 +3,11 @@ package Queue
 import (
 	"github.com/RichardKnop/machinery/v1"
 	"github.com/RichardKnop/machinery/v1/tasks"
-	"log"
 	"orange-go/Library/Handler"
+	"orange-go/Library/Logger"
 )
+
+var queueLogger = Logger.MustModuleLogger("queue")
 
 // server对应不同队列queue
 var serverMap map[string]*machinery.Server
@@ -30,7 +32,7 @@ func Run() {
 	for _, queue := range *getQueues() {
 		serverMap[queue.queueName], err = machinery.NewServer(conf)
 		if err != nil {
-			log.Println("start server failed", err)
+			queueLogger.Error("start server failed", "error", err)
 			return
 		}
 
@@ -47,7 +49,7 @@ func Run() {
 			go func(workerIn *machinery.Worker, queueName string) {
 				err = workerIn.Launch()
 				if err != nil {
-					log.Println("start "+queueName+": worker error", err)
+					queueLogger.Error("worker launch error", "queue", queueName, "error", err)
 					return
 				}
 
@@ -56,7 +58,7 @@ func Run() {
 			//注册任务
 			err = serverMap[queueIn.queueName].RegisterTasks(queueIn.tasks)
 			if err != nil {
-				log.Panicln("register tasks in queue: "+queueIn.queueName+" failed", err)
+				queueLogger.Panic("register tasks failed", "queue", queueIn.queueName, "error", err)
 			}
 		}(queue)
 
@@ -82,7 +84,7 @@ func AddTask(taskName string, params map[string]interface{}) string {
 	//获取队列名
 	queueName, err := getQueueByTask(taskName)
 	if err != nil {
-		log.Panicln(err)
+		queueLogger.Panic("get queue by task error", "error", err)
 	}
 
 	//参数签名
@@ -97,7 +99,7 @@ func AddTask(taskName string, params map[string]interface{}) string {
 	server := serverMap[queueName]
 	asyncResult, err := server.SendTask(signature)
 	if err != nil {
-		log.Panicln(err)
+		queueLogger.Panic("send task error", "error", err)
 	}
 
 	//获取结果
