@@ -2,11 +2,13 @@ package Database
 
 import (
 	"fmt"
-	"github.com/RichardKnop/machinery/v1/log"
 	"github.com/shockerli/cvt"
 	"gorm.io/gorm"
 	"orange-go/Library/Gorm"
+	"orange-go/Library/Logger"
 )
+
+var dbLogger = Logger.MustModuleLogger("database")
 
 // InitMigrate
 // @Description: AutoMigrate数据库自动迁移
@@ -23,12 +25,12 @@ func InitMigrate() {
 			cvt.String(migration["charset"]),
 		).AutoMigrate(migration["model"])
 		if migrateErr != nil {
-			log.ERROR.Println(migrateErr)
+			dbLogger.Error("migration error", "error", migrateErr)
 			return
 		}
 	}
 
-	log.INFO.Println("Database [" + Gorm.Mysql.Migrator().CurrentDatabase() + "]: Migration Success!")
+	dbLogger.Info("Database migration success", "database", Gorm.Mysql.Migrator().CurrentDatabase())
 
 }
 

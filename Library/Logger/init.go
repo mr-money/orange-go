@@ -166,7 +166,7 @@ func MustModuleLogger(name string) *zap.SugaredLogger {
 
 	// 创建独立的 logger 实例（不修改全局变量）
 	writeSyncer := newDailyWriteSyncer(name, lc.MaxSize, lc.MaxBackups, lc.MaxAge)
-	localLogger, err := createLogger(lc, writeSyncer)
+	localLogger, err := createMultiOutputLogger(lc, writeSyncer)
 	if err != nil {
 		slog.Error("init logger", "module", name, "err", err)
 		panic(err)

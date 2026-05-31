@@ -3,14 +3,16 @@ package MongoDB
 import (
 	"context"
 	"fmt"
-	"github.com/RichardKnop/machinery/v1/log"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"go.mongodb.org/mongo-driver/mongo/writeconcern"
 	"orange-go/Config"
+	"orange-go/Library/Logger"
 	"time"
 )
+
+var mongoLogger = Logger.MustModuleLogger("mongodb")
 
 var (
 	MongoDataBase = connect()
@@ -49,15 +51,15 @@ func connect() *mongo.Database {
 	// 开启驱动
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri), opt)
 	if err != nil {
-		log.INFO.Panicln(err)
+		mongoLogger.Panic("mongo connect failed", "err", err)
 	}
 
 	// 注意，在这一步才开始正式连接mongo
 	if err = client.Ping(context.Background(), readpref.Primary()); err != nil {
-		log.INFO.Panicln(err)
+		mongoLogger.Panic("mongo ping failed", "err", err)
 	}
 
-	log.INFO.Println("MongoDB Database [" + Config.GetFieldByName(Config.Configs.Web.MongoDB, "Port") + "]: Connect Success!")
+	mongoLogger.Info("MongoDB Database [" + Config.GetFieldByName(Config.Configs.Web.MongoDB, "Port") + "]: Connect Success!")
 
 	return client.Database(Config.GetFieldByName(Config.Configs.Web.MongoDB, "DbName"))
 }

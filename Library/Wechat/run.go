@@ -5,13 +5,13 @@ import (
 	"crypto/cipher"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
+	"orange-go/Library/Logger"
 )
 
-//
+var wechatLogger = Logger.MustModuleLogger("wechat")
+
 // StepInfo
 // @Description: 微信运动用户数据
-//
 type StepInfo struct {
 	StepInfoList []struct {
 		Timestamp int `json:"timestamp"`
@@ -19,38 +19,36 @@ type StepInfo struct {
 	} `json:"stepInfoList"`
 }
 
-//
 // GetWxRunData
 // @Description: 解析微信运动数据
 // @param sessionKey
 // @param encryptedData
 // @param iv
-//
 func GetWxRunData(sessionKey, encryptedData, iv string) (stepInfo StepInfo) {
 	// 对密钥和 IV 进行 Base64 解码
 	key, err := base64.StdEncoding.DecodeString(sessionKey)
 	if err != nil {
-		fmt.Println("Error decoding session key:", err)
+		wechatLogger.Error("decode session key error", "error", err)
 		return
 	}
 
 	ivBytes, err := base64.StdEncoding.DecodeString(iv)
 	if err != nil {
-		fmt.Println("Error decoding IV:", err)
+		wechatLogger.Error("decode iv error", "error", err)
 		return
 	}
 
 	// 对密文进行 Base64 解码
 	ciphertext, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
-		fmt.Println("Error decoding encrypted data:", err)
+		wechatLogger.Error("decode encrypted data error", "error", err)
 		return
 	}
 
 	// 使用密钥和 IV 创建一个 AES 解密器
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		fmt.Println("Error creating cipher:", err)
+		wechatLogger.Error("create cipher error", "error", err)
 		return
 	}
 
@@ -66,7 +64,7 @@ func GetWxRunData(sessionKey, encryptedData, iv string) (stepInfo StepInfo) {
 
 	// 解析 JSON
 	if err := json.Unmarshal(decryptedData, &stepInfo); err != nil {
-		fmt.Println("Error decoding JSON:", err)
+		wechatLogger.Error("decode json error", "error", err)
 		return
 	}
 
