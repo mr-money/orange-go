@@ -11,12 +11,8 @@ import (
 var serverMap map[string]*machinery.Server
 
 func Run() {
-	/*rootPath, _ := os.Getwd()
-	cnf, err := config.NewFromYaml(rootPath+"/Config/queue.yml", false)
-	if err != nil {
-		log.Println("config failed", err)
-		return
-	}*/
+	//用 zap 替换 machinery 内部日志，级别跟随 env_mode
+	initMachineryLogger()
 
 	var err error
 
