@@ -6,7 +6,6 @@ import (
 	"crypto/cipher"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"github.com/pkg/errors"
 	"github.com/shockerli/cvt"
 	"github.com/wechatpay-apiv3/wechatpay-go/core"
@@ -19,8 +18,11 @@ import (
 	"github.com/wechatpay-apiv3/wechatpay-go/utils"
 	"io/ioutil"
 	"orange-go/Library/Handler"
+	"orange-go/Library/Logger"
 	"time"
 )
+
+var paymentLogger = Logger.MustModuleLogger("payment")
 
 // WxConf 微信支付配置
 type WxConf struct {
@@ -157,12 +159,7 @@ func (conf WxConf) WechatPayService(payOrder *PayOrder) (interface{}, error) {
 		"package":   "prepay_id=" + prepayId["prepay_id"],
 	}
 
-	message := fmt.Sprintf("%s\n%s\n%s\n%s\n",
-		prepay["appId"],
-		prepay["timeStamp"],
-		prepay["nonceStr"],
-		prepay["package"],
-	)
+	message := prepay["appId"] + "\n" + prepay["timeStamp"] + "\n" + prepay["nonceStr"] + "\n" + prepay["package"] + "\n"
 	sign, err := client.Sign(context.Background(), message)
 	if err != nil {
 		return nil, err
@@ -208,15 +205,15 @@ func (conf WxConf) WechatPay(payOrder *PayOrder) (interface{}, error) {
 
 // DecryptedData 回调解密资源对象
 type DecryptedData struct {
-	SpAppID        string `json:"sp_appid"`
-	SpMchID        string `json:"sp_mchid"`
-	SubAppID       string `json:"sub_appid"`
-	SubMchID       string `json:"sub_mchid"`
+	SpAppid        string `json:"sp_appid"`
+	SpMchid        string `json:"sp_mchid"`
+	SubAppid       string `json:"sub_appid"`
+	SubMchid       string `json:"sub_mchid"`
 	OutTradeNo     string `json:"out_trade_no"`
 	TradeStateDesc string `json:"trade_state_desc"`
 	TradeType      string `json:"trade_type"`
 	Attach         string `json:"attach"`
-	TransactionID  string `json:"transaction_id"`
+	TransactionId  string `json:"transaction_id"`
 	TradeState     string `json:"trade_state"`
 	BankType       string `json:"bank_type"`
 	SuccessTime    string `json:"success_time"`
@@ -229,33 +226,33 @@ type DecryptedData struct {
 	PromotionDetail []struct {
 		Amount              int    `json:"amount"`
 		WeChatPayContribute int    `json:"wechatpay_contribute"`
-		CouponID            string `json:"coupon_id"`
+		CouponId            string `json:"coupon_id"`
 		Scope               string `json:"scope"`
 		MerchantContribute  int    `json:"merchant_contribute"`
 		Name                string `json:"name"`
 		OtherContribute     int    `json:"other_contribute"`
 		Currency            string `json:"currency"`
-		StockID             string `json:"stock_id"`
+		StockId             string `json:"stock_id"`
 		GoodsDetail         []struct {
 			GoodsRemark    string `json:"goods_remark"`
 			Quantity       int    `json:"quantity"`
 			DiscountAmount int    `json:"discount_amount"`
-			GoodsID        string `json:"goods_id"`
+			GoodsId        string `json:"goods_id"`
 			UnitPrice      int    `json:"unit_price"`
 		} `json:"goods_detail"`
 	} `json:"promotion_detail"`
 	Payer struct {
-		OpenID string `json:"openid"`
+		Openid string `json:"openid"`
 	} `json:"payer"`
 	SceneInfo struct {
-		DeviceID string `json:"device_id"`
+		DeviceId string `json:"device_id"`
 	} `json:"scene_info"`
 }
 
 // NotifyRequest
 // @Description: 支付回调参数
 type NotifyRequest struct {
-	ID           string `json:"id"`
+	Id           string `json:"id"`
 	CreateTime   string `json:"create_time"`
 	ResourceType string `json:"resource_type"`
 	EventType    string `json:"event_type"`
@@ -302,7 +299,7 @@ func DecryptWechatData(key, nonce, associatedData, ciphertext string) (Decrypted
 	// 解密数据
 	decryptedByte, err := gcm.Open(nil, nonceBytes, ciphertextBytes, associatedDataBytes)
 	if err != nil {
-		fmt.Println(key, nonce, associatedData, ciphertext)
+		paymentLogger.Error("decrypt wechat data error", "key", key, "nonce", nonce, "associatedData", associatedData, "ciphertext", ciphertext, "error", err)
 
 		return DecryptedData{}, err
 	}

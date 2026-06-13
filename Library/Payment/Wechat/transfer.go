@@ -3,17 +3,16 @@ package Wechat
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/wechatpay-apiv3/wechatpay-go/core"
 	"github.com/wechatpay-apiv3/wechatpay-go/services/partnertransferbatch"
 	"io/ioutil"
-	"log"
+	"orange-go/Library/Logger"
 )
 
-//
+var transferLogger = Logger.MustModuleLogger("payment")
+
 // TransferBatch
 // @Description: 批量转账数据
-//
 type TransferBatch struct {
 	OutBatchNo  string //商家批次单号 商户系统内部唯一
 	BatchName   string //批次名称
@@ -30,14 +29,12 @@ type TransferBatch struct {
 	}
 }
 
-//
 // TransferBatch
 // @Description: 发起商家转账 商户可以通过该接口同时向多个用户微信零钱进行转账操作
 // @receiver conf 支付配置
 // @param TransferBatch 提现数据
 // @return interface{} 微信返回
 // @return error
-//
 func (conf WxConf) TransferBatch(TransferBatch *TransferBatch) (interface{}, error) {
 	wechatClient, err := clientInit(conf)
 	if err != nil {
@@ -73,7 +70,7 @@ func (conf WxConf) TransferBatch(TransferBatch *TransferBatch) (interface{}, err
 
 	transferBatchRequest.TransferDetailList = TransferDetailList
 
-	fmt.Printf("transferBatchRequest---------%v\n", transferBatchRequest)
+	transferLogger.Debug("transfer batch request", "request", transferBatchRequest)
 
 	svc := partnertransferbatch.TransferBatchApiService{Client: wechatClient}
 
@@ -116,10 +113,10 @@ func (conf WxConf) TransferBatch(TransferBatch *TransferBatch) (interface{}, err
 
 	if err != nil {
 		// 处理错误
-		log.Printf("call InitiateBatchTransfer err:%s", err)
+		transferLogger.Error("call InitiateBatchTransfer error", "error", err)
 	} else {
 		// 处理返回结果
-		log.Printf("status=%d resp=%s", apiResult.Response.StatusCode, resp)
+		transferLogger.Info("transfer batch success", "status", apiResult.Response.StatusCode, "response", resp)
 	}
 
 	transferRes, _ := ioutil.ReadAll(apiResult.Response.Body)
