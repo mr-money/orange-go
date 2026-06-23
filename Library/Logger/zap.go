@@ -1,7 +1,6 @@
 package Logger
 
 import (
-	"io"
 	"os"
 	"time"
 
@@ -85,31 +84,6 @@ func (c *colorCore) Sync() error {
 	return c.ws.Sync()
 }
 
-// syncWriteSyncer 包装 WriteSyncer，确保每次写入都同步
-type syncWriteSyncer struct {
-	ws     zapcore.WriteSyncer
-	closer io.Closer
-}
-
-func (s *syncWriteSyncer) Write(p []byte) (n int, err error) {
-	n, err = s.ws.Write(p)
-	if err == nil {
-		_ = s.ws.Sync()
-	}
-	return n, err
-}
-
-func (s *syncWriteSyncer) Sync() error {
-	return s.ws.Sync()
-}
-
-func (s *syncWriteSyncer) Close() error {
-	if s.closer == nil {
-		return nil
-	}
-	return s.closer.Close()
-}
-
 // localTimeEncoder 使用本地时区编码时间
 func localTimeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 	enc.AppendString(t.In(time.Local).Format("2006-01-02T15:04:05.000Z07:00"))
@@ -140,7 +114,8 @@ func getConsoleEncoder() zapcore.Encoder {
 	return zapcore.NewConsoleEncoder(encodeConfig)
 }
 
-// getLogWriter 获取指定文件的日志写入器（带自动同步）
+// getLogWriter 获取指定文件的日志写入器
+// 刷盘由 dailyWriteSyncer 的定时 Sync 统一管理，避免每次写入都触发 fsync
 func getLogWriter(filename string, maxsize, maxBackup, maxAge int) zapcore.WriteSyncer {
 	lumberJackLogger := &lumberjack.Logger{
 		Filename:   filename,
@@ -149,9 +124,7 @@ func getLogWriter(filename string, maxsize, maxBackup, maxAge int) zapcore.Write
 		MaxBackups: maxBackup,
 		Compress:   false,
 	}
-
-	ws := zapcore.AddSync(lumberJackLogger)
-	return &syncWriteSyncer{ws: ws, closer: lumberJackLogger}
+	return zapcore.AddSync(lumberJackLogger)
 }
 
 // createLogger 创建仅输出到文件的 Logger 实例

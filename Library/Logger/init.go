@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"go.uber.org/zap"
@@ -74,15 +75,22 @@ var (
 	TestLogger = MustModuleLogger("test")
 )
 
+// writerSlot 不可变结构体，通过 atomic.Pointer 实现无锁读取
+type writerSlot struct {
+	date   string
+	writer zapcore.WriteSyncer
+}
+
+// dailyWriteSyncer 实现跨天自动切分日志文件
+// 使用 atomic.Pointer 实现无锁快路径，仅在跨天时短暂加锁
 type dailyWriteSyncer struct {
 	module     string
 	maxSize    int
 	maxBackups int
 	maxAge     int
 
-	mu        sync.Mutex
-	writers   map[string]zapcore.WriteSyncer
-	lastDate  string
+	current   atomic.Pointer[writerSlot]
+	mu        sync.Mutex // 仅保护 rotate 操作
 	stopClean chan struct{}
 }
 
@@ -92,114 +100,91 @@ func newDailyWriteSyncer(module string, maxSize, maxBackups, maxAge int) *dailyW
 		maxSize:    maxSize,
 		maxBackups: maxBackups,
 		maxAge:     maxAge,
-		writers:    make(map[string]zapcore.WriteSyncer),
 		stopClean:  make(chan struct{}),
 	}
-	// 启动定时清理协程
-	go w.startCleanupRoutine()
+	go w.startSyncRoutine()
 	return w
 }
 
-func (w *dailyWriteSyncer) currentWriter() (zapcore.WriteSyncer, error) {
-	date := nowFunc().Format("20060102")
+// Write 实现 io.Writer，快路径无锁
+func (w *dailyWriteSyncer) Write(p []byte) (n int, err error) {
+	slot := w.current.Load()
+	today := nowFunc().Format("20060102")
 
+	// 快路径：日期未变，无锁写入
+	if slot != nil && slot.date == today {
+		return slot.writer.Write(p)
+	}
+
+	// 慢路径：跨天切分
+	return w.rotate(today, p)
+}
+
+// rotate 执行跨天切分，double-check 保证只执行一次
+func (w *dailyWriteSyncer) rotate(today string, p []byte) (int, error) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	// 检查日期是否变化
-	if w.lastDate != "" && w.lastDate != date {
-		// 关闭旧的写入器
-		if oldWriter, ok := w.writers[w.lastDate]; ok {
-			if closer, ok := oldWriter.(io.Closer); ok {
-				closer.Close()
-			}
-			delete(w.writers, w.lastDate)
+	// double-check：其他协程可能已经完成了切分
+	if slot := w.current.Load(); slot != nil && slot.date == today {
+		return slot.writer.Write(p)
+	}
+
+	// 创建新目录和写入器
+	dirPath := filepath.Join(logsBaseDir, today)
+	if err := os.MkdirAll(dirPath, 0755); err != nil {
+		return 0, err
+	}
+	filePath := filepath.Join(dirPath, w.module+".log")
+	newWriter := getLogWriter(filePath, w.maxSize, w.maxBackups, w.maxAge)
+
+	// Swap 原子替换，返回旧 writer
+	oldSlot := w.current.Swap(&writerSlot{date: today, writer: newWriter})
+
+	// 关闭旧 writer，刷盘剩余数据
+	if oldSlot != nil {
+		if closer, ok := oldSlot.writer.(io.Closer); ok {
+			closer.Close()
 		}
 	}
 
-	// 更新最后日期
-	w.lastDate = date
-
-	if writer, ok := w.writers[date]; ok {
-		return writer, nil
-	}
-
-	dirPath := filepath.Join(logsBaseDir, date)
-	if err := os.MkdirAll(dirPath, 0755); err != nil {
-		return nil, err
-	}
-
-	filePath := filepath.Join(dirPath, w.module+".log")
-	writer := getLogWriter(filePath, w.maxSize, w.maxBackups, w.maxAge)
-	w.writers[date] = writer
-	return writer, nil
+	return newWriter.Write(p)
 }
 
-// startCleanupRoutine 启动定时清理协程，定期检查并清理过期的写入器
-func (w *dailyWriteSyncer) startCleanupRoutine() {
-	ticker := time.NewTicker(1 * time.Hour)
+// Sync 刷盘当前 writer
+func (w *dailyWriteSyncer) Sync() error {
+	if slot := w.current.Load(); slot != nil {
+		return slot.writer.Sync()
+	}
+	return nil
+}
+
+// startSyncRoutine 定时刷盘，兼顾性能和数据安全
+func (w *dailyWriteSyncer) startSyncRoutine() {
+	ticker := time.NewTicker(3 * time.Second)
 	defer ticker.Stop()
 
 	for {
 		select {
 		case <-ticker.C:
-			w.cleanupOldWriters()
+			w.Sync()
 		case <-w.stopClean:
 			return
 		}
 	}
 }
 
-// cleanupOldWriters 清理过期的写入器（只保留当天的写入器）
-func (w *dailyWriteSyncer) cleanupOldWriters() {
-	w.mu.Lock()
-	defer w.mu.Unlock()
-
-	today := nowFunc().Format("20060102")
-	for date, writer := range w.writers {
-		if date != today {
-			if closer, ok := writer.(io.Closer); ok {
-				closer.Close()
-			}
-			delete(w.writers, date)
-		}
-	}
-}
-
-func (w *dailyWriteSyncer) Write(p []byte) (n int, err error) {
-	writer, err := w.currentWriter()
-	if err != nil {
-		return 0, err
-	}
-	return writer.Write(p)
-}
-
-func (w *dailyWriteSyncer) Sync() error {
-	writer, err := w.currentWriter()
-	if err != nil {
-		return err
-	}
-	return writer.Sync()
-}
-
+// Close 关闭当前 writer 并停止后台协程
 func (w *dailyWriteSyncer) Close() error {
-	// 停止定时清理协程
 	close(w.stopClean)
 
-	w.mu.Lock()
-	defer w.mu.Unlock()
-
-	var firstErr error
-	for date, writer := range w.writers {
-		if closer, ok := writer.(interface{ Close() error }); ok {
-			if err := closer.Close(); err != nil && firstErr == nil {
-				firstErr = err
-			}
+	if slot := w.current.Load(); slot != nil {
+		_ = slot.writer.Sync()
+		if closer, ok := slot.writer.(io.Closer); ok {
+			return closer.Close()
 		}
-		delete(w.writers, date)
 	}
-
-	return firstErr
+	return nil
 }
 
 // MustModuleLogger 根据模块创建日志（线程安全，每个模块独立logger）
