@@ -80,18 +80,24 @@ type dailyWriteSyncer struct {
 	maxBackups int
 	maxAge     int
 
-	mu      sync.Mutex
-	writers map[string]zapcore.WriteSyncer
+	mu        sync.Mutex
+	writers   map[string]zapcore.WriteSyncer
+	lastDate  string
+	stopClean chan struct{}
 }
 
 func newDailyWriteSyncer(module string, maxSize, maxBackups, maxAge int) *dailyWriteSyncer {
-	return &dailyWriteSyncer{
+	w := &dailyWriteSyncer{
 		module:     module,
 		maxSize:    maxSize,
 		maxBackups: maxBackups,
 		maxAge:     maxAge,
 		writers:    make(map[string]zapcore.WriteSyncer),
+		stopClean:  make(chan struct{}),
 	}
+	// 启动定时清理协程
+	go w.startCleanupRoutine()
+	return w
 }
 
 func (w *dailyWriteSyncer) currentWriter() (zapcore.WriteSyncer, error) {
@@ -99,6 +105,20 @@ func (w *dailyWriteSyncer) currentWriter() (zapcore.WriteSyncer, error) {
 
 	w.mu.Lock()
 	defer w.mu.Unlock()
+
+	// 检查日期是否变化
+	if w.lastDate != "" && w.lastDate != date {
+		// 关闭旧的写入器
+		if oldWriter, ok := w.writers[w.lastDate]; ok {
+			if closer, ok := oldWriter.(io.Closer); ok {
+				closer.Close()
+			}
+			delete(w.writers, w.lastDate)
+		}
+	}
+
+	// 更新最后日期
+	w.lastDate = date
 
 	if writer, ok := w.writers[date]; ok {
 		return writer, nil
@@ -113,6 +133,37 @@ func (w *dailyWriteSyncer) currentWriter() (zapcore.WriteSyncer, error) {
 	writer := getLogWriter(filePath, w.maxSize, w.maxBackups, w.maxAge)
 	w.writers[date] = writer
 	return writer, nil
+}
+
+// startCleanupRoutine 启动定时清理协程，定期检查并清理过期的写入器
+func (w *dailyWriteSyncer) startCleanupRoutine() {
+	ticker := time.NewTicker(1 * time.Hour)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ticker.C:
+			w.cleanupOldWriters()
+		case <-w.stopClean:
+			return
+		}
+	}
+}
+
+// cleanupOldWriters 清理过期的写入器（只保留当天的写入器）
+func (w *dailyWriteSyncer) cleanupOldWriters() {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	today := nowFunc().Format("20060102")
+	for date, writer := range w.writers {
+		if date != today {
+			if closer, ok := writer.(io.Closer); ok {
+				closer.Close()
+			}
+			delete(w.writers, date)
+		}
+	}
 }
 
 func (w *dailyWriteSyncer) Write(p []byte) (n int, err error) {
@@ -132,6 +183,9 @@ func (w *dailyWriteSyncer) Sync() error {
 }
 
 func (w *dailyWriteSyncer) Close() error {
+	// 停止定时清理协程
+	close(w.stopClean)
+
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
