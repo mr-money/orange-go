@@ -5,3 +5,4 @@ Logs
 .claude/
 AGENTS.md
 .codebase-memory/
+.codegraph/
