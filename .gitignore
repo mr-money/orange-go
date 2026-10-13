@@ -4,3 +4,4 @@ Config/*.yml
 Logs
 .claude/
 AGENTS.md
+.codebase-memory/
